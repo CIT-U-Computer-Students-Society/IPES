@@ -168,7 +168,7 @@ the dashboard route guard; a navigation regression covers this behavior.
 | Responsive browser sizes and live backend end-to-end | NOT RUN: browser checked at 1280×720; API responses were local fixtures, not a live service. |
 
 Node 24.14.0 and npm 11.13.0 were used on Windows. The development server emitted
-an existing PostCSS `from` warning; Vitest also recommends the non-SWC React
+a PostCSS `from` warning; Vitest also recommends the non-SWC React
 plugin. These do not fail validation.
 
 The tooling-layer production build measured 69.05 kB CSS and 1,919.71 kB
