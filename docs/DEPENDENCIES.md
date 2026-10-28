@@ -41,7 +41,10 @@ remain locked. Package count reductions primarily
 affect installation and maintenance; no production bundle size improvement is
 claimed without a successful comparable build.
 
-## Retained packages
+## Retained packages after pruning
+
+This section records the first stack layer. The Mantine migration below describes
+the current UI dependencies.
 
 - Radix/shadcn primitives, Tailwind, Lucide, and the class utilities support active
   UI components. The application uses Sonner as its single toast system.
@@ -113,19 +116,64 @@ warnings. `npm run build` succeeds; Vite still reports the large initial chunk
 (1,919.71 kB JavaScript, 428.48 kB gzip). The production build is now available
 for the Mantine layer's interaction and visual checks.
 
-## UI library candidate
+## Mantine migration
 
-Mantine is the strongest candidate for a future consolidated UI stack in this
-application. Its [core package](https://mantine.dev/getting-started/) supplies
-inputs, buttons, and overlays, with optional packages for dates and notifications.
-Its [theme provider](https://mantine.dev/theming/color-schemes/) manages light,
-dark, and system color schemes. Those capabilities could replace the current
-Radix wrappers and theme integration under one component system.
+The third stack layer replaces the remaining 13 Radix packages,
+`class-variance-authority`, `next-themes`, and `sonner` with exact versions of
+`@mantine/core`, `@mantine/hooks`, and `@mantine/notifications` at 9.7.4. The
+application now has 18 runtime and 21 development dependencies, with 384 lockfile
+package entries (excluding the root). A normal clean install adds 327 packages
+on Windows; platform-specific optional packages explain the different count.
+Four retained Floating UI transitive packages update to satisfy the new overlay
+dependencies; the migration does not preserve their former Radix-era versions.
 
-This is a maintenance recommendation, not a measured performance claim.
-[Mantine Charts](https://mantine.dev/charts/getting-started/) still requires
-Recharts, and a migration would involve component, styling, and interaction
-changes. Keep the current pruned stack until that work is justified. Evaluate a
-small representative screen with a dialog, select, table, theme toggle, and form
-validation before deciding. Retain React Hook Form/Zod unless the repository's
-form convention is explicitly changed.
+Shared modules in `src/components/ui/` adapt the page composition to Mantine
+buttons, inputs, cards, tables, tabs, avatars, progress, skeletons, switches,
+radios, selects, menus, and modals. Mantine handles interactive behavior and focus.
+Destructive confirmations use named modal dialogs with cancel-first focus and
+outside-click dismissal disabled. Evaluation scores use Mantine radio cards,
+including visible checked state and disabled behavior.
+
+The root [theme provider](https://mantine.dev/theming/color-schemes/) keeps the
+existing `theme` preference for light/dark mode and defaults to the system scheme.
+It bridges the computed scheme to the page layout's `.dark` selector. Navy and
+amber branding remain; dark primary text uses a lighter shade for contrast.
+Notifications preserve titles, descriptions, durations, and success/error colors.
+The obsolete shadcn generator configuration and unused tooltip/toast wrappers
+are removed.
+
+Tailwind still handles page layout utilities. Mantine's layered styles load in
+`main.tsx`, after the explicit layer order in `styles/layers.css`; keep the
+library CSS outside the Tailwind compilation entry. React Hook Form, Zod, and
+their adapter remain the form convention, with refs and validation ARIA tested.
+Recharts, dnd-kit, Lucide, and dotLottie retain their existing responsibilities.
+API hooks and backend behavior are unchanged.
+
+Browser QA also exposed an organization-entry loop: updating the provider
+recreated its cleanup callback, rerunning the selector's effect and clearing the
+selected organization. Stabilizing that callback preserves the selection through
+the dashboard route guard; a navigation regression covers this behavior.
+
+### Migration verification (October 29, 2026)
+
+| Check | Observed result |
+| --- | --- |
+| `npm ci --no-audit --no-fund` | PASS: 327 packages; no peer overrides, lifecycle scripts enabled. |
+| Activated backend: `python manage.py test` | PASS: 19 tests on SQLite. Existing unordered-pagination warning remains. |
+| `npm run test -- --run` | PASS: 23 tests in 5 files, including 11 Mantine interaction regressions and organization entry. |
+| `npm run lint` | PASS: zero errors, two existing mixed-export Fast Refresh warnings in the form helper and organization context. |
+| `npx tsc -p tsconfig.app.json --noEmit` | PASS. |
+| `npm run build` | PASS; existing large JavaScript chunk warning remains. See measured assets below. |
+| Browser with local mocked API data | PASS: admin/member sign-in and organization entry, user filtering/menu/removal cancellation, form creation/editor transition, notifications, light/dark styling, rating selection and completion progress. No browser console warnings/errors observed. |
+| Responsive browser sizes and live backend end-to-end | NOT RUN: browser checked at 1280×720; API responses were local fixtures, not a live service. |
+
+Node 24.14.0 and npm 11.13.0 were used on Windows. The development server emitted
+an existing PostCSS `from` warning; Vitest also recommends the non-SWC React
+plugin. These do not fail validation.
+
+The tooling-layer production build measured 69.05 kB CSS and 1,919.71 kB
+JavaScript (428.48 kB gzip). With Mantine's full styles, the migration measures
+307.44 kB CSS (46.50 kB gzip) and 1,921.43 kB JavaScript (427.17 kB gzip).
+The larger CSS is an explicit migration tradeoff; fewer installed packages do
+not imply a smaller production bundle. Route splitting and selective CSS imports
+can be evaluated separately with visual regression coverage.
