@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -454,6 +454,7 @@ const AdminUsers = () => {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar>
+                              <AvatarImage src={user.display_picture || undefined} alt={`${user.first_name} ${user.last_name}'s profile picture`} />
                               <AvatarFallback className="bg-primary/10 text-primary">
                                 {user.first_name[0]}{user.last_name[0]}
                               </AvatarFallback>

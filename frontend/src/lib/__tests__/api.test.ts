@@ -67,4 +67,21 @@ describe('API Utility', () => {
             })
         );
     });
+
+    it('sends multipart data unchanged while preserving authentication and CSRF headers', async () => {
+        localStorage.setItem('authToken', 'test-token');
+        localStorage.setItem('activeOrganizationId', '111');
+        document.cookie = 'csrftoken=test-csrf-token';
+        vi.mocked(globalThis.fetch).mockResolvedValue({ ok: true } as Response);
+        const payload = new FormData();
+        payload.append('display_picture', new File(['image'], 'avatar.png', { type: 'image/png' }));
+        await api.patch('/auth/me/', payload);
+        const options = vi.mocked(globalThis.fetch).mock.calls[0][1];
+        expect(options.body).toBe(payload);
+        const headers = new Headers(options.headers);
+        expect(headers.has('Content-Type')).toBe(false);
+        expect(headers.get('Authorization')).toBe('Token test-token');
+        expect(headers.get('X-CSRFToken')).toBe('test-csrf-token');
+        expect(headers.get('X-Organization-Id')).toBe('111');
+    });
 });
