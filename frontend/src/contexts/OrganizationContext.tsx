@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 interface OrganizationContextType {
     activeOrganizationId: number | null;
@@ -22,10 +22,10 @@ export const OrganizationProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [activeOrganizationId]);
 
-    const clearOrganizationState = () => {
+    const clearOrganizationState = useCallback(() => {
         setActiveOrganizationId(null);
         localStorage.removeItem('activeOrganizationId');
-    };
+    }, []);
 
     return (
         <OrganizationContext.Provider value={{ activeOrganizationId, setActiveOrganizationId, clearOrganizationState }}>
