@@ -36,7 +36,7 @@ jobs:
     permissions:
       contents: write
       issues: write
-      pull-requests: read
+      pull-requests: write
     steps:
       - name: Checkout promoted history
         uses: actions/checkout@v7
@@ -46,7 +46,8 @@ jobs:
       - name: Publish component releases promoted to main
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          # Publication and PR labels use this job's explicit permissions.
+          github-token: ${{ github.token }}
           script: |
             const publish = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/publish-releases.cjs`);
             await publish({ github, context, core });
