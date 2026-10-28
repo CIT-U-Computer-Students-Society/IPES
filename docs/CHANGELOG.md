@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.1...docs-v1.0.2) (2026-10-28)
+
+
+### Documentation
+
+* **web:** clarify observed development warning ([4e61fb2](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/4e61fb2051eed0e1575a493b2f039b060fb5abf5))
+* **web:** document Mantine conventions and migration evidence ([5f45cec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/5f45cecedd43e97679ba4762a6aba49a96e897e9))
+* **web:** record dependency audit and validation results ([4228369](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/4228369a9eab40d15a6acdcc7708d633aca90657))
+* **web:** record validation compatibility repairs ([a4a4cec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/a4a4cec5272c2532d8fa19ddbd31c4cb676d9e4a))
+
 ## [1.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.0...docs-v1.0.1) (2026-10-28)
 
 
