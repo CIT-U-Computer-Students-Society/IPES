@@ -1,9 +1,13 @@
-import { useState, useEffect } from "react";
+import { RouteLoading } from "@/components/RouteLoading";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { useMediaQuery } from "@mantine/hooks";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+const DotLottieReact = lazy(() => import("@lottiefiles/dotlottie-react").then((module) => ({ default: module.DotLottieReact })));
+
 export default function AuthLayout() {
+  const showAnimation = useMediaQuery("(min-width: 1024px)");
   const [currentOrg, setCurrentOrg] = useState(0);
 
   const organizations = [
@@ -59,16 +63,20 @@ export default function AuthLayout() {
         {/* Middle Content - Adaptive Lottie Animation */}
         <div className="flex-1 flex items-center justify-center min-h-0 pointer-events-none relative z-10 px-6">
           <div className="w-full h-full max-w-[600px] max-h-[600px]">
-            <DotLottieReact
-              src="/assets/anim_getthingsdone.json"
-              loop
-              autoplay
-              aria-hidden
-              className="w-full h-full object-contain transition-opacity duration-700"
-              renderConfig={{
-                autoResize: true
-              }}
-            />
+            {showAnimation && (
+              <Suspense fallback={null}>
+                <DotLottieReact
+                  src="/assets/anim_getthingsdone.json"
+                  loop
+                  autoplay
+                  aria-hidden
+                  className="w-full h-full object-contain transition-opacity duration-700"
+                  renderConfig={{
+                    autoResize: true
+                  }}
+                />
+              </Suspense>
+            )}
           </div>
         </div>
 
@@ -109,7 +117,9 @@ export default function AuthLayout() {
           <ThemeToggle />
         </div>
         
-        <Outlet />
+        <Suspense fallback={<RouteLoading />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   );
