@@ -89,3 +89,10 @@ We follow the Conventional Commits specification to maintain a clean git history
 - **Run Local Verification**: Before committing or pushing, verify that backend and frontend test suites pass:
   - Run `python manage.py test` inside `backend/`.
   - Run `npm run test` inside `frontend/`.
+
+## Component releases
+
+Release Please prepares separate web, backend, and documentation release PRs into
+`dev`. After those PRs are reviewed and merged, promote `dev` to `main` with a merge
+commit to publish their independent tags and GitHub releases. See the
+[release guide](RELEASING.md) for setup, changelogs, validation, and recovery.
