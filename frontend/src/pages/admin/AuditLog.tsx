@@ -212,7 +212,7 @@ const AuditLog = () => {
                           const titleMatch = inside.match(/(?:^|,\s*)(?:title|name)\s*=\s*([^,]+)/i);
                           if (titleMatch) {
                             let title = titleMatch[1].trim();
-                            title = title.replace(/^['\"]|['\"]$/g, '');
+                            title = title.replace(/^['"]|['"]$/g, '');
                             return formatted.replace(/\s*\(.*\)\s*$/, ` (${title})`);
                           } else if (!inside.includes('=')) {
                             return formatted.replace(/\s*\(.*\)\s*$/, ` (${inside.trim()})`);

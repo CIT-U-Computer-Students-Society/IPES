@@ -45,7 +45,7 @@ const AdminAccomplishments = () => {
   const { activeOrganizationId } = useOrganizationState();
   const { data: accomplishments = [], isLoading } = useAccomplishments({
     organization_id: activeOrganizationId
-  } as any);
+  });
 
   const verifyAccomplishment = useVerifyAccomplishment();
 

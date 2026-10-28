@@ -3,6 +3,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Membership } from '../useUsers';
+import type { JoinRequest } from './types';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
@@ -16,7 +18,7 @@ export const usePendingJoinRequests = (organizationId?: number) => {
     queryFn: async () => {
       if (!effectiveOrgId) return [];
       const response = await api.get(`/join-requests/?organization_id=${effectiveOrgId}&status=Pending`);
-      const data = await response.json();
+      const data = await response.json() as JoinRequest[] | { results: JoinRequest[] };
       return Array.isArray(data) ? data : data.results || [];
     },
     enabled: !!effectiveOrgId
@@ -58,7 +60,7 @@ export const useRejectJoinRequest = () => {
 export const useUpdateMembership = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<{ message: string }, Error, { id: number; data: Partial<any> }>({
+  return useMutation<{ message: string }, Error, { id: number; data: Partial<Membership> }>({
     mutationFn: async ({ id, data }) => {
       const response = await api.patch(`/memberships/${id}/`, data);
       return response.json();

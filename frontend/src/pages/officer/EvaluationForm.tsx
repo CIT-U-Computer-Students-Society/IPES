@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { formatApiError } from "@/lib/api";
+import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeft, User, Trophy, Save, Send, Clock, ChevronRight, AlertCircle, Building2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,11 +84,10 @@ const EvaluationForm = () => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [textAnswers, setTextAnswers] = useState<Record<number, string>>({});
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [initializedAssignmentId, setInitializedAssignmentId] = useState<string | null>(null);
 
   // Sync incoming responses initially
-  useEffect(() => {
-    if (responses && questions && !isInitialized) {
+  if (id && responses && questions && initializedAssignmentId !== id) {
       const initialAnswers: Record<number, string> = {};
       const initialTexts: Record<number, string> = {};
 
@@ -101,9 +101,8 @@ const EvaluationForm = () => {
       });
       setAnswers(initialAnswers);
       setTextAnswers(initialTexts);
-      setIsInitialized(true);
-    }
-  }, [responses, questions, isInitialized]);
+      setInitializedAssignmentId(id);
+  }
 
   // Loading and Error States
   if (aLoading || qLoading || rLoading || !assignment || !questions) {
@@ -151,7 +150,7 @@ const EvaluationForm = () => {
 
   const formatPayload = () => {
     return questions.map((q) => {
-      const resp: any = { question_id: q.id };
+      const resp: { question_id: number; score_value?: number; text?: string } = { question_id: q.id };
       if (answers[q.id]) {
         resp.score_value = Number(answers[q.id]);
       }
@@ -172,10 +171,10 @@ const EvaluationForm = () => {
         title: "Draft Saved",
         description: "Your recent answers have been saved securely.",
       });
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Error Saving Draft",
-        description: err.message || "Something went wrong.",
+        description: formatApiError(err),
         variant: "destructive"
       });
     }
@@ -220,10 +219,10 @@ const EvaluationForm = () => {
       });
       setShowSubmitDialog(false);
       navigate(`${basePath}evaluations`);
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Submission Error",
-        description: err.message || "Failed to submit evaluation.",
+        description: formatApiError(err),
         variant: "destructive"
       });
     }

@@ -188,7 +188,7 @@ const OfficerAccomplishments = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
-                <Select value={newAccomplishment.type} onValueChange={(val: any) => setNewAccomplishment(prev => ({ ...prev, type: val }))}>
+                <Select value={newAccomplishment.type} onValueChange={(val) => setNewAccomplishment(prev => ({ ...prev, type: val as Accomplishment['type'] }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -282,7 +282,7 @@ const OfficerAccomplishments = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-type">Type</Label>
-                  <Select value={editingAccomplishment.type} onValueChange={(val: any) => setEditingAccomplishment(prev => prev ? { ...prev, type: val } : null)}>
+                  <Select value={editingAccomplishment.type} onValueChange={(val) => setEditingAccomplishment(prev => prev ? { ...prev, type: val as Accomplishment['type'] } : null)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>

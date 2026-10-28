@@ -58,7 +58,7 @@ export const useOrganization = (organizationId?: number) => {
 export const useCreateOrganization = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<any, Error, { name: string; code: string; description: string; period_year_start: string; period_year_end?: string }>({
+  return useMutation<Response, Error, { name: string; code: string; description: string; period_year_start: string; period_year_end?: string }>({
     mutationFn: async (data) => {
       const result = await api.post('/organizations/', data);
       return result;
@@ -74,7 +74,7 @@ export const useCreateOrganization = () => {
 export const useUpdateOrganization = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<any, Error, { id: number; data: Partial<{ name: string; code: string; description: string; email: string }> }>({
+  return useMutation<Organization, Error, { id: number; data: Partial<{ name: string; code: string; description: string; email: string }> }>({
     mutationFn: async ({ id, data }) => {
       const response = await api.patch(`/organizations/${id}/`, data);
       return response.json();

@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/api";
 import React from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useCurrentUser, Membership, useLogout } from '@/hooks/useUsers';
@@ -55,7 +56,7 @@ const SelectOrganization = () => {
     const joinOrgMutation = useJoinOrganization();
 
     // Moved BEFORE the early return - hooks must always be called in the same order
-    const memberships = user?.memberships || [];
+    const memberships = React.useMemo(() => user?.memberships || [], [user?.memberships]);
 
     // Group memberships by organization
     const groupedOrgs = React.useMemo(() => {
@@ -115,8 +116,8 @@ const SelectOrganization = () => {
                     description: `${createForm.name} was set up successfully.`,
                 });
             },
-            onError: (err: any) => {
-                const errorMessage = err.data?.error || err.data?.code?.[0] || err.message || "Ensure your code is unique and try again.";
+            onError: (err) => {
+                const errorMessage = formatApiError(err);
                 toast.error("Failed to create organization", {
                     description: errorMessage,
                 });
@@ -135,8 +136,8 @@ const SelectOrganization = () => {
                     description: "Waiting for Admin approval.",
                 });
             },
-            onError: (err: any) => {
-                const errorMessage = err.data?.error || err.message || "Ensure the code is correct.";
+            onError: (err) => {
+                const errorMessage = formatApiError(err);
                 toast.error("Failed to submit join request", {
                     description: errorMessage,
                 });

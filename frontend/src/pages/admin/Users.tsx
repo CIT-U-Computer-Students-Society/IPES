@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/api";
 import { useState } from "react";
 import {
   Users,
@@ -82,6 +83,59 @@ const POSITIONS = [
 import { useOrganizationState } from "@/contexts/OrganizationContext";
 import { useUpdateMembership, useOrganizationUnits, usePositionTypes, useCreateMembership, useRemoveMember, useSetMemberRole } from "@/hooks/useOrganizations";
 
+const StatsSkeleton = () => (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {[1, 2, 3, 4].map((i) => (
+      <Card key={i}>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-10 h-10 rounded-lg" />
+            <div>
+              <Skeleton className="h-8 w-12 mb-1" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+);
+
+// Loading skeleton for table
+const TableSkeleton = () => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHead>User</TableHead>
+        <TableHead>Role</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead>Org Unit / Position</TableHead>
+        <TableHead className="text-right">Actions</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <TableRow key={i}>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div>
+                <Skeleton className="h-4 w-32 mb-1" />
+                <Skeleton className="h-3 w-40" />
+              </div>
+            </div>
+          </TableCell>
+          <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+          <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+);
+
+
 const AdminUsers = () => {
   const { activeOrganizationId } = useOrganizationState();
   const { data: currentUser } = useCurrentUser();
@@ -157,10 +211,10 @@ const AdminUsers = () => {
         description: "Role added successfully",
       });
       setFormData({ unit_id: undefined, position_id: undefined });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.data?.error || "Failed to add role",
+        description: formatApiError(error),
         variant: "destructive",
       });
     }
@@ -254,57 +308,6 @@ const AdminUsers = () => {
       setUserToRemove(null);
     }
   };
-  const StatsSkeleton = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[1, 2, 3, 4].map((i) => (
-        <Card key={i}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Skeleton className="w-10 h-10 rounded-lg" />
-              <div>
-                <Skeleton className="h-8 w-12 mb-1" />
-                <Skeleton className="h-4 w-20" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-
-  // Loading skeleton for table
-  const TableSkeleton = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>User</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Org Unit / Position</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <TableRow key={i}>
-            <TableCell>
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-10 h-10 rounded-full" />
-                <div>
-                  <Skeleton className="h-4 w-32 mb-1" />
-                  <Skeleton className="h-3 w-40" />
-                </div>
-              </div>
-            </TableCell>
-            <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-            <TableCell><Skeleton className="h-6 w-16" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-            <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
 
   return (
     <div className="space-y-6">
@@ -480,7 +483,7 @@ const AdminUsers = () => {
                         <TableCell className="text-muted-foreground text-sm">
                           {activeMemberships.length === 0 ? "Unassigned" : (
                             <div className="space-y-2">
-                              {activeMemberships.map((m: any, idx: number) => (
+                              {activeMemberships.map((m, idx: number) => (
                                 <div key={idx} className="leading-tight">
                                   {m.unit_name}
                                   <br />
@@ -602,7 +605,7 @@ const AdminUsers = () => {
                       <SelectValue placeholder="Select unit..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {units?.map((unit: any) => (
+                      {units?.map((unit) => (
                         <SelectItem key={unit.id} value={unit.id.toString()}>
                           {unit.name}
                         </SelectItem>
@@ -620,7 +623,7 @@ const AdminUsers = () => {
                       <SelectValue placeholder="Select position..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {positions?.map((pos: any) => (
+                      {positions?.map((pos) => (
                         <SelectItem key={pos.id} value={pos.id.toString()}>
                           {pos.name}
                         </SelectItem>

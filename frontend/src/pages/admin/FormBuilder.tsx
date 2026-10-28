@@ -334,7 +334,7 @@ const AdminFormBuilder = () => {
       // Add a tempId to any question that doesn't have an id, so dnd-kit has a stable identifier
       const questionsWithIds = formQuestions.map(q => ({
         ...q,
-        tempId: q.id ? undefined : `temp-${Math.random().toString(36).substring(2, 9)}`
+        tempId: q.id ? undefined : `temp-${crypto.randomUUID()}`
       }));
       setLocalQuestions(questionsWithIds);
       setDeletedQuestionIds([]); // Reset deletions when switching forms
@@ -625,7 +625,7 @@ const AdminFormBuilder = () => {
       is_required: true,
       min_value: (type === 'rating' || type === 'number') ? 1 : undefined,
       max_value: type === 'rating' ? 5 : (type === 'number' ? 100 : undefined),
-      tempId: `temp-${Math.random().toString(36).substring(2, 9)}`,
+      tempId: `temp-${crypto.randomUUID()}`,
     }]);
   };
 
