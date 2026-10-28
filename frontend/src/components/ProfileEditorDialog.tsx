@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, Mail, Building2, Shield, Save, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCurrentUser, useUpdateCurrentUser } from "@/hooks/useUsers";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 
 export function ProfileEditorDialog({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = useState(false);
@@ -27,7 +27,10 @@ export function ProfileEditorDialog({ children }: { children: React.ReactNode })
         last_name: "",
     });
 
-    useEffect(() => {
+    const [formSource, setFormSource] = useState({ user, open });
+    // Synchronize before rendering instead of painting stale values and then resetting in an effect.
+    if (formSource.user !== user || formSource.open !== open) {
+        setFormSource({ user, open });
         if (user && open) {
             setFormData({
                 first_name: user.first_name || "",
@@ -35,7 +38,7 @@ export function ProfileEditorDialog({ children }: { children: React.ReactNode })
             });
             setIsEditing(false); // Reset edit state when opening dialog
         }
-    }, [user, open]);
+    }
 
     if (isUserLoading || !user) {
         return (

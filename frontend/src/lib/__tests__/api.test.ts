@@ -1,12 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { api, getApiUrl } from '../api';
+import { api, ApiError, formatApiError, getApiUrl } from '../api';
 
 const MOCK_API_URL = 'http://localhost:8000/api';
+
+describe('API error formatting used by mutation handlers', () => {
+    it.each([
+        [{ rank: ['Already assigned'] }, 'rank: Already assigned'],
+        [{ non_field_errors: ['Invalid credentials'] }, 'Invalid credentials'],
+        [{ detail: 'Membership unavailable' }, 'Membership unavailable'],
+    ])('preserves structured API error messages', (data, expected) => {
+        expect(formatApiError(new ApiError(400, 'Bad Request', data))).toBe(expected);
+    });
+
+    it('handles network errors and unknown thrown values', () => {
+        expect(formatApiError(new Error('Connection lost'))).toBe('Connection lost');
+        expect(formatApiError(null)).toBe('An unexpected error occurred.');
+    });
+});
 
 describe('API Utility', () => {
     beforeEach(() => {
         vi.unstubAllGlobals();
-        global.fetch = vi.fn();
+        globalThis.fetch = vi.fn();
         localStorage.clear();
         document.cookie = '';
     });
@@ -21,11 +36,11 @@ describe('API Utility', () => {
         document.cookie = 'csrftoken=test-csrf-token';
         
         const mockResponse = { ok: true, json: () => Promise.resolve({ success: true }) };
-        (global.fetch as any).mockResolvedValue(mockResponse);
+        vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as Response);
 
         await api.get('/test-endpoint');
 
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(globalThis.fetch).toHaveBeenCalledWith(
             expect.any(String),
             expect.objectContaining({
                 headers: expect.objectContaining({
@@ -39,11 +54,11 @@ describe('API Utility', () => {
         localStorage.setItem('activeOrganizationId', '111');
         
         const mockResponse = { ok: true, json: () => Promise.resolve({ success: true }) };
-        (global.fetch as any).mockResolvedValue(mockResponse);
+        vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as Response);
 
         await api.get('/test-endpoint'); // not auth/login so it should attach
 
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(globalThis.fetch).toHaveBeenCalledWith(
             expect.any(String),
             expect.objectContaining({
                 headers: expect.objectContaining({

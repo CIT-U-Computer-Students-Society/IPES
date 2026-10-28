@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 interface LoginResponse {
   user: {
@@ -51,19 +51,19 @@ const Login = () => {
 
       // Redirect to Organization Selector Hub with replace to prevent back navigation
       navigate("/select-organization", { replace: true });
-    } catch (err: any) {
+    } catch (err) {
       console.error('Login error:', err);
       let errorMsg = "";
 
-      if (err.name === 'ApiError' && err.data) {
-        const errorData = err.data as any; // Cast to any to access properties
+      if (err instanceof ApiError && err.data && typeof err.data === 'object') {
+        const errorData = err.data as { message?: string; errors?: Record<string, string | string[]> };
 
         // Handle field-specific errors if available
         if (errorData.errors) {
           const newFieldErrors: Record<string, string[]> = {};
           let hasFieldErrors = false;
 
-          Object.entries(errorData.errors).forEach(([field, msgs]: [string, any]) => {
+          Object.entries(errorData.errors).forEach(([field, msgs]) => {
             if (field === 'non_field_errors') {
               // Collect non-field errors to show in the main alert
               const nonFieldMsgs = Array.isArray(msgs) ? msgs.join('; ') : msgs;

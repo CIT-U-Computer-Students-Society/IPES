@@ -16,7 +16,7 @@ export default function AuthLayout() {
       setCurrentOrg((prev) => (prev + 1) % organizations.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [organizations.length]);
 
 
   return (

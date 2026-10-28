@@ -44,7 +44,7 @@ IPES/
 │   └── sample.env
 ├── frontend/                    # React 18 + TypeScript SPA (Vite)
 │   ├── src/
-│   │   ├── components/          # Reusable UI (shadcn/ui + custom)
+│   │   ├── components/          # Reusable UI (Mantine adapters + custom)
 │   │   ├── contexts/            # OrganizationContext (global org state)
 │   │   ├── hooks/               # TanStack Query hooks per API domain
 │   │   ├── lib/api.ts           # Centralized fetch client
@@ -81,7 +81,7 @@ IPES/
 |---|---|
 | Framework | React 18 + TypeScript |
 | Build tool | Vite 7 |
-| Styling | TailwindCSS + shadcn/ui (Radix UI) |
+| Styling | Mantine 9 + TailwindCSS page layouts |
 | Data fetching | TanStack React Query |
 | Routing | React Router v6 |
 | Forms | React Hook Form + Zod validation |
@@ -180,7 +180,7 @@ npm run build
    - `/admin/*` — Admin-facing views (Admin layout)
    - `/admin/my-*` — Admin users accessing their own member views
 
-5. **UI Components**: Use shadcn/ui primitives from `frontend/src/components/ui/` before creating new components. Custom components live in `frontend/src/components/`.
+5. **UI Components**: Use Mantine components through the shared adapters in `frontend/src/components/ui/` before creating new components. New UI should use Mantine; keep overlay focus, selection, keyboard navigation, and disabled behavior in its primitives. Theme and notifications are provided once at the application root. Custom components live in `frontend/src/components/`.
 
 6. **Validation**: Use **Zod** for all form schemas and **React Hook Form** for form state. Do not add ad-hoc validation logic outside of schema definitions.
 

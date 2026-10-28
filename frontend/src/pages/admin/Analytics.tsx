@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   BarChart3,
   TrendingUp,
@@ -36,11 +36,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useForms, useFormAnalytics } from "@/hooks/useEvaluations";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 
 const AdminAnalytics = () => {
   const { data: forms, isLoading: isLoadingForms } = useForms(); // Fetch all forms for the org
-  const [selectedFormId, setSelectedFormId] = useState<string>("all");
+  const [chosenFormId, setSelectedFormId] = useState<string>("all");
 
 
   const availableForms = (forms || []).filter(form => {
@@ -51,14 +51,8 @@ const AdminAnalytics = () => {
     return true;
   });
 
-  useEffect(() => {
-    // Attempt to set a default form if available
-    if (availableForms.length > 0 && selectedFormId === "all") {
-      // Find the most recently created or active one
-      const defaultForm = availableForms.find(f => f.is_active) || availableForms[0];
-      setSelectedFormId(defaultForm.id.toString());
-    }
-  }, [availableForms, selectedFormId]);
+  const defaultForm = availableForms.find(f => f.is_active) || availableForms[0];
+  const selectedFormId = chosenFormId === "all" && defaultForm ? String(defaultForm.id) : chosenFormId;
 
   const formIdToFetch = selectedFormId !== "all" ? parseInt(selectedFormId) : undefined;
 

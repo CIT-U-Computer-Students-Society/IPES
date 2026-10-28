@@ -12,7 +12,7 @@ This guide details the steps to set up, configure, and run the Individual Perfor
 - Database (PostgreSQL / Supabase Postgres)
 
 ### Frontend
-- Node.js 18+ and npm (or yarn/pnpm/bun)
+- Node.js 24 and npm (the dependency audit used Node.js 24.14.0)
 - Modern web browser
 
 ---
@@ -69,6 +69,11 @@ Install frontend dependencies:
 ```bash
 npm install
 ```
+
+`frontend/package-lock.json` is the maintained dependency lockfile. Use npm for
+dependency changes and commit both `package.json` and `package-lock.json`.
+See the [dependency audit](DEPENDENCIES.md) for the retained UI stack and known
+installation/build compatibility issues.
 
 Create frontend environment file:
 ```bash
