@@ -31,6 +31,7 @@ export {
   useUpdateForm,
   useDeleteForm,
   useFormAnalytics,
+  useExportFormAnalytics,
 } from './evaluations/useFormHooks';
 
 // Assignment rule hooks

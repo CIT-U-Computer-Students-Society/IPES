@@ -19,8 +19,8 @@ def auto_assign_on_membership_activation(sender, instance, created, **kwargs):
     org = instance.unit_id.organization_id
     forms = EvaluationForm.objects.filter(
         organization_id=org,
-        is_active=True
-    ).prefetch_related('assignment_rules')
+        is_active=True, is_deleted=False, results_released=False,
+    ).prefetch_related('assignment_rules__evaluator_unit', 'assignment_rules__evaluator_position', 'assignment_rules__evaluatee_unit', 'assignment_rules__evaluatee_position')
 
     for form in forms:
         rules = form.assignment_rules.all()
@@ -43,47 +43,10 @@ def auto_assign_on_membership_activation(sender, instance, created, **kwargs):
 
 
 def _apply_rule_for_single_evaluator(rule, form, ev_user):
-    """Create assignments where ev_user is evaluator, for all matching evaluatees."""
-    from apps.evaluations.models import EvaluationAssignment
-
-    evaluatees = _get_memberships_for_side(rule.evaluatee_unit, rule.evaluatee_position, form)
-    for ee_membership in evaluatees:
-        ee_user = ee_membership.user_id
-        if rule.exclude_self and ev_user == ee_user:
-            continue
-        EvaluationAssignment.objects.get_or_create(
-            evaluator_id=ev_user,
-            evaluatee_id=ee_user,
-            form_id=form,
-            defaults={'status': 'Pending'}
-        )
+    from apps.evaluations.services import generate_rule_assignments
+    generate_rule_assignments(rule, form, evaluator_id=ev_user.pk)
 
 
 def _apply_rule_for_single_evaluatee(rule, form, ee_user):
-    """Create assignments where ee_user is evaluatee, for all matching evaluators."""
-    from apps.evaluations.models import EvaluationAssignment
-
-    evaluators = _get_memberships_for_side(rule.evaluator_unit, rule.evaluator_position, form)
-    for ev_membership in evaluators:
-        ev_user = ev_membership.user_id
-        if rule.exclude_self and ev_user == ee_user:
-            continue
-        EvaluationAssignment.objects.get_or_create(
-            evaluator_id=ev_user,
-            evaluatee_id=ee_user,
-            form_id=form,
-            defaults={'status': 'Pending'}
-        )
-
-
-def _get_memberships_for_side(unit, position, form):
-    """Return active Memberships matching the given unit/position filters within the form's org."""
-    qs = Membership.objects.filter(
-        unit_id__organization_id=form.organization_id,
-        is_active=True,
-    ).select_related('user_id')
-    if unit:
-        qs = qs.filter(unit_id=unit)
-    if position:
-        qs = qs.filter(position_id=position)
-    return qs
+    from apps.evaluations.services import generate_rule_assignments
+    generate_rule_assignments(rule, form, evaluatee_id=ee_user.pk)

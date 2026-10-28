@@ -2,8 +2,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.utils import timezone
-from apps.evaluations.models import EvaluationForm, Question
-from apps.organizations.models import Organization
+from apps.evaluations.models import EvaluationForm
+from apps.organizations.models import Organization, OrganizationRole
 from apps.users.models import User
 
 class EvaluationViewSetTest(APITestCase):
@@ -14,6 +14,8 @@ class EvaluationViewSetTest(APITestCase):
         self.org = Organization.objects.create(
             name='Test Org', code='ORG1', period_year_start=timezone.now().date(), is_active=True
         )
+        OrganizationRole.objects.create(user=self.user, organization=self.org, role='Admin')
+        self.client.credentials(HTTP_X_ORGANIZATION_ID=str(self.org.pk))
         
         self.form = EvaluationForm.objects.create(
             organization_id=self.org,

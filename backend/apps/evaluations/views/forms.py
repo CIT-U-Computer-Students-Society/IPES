@@ -5,7 +5,8 @@ EvaluationForm ViewSet — CRUD, lifecycle actions, and analytics.
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response as DRFResponse
-from django.db import models
+from django.db import transaction
+from apps.organizations.access import active_organization, EvaluationOrganizationPermission, require_organization_admin
 
 from django.contrib.auth import get_user_model
 
@@ -13,7 +14,7 @@ from apps.audit.utils import log_action, AuditActions
 
 User = get_user_model()
 
-from ..models import EvaluationForm, Question, EvaluationAssignment, Response
+from ..models import EvaluationForm, Question, EvaluationAssignment
 from ..serializers import (
     EvaluationFormSerializer,
     EvaluationFormCreateSerializer,
@@ -26,7 +27,7 @@ from .analytics import compute_form_analytics
 class EvaluationFormViewSet(viewsets.ModelViewSet):
     """ViewSet for EvaluationForm CRUD operations"""
     queryset = EvaluationForm.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, EvaluationOrganizationPermission]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -36,7 +37,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filter forms based on organization"""
         queryset = EvaluationForm.objects.all()
-        org_id = self.request.query_params.get('organization_id')
+        org_id = active_organization(self.request)
         is_active = self.request.query_params.get('is_active')
         results_released = self.request.query_params.get('results_released')
 
@@ -50,8 +51,9 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
         if results_released is not None:
             queryset = queryset.filter(results_released=results_released.lower() == 'true')
 
-        return queryset.order_by('-id')
+        return queryset.select_related('created_by').prefetch_related('questions').order_by('-id')
 
+    @transaction.atomic
     def perform_create(self, serializer):
         """Set created_by to current user and log creation"""
         form = serializer.save(created_by=self.request.user)
@@ -59,6 +61,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             self.request.user,
             AuditActions.FORM_CREATED,
             self.request,
+            organization_id=form.organization_id_id,
             form_title=form.title,
             form_id=str(form.id)
         )
@@ -87,6 +90,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.FORM_PUBLISHED,
             request,
+            organization_id=form.organization_id_id,
             form_title=form.title,
             form_id=str(form.id)
         )
@@ -114,6 +118,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.FORM_UNPUBLISHED,
             request,
+            organization_id=form.organization_id_id,
             form_title=form.title,
             form_id=str(form.id)
         )
@@ -148,6 +153,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.FORM_PUBLISHED,
             request,
+            organization_id=form.organization_id_id,
             form_title=form.title,
             form_id=str(form.id)
         )
@@ -168,6 +174,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.FORM_DELETED,
             request,
+            organization_id=form.organization_id_id,
             form_title=form.title,
             form_id=str(form.id)
         )
@@ -201,7 +208,6 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             organization_id=form.organization_id,
             title=f"{form.title} (Copy)",
             description=form.description,
-            type=form.type,
             start_date=form.start_date,
             end_date=form.end_date,
             created_by=request.user,
@@ -227,6 +233,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.FORM_DUPLICATED,
             request,
+            organization_id=form.organization_id_id,
             original_form_id=str(form.id),
             new_form_id=str(new_form.id)
         )
@@ -236,6 +243,13 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def analytics(self, request, pk=None):
         """Get comprehensive analytics for a specific evaluation form"""
+        require_organization_admin(request)
         form = self.get_object()
         data = compute_form_analytics(form)
         return DRFResponse(data)
+
+    @action(detail=True, methods=['get'])
+    def analytics_export(self, request, pk=None):
+        """Load detailed answers only when an administrator requests an export."""
+        require_organization_admin(request)
+        return DRFResponse(compute_form_analytics(self.get_object(), include_raw=True))

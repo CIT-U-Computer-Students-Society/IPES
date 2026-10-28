@@ -1,80 +1,73 @@
-"""
-Response ViewSet — CRUD and bulk-create/update for evaluation responses.
-"""
+"""Tenant-scoped response reads and transactional evaluator-only writes."""
 
-from rest_framework import viewsets, status, permissions
+from django.db import transaction
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response as DRFResponse
 
-from ..models import EvaluationAssignment, Response
+from apps.organizations.access import active_organization, is_organization_admin
+from apps.validation import positive_id
+from ..models import Response
 from ..serializers import ResponseSerializer
+from ..services import locked_assignment, save_answers
 
 
 class ResponseViewSet(viewsets.ModelViewSet):
-    """ViewSet for Response CRUD operations"""
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """Filter responses based on assignment"""
-        queryset = Response.objects.all()
-        assignment_id = self.request.query_params.get('assignment_id')
-        question_id = self.request.query_params.get('question_id')
+        org_id = active_organization(self.request)
+        queryset = Response.objects.filter(
+            assignment_id__form_id__organization_id=org_id,
+            assignment_id__form_id__is_deleted=False,
+        )
+        if not is_organization_admin(self.request, org_id):
+            queryset = queryset.filter(assignment_id__evaluator_id=self.request.user)
+        for name in ('assignment_id', 'question_id'):
+            value = self.request.query_params.get(name)
+            if value:
+                queryset = queryset.filter(**{name: positive_id(value, name)})
+        return queryset.select_related('assignment_id', 'question_id').order_by('id')
 
-        if assignment_id:
-            queryset = queryset.filter(assignment_id=assignment_id)
-        if question_id:
-            queryset = queryset.filter(question_id=question_id)
+    def create(self, request, *args, **kwargs):
+        assignment_id = request.data.get('assignment_id')
+        self._validate_assignment_id(assignment_id)
+        _, rows = save_answers(request, assignment_id, {'responses': [request.data]}, replace=False)
+        return DRFResponse(ResponseSerializer(rows[0]).data, status=status.HTTP_201_CREATED)
 
-        return queryset.select_related('assignment_id', 'question_id')
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        locked_assignment(request, instance.assignment_id_id)
+        instance.refresh_from_db()
+        for name, expected in (('assignment_id', instance.assignment_id_id), ('question_id', instance.question_id_id)):
+            if name in request.data and str(request.data[name]) != str(expected):
+                raise ValidationError({name: 'Response relationships cannot be changed.'})
+        answer = {
+            'question_id': instance.question_id_id,
+            'score_value': request.data.get('score_value', instance.score_value),
+            'text': request.data.get('text', instance.text),
+        }
+        _, rows = save_answers(request, instance.assignment_id_id, {'responses': [answer]}, replace=False)
+        return DRFResponse(ResponseSerializer(rows[0]).data)
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        locked_assignment(request, instance.assignment_id_id)
+        instance.delete()
+        return DRFResponse(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def _validate_assignment_id(value):
+        return positive_id(value, 'assignment_id')
 
     @action(detail=False, methods=['post'])
     def bulk_create(self, request):
-        """Bulk create responses for an assignment"""
         assignment_id = request.data.get('assignment_id')
-        responses_data = request.data.get('responses', [])
-
-        if not assignment_id:
-            return DRFResponse(
-                {'error': 'assignment_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            assignment = EvaluationAssignment.objects.get(id=assignment_id)
-        except EvaluationAssignment.DoesNotExist:
-            return DRFResponse(
-                {'error': 'Assignment not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        created_responses = []
-        for response_data in responses_data:
-            question_id = response_data.get('question_id')
-            existing_response = Response.objects.filter(
-                assignment_id=assignment,
-                question_id_id=question_id,
-            ).first()
-
-            if existing_response:
-                existing_response.score_value = response_data.get('score_value')
-                existing_response.text = response_data.get('text', '')
-                existing_response.save()
-                created_responses.append(existing_response)
-            else:
-                response = Response.objects.create(
-                    assignment_id=assignment,
-                    question_id_id=question_id,
-                    score_value=response_data.get('score_value'),
-                    text=response_data.get('text', '')
-                )
-                created_responses.append(response)
-
-        # Mark assignment as 'In Progress' if it was previously just 'Pending'
-        if assignment.status == 'Pending':
-            assignment.status = 'In Progress'
-            assignment.save()
-
-        serializer = ResponseSerializer(created_responses, many=True)
-        return DRFResponse(serializer.data, status=status.HTTP_201_CREATED)
+        self._validate_assignment_id(assignment_id)
+        _, rows = save_answers(request, assignment_id, request.data)
+        return DRFResponse(ResponseSerializer(rows, many=True).data, status=status.HTTP_201_CREATED)

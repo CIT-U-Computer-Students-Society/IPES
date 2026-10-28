@@ -10,7 +10,7 @@ from django.db.models import Avg, Count, Q
 from ..models import EvaluationForm, EvaluationAssignment, Response
 
 
-def compute_form_analytics(form: EvaluationForm) -> dict:
+def compute_form_analytics(form: EvaluationForm, *, include_raw=False) -> dict:
     """Return a comprehensive analytics dict for *form*."""
 
     # 1. Basic stats
@@ -25,7 +25,7 @@ def compute_form_analytics(form: EvaluationForm) -> dict:
         else 0
     )
     overall_score = completed.aggregate(avg=Avg('total_score'))['avg']
-    overall_score = round(overall_score, 2) if overall_score else 0.0
+    overall_score = round(overall_score, 2) if overall_score is not None else 0.0
 
     # 2. Category data (top-6 highest-scoring questions)
     question_stats = (
@@ -34,7 +34,7 @@ def compute_form_analytics(form: EvaluationForm) -> dict:
             assignment_id__status='Completed',
             score_value__isnull=False,
         )
-        .values('question_id__text')
+        .values('question_id', 'question_id__text')
         .annotate(avg_score=Avg('score_value'))
         .order_by('-avg_score')[:6]
     )
@@ -152,40 +152,41 @@ def compute_form_analytics(form: EvaluationForm) -> dict:
     unit_breakdown.sort(key=lambda x: x['avgScore'], reverse=True)
 
     # 4. Raw data (for export)
-    raw_responses = Response.objects.filter(
-        assignment_id__form_id=form,
-        assignment_id__status='Completed',
-    ).select_related(
-        'assignment_id',
-        'assignment_id__evaluator_id',
-        'assignment_id__evaluatee_id',
-        'question_id',
-    )
-
     raw_data = []
-    for r in raw_responses:
-        evaluator = r.assignment_id.evaluator_id
-        evaluatee = r.assignment_id.evaluatee_id
-        raw_data.append({
-            'evaluator_name': (
-                f"{evaluator.first_name} {evaluator.last_name}".strip()
-                if evaluator
-                else 'Unknown'
-            ),
-            'evaluatee_name': (
-                f"{evaluatee.first_name} {evaluatee.last_name}".strip()
-                if evaluatee
-                else 'Unknown'
-            ),
-            'question_text': r.question_id.text,
-            'score': r.score_value,
-            'text_response': r.text,
-            'submitted_at': (
-                r.assignment_id.submitted_at.isoformat()
-                if r.assignment_id.submitted_at
-                else None
-            ),
-        })
+    if include_raw:
+        raw_responses = Response.objects.filter(
+            assignment_id__form_id=form,
+            assignment_id__status='Completed',
+        ).select_related(
+            'assignment_id',
+            'assignment_id__evaluator_id',
+            'assignment_id__evaluatee_id',
+            'question_id',
+        )
+
+        for r in raw_responses:
+            evaluator = r.assignment_id.evaluator_id
+            evaluatee = r.assignment_id.evaluatee_id
+            raw_data.append({
+                'evaluator_name': (
+                    f"{evaluator.first_name} {evaluator.last_name}".strip()
+                    if evaluator
+                    else 'Unknown'
+                ),
+                'evaluatee_name': (
+                    f"{evaluatee.first_name} {evaluatee.last_name}".strip()
+                    if evaluatee
+                    else 'Unknown'
+                ),
+                'question_text': r.question_id.text,
+                'score': r.score_value,
+                'text_response': r.text,
+                'submitted_at': (
+                    r.assignment_id.submitted_at.isoformat()
+                    if r.assignment_id.submitted_at
+                    else None
+                ),
+            })
 
     return {
         'form_details': {
