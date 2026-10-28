@@ -452,8 +452,8 @@ IPES/
 │   │   └── api.py               API root endpoint listing all available routes
 │   ├── scripts/                 Utility scripts for testing and verification
 │   ├── manage.py                Django CLI entry point
-│   ├── requirements.txt         Python dependencies
-│   └── sample.env               Environment variable template
+│   └── requirements.txt         Python dependencies
+├── sample.env                   Backend environment template (copy to root .env)
 ├── docs/                        Developer documentation and guides
 ├── frontend/                    React SPA
 │   ├── src/
@@ -485,7 +485,7 @@ git clone https://github.com/CIT-U-Computer-Students-Society/IPES.git && cd IPES
 cd backend
 python -m venv .venv && .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-cp sample.env .env                 # Edit with your DB credentials
+cp ../sample.env ../.env           # Edit root .env with your DB credentials
 
 # 3. Database
 python manage.py migrate
