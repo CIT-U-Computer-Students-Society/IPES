@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.0...docs-v1.0.1) (2026-10-28)
+
+
+### Documentation
+
+* **release:** document label permission recovery ([06489b7](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/06489b7e49455d0656ca7b17f50138c74fcfb14e))
+* **release:** explain combined release pull requests and migration ([cdc3539](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/cdc3539e8d1797f21783b02d6535bfdf36faac6c))
+
 ## 1.0.0 (2026-10-28)
 
 
