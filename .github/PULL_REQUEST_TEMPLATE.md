@@ -4,6 +4,10 @@ Please include a summary of the change and which issue is fixed. Please also inc
 
 Fixes # (issue)
 
+### Change overview
+
+<!-- Include a Mermaid diagram of the changed behavior, workflow, or component relationships, with a brief text explanation. For documentation or tooling, show the actual authoring or tooling flow. -->
+
 ## Type of change
 
 Please delete options that are not relevant.
@@ -16,10 +20,20 @@ Please delete options that are not relevant.
 
 ## How Has This Been Tested?
 
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
+Record the tested revision and relevant environment. Include exact commands or reproduction steps, observed summaries, and available logs or CI links. Run both required suites: `python manage.py test` from `backend/` with its virtual environment activated, and `npm run test -- --run` from `frontend/`.
 
-- [ ] Test A
-- [ ] Test B
+| Category | Suite or scenario | Command or steps | Result | Evidence |
+|---|---|---|---|---|
+| Automated | Backend suite | `python manage.py test` | NOT RUN | |
+| Automated | Frontend suite | `npm run test -- --run` | NOT RUN | |
+| Regression | | | NOT RUN | |
+| Other checks | | | NOT RUN | |
+
+<!-- Replace empty cells with actual evidence. Name the regression scenarios and other applicable checks. Use PASS, FAIL, SKIPPED, BLOCKED, NOT RUN, or N/A accurately; explain BLOCKED, NOT RUN, and N/A. Include test counts only when reported, distinguishing cases from files/suites. Label regressions already included in an automated suite to avoid double counting. -->
+
+### Testing charts
+
+<!-- Include a Mermaid chart with Automated, Regression, and Other checks groups and explicit outcomes matching the evidence table. Show all failures and unrun checks. If counts are unavailable, chart qualitative statuses. See .agents/skills/git-pr/references/chart-examples.md. -->
 
 ## Checklist:
 
