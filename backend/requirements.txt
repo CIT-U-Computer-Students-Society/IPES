@@ -1,6 +1,7 @@
 python-decouple
 psycopg[binary]
 pillow
+django-storages[s3]>=1.14.6,<2
 django-cors-headers
 djangorestframework
 flake8
