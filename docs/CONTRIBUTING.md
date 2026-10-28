@@ -18,6 +18,40 @@ To ensure release stability, we enforce a strict branching protocol:
    - Created for specific tasks (e.g. `feat/new-evaluations` or `fix/user-login`).
    - Merged back into `dev` via pull requests after reviews and CI checks pass.
 
+### Keeping dev in sync with main
+
+The **Sync dev with main** workflow runs after each push to `main`, including
+release merges, and can also be run manually from Actions on `main`. It opens a
+`main` → `dev` PR when main contains commits missing from dev, reuses an existing
+open sync PR, and skips creation when dev already contains main. This includes
+release merge commits even when the branches have identical files.
+
+Review the sync PR, resolve conflicts if present, run both application test suites,
+and wait for required CI checks. Merge it using **Create a merge commit** so dev
+records main's history; squash and rebase merges do not preserve that ancestry.
+The automation never merges, force-pushes, or resets either branch. New pushes to
+main appear automatically in the open PR, while dev's own work stays on dev.
+
+For setup, enable **Allow GitHub Actions to create and approve pull requests** in
+**Settings → Actions → General → Workflow permissions**. The workflow requests
+only contents read and pull requests write access. Organization policy must also
+allow PR creation. With the default `GITHUB_TOKEN`, GitHub may require approval
+before running validation on an automatically created PR; approve those runs in
+Actions if prompted. See [GitHub's token documentation](https://docs.github.com/en/actions/concepts/security/github_token).
+
+Optionally set the repository Actions secret `DEV_SYNC_TOKEN` to a GitHub App
+installation token or fine-grained personal access token with **Contents: Read**
+and **Pull requests: Read and write** for this repository to trigger validation
+without the default-token approval requirement. Token expiration or revocation
+will fail the run visibly; refresh the secret and rerun the workflow.
+
+The workflow becomes active after it reaches `main` through the normal release
+process. Test its API behavior locally without credentials or branch changes:
+
+```bash
+node --test .github/scripts/sync-dev-with-main.test.cjs
+```
+
 ---
 
 ## 💬 Conventional Commits
