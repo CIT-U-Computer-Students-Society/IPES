@@ -1,0 +1,25 @@
+name: Release Automation Tests
+
+on:
+  pull_request:
+    branches: [dev, main]
+    paths:
+      - '.github/scripts/**'
+      - '.github/workflows/release-*.yml'
+      - 'release-please-config.json'
+      - '.release-please-manifest.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Test release publication and configuration
+        run: node --test .github/scripts/publish-releases.test.cjs
