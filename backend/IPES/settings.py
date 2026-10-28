@@ -164,6 +164,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 AUTH_USER_MODEL = "users.User"
 
 # CORS Configuration

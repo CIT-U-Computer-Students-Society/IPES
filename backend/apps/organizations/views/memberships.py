@@ -8,23 +8,24 @@ from django.utils import timezone
 
 from ..models import OrganizationUnit, Membership, OrganizationRole
 from ..serializers import MembershipSerializer
+from ..access import active_organization, EvaluationOrganizationPermission
 
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """ViewSet for Membership CRUD"""
     queryset = Membership.objects.filter(is_active=True)
     serializer_class = MembershipSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, EvaluationOrganizationPermission]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(unit_id__organization_id=active_organization(self.request))
         user_id = self.request.query_params.get('user_id')
         unit_id = self.request.query_params.get('unit_id')
         if user_id:
             queryset = queryset.filter(user_id=user_id)
         if unit_id:
             queryset = queryset.filter(unit_id=unit_id)
-        return queryset
+        return queryset.select_related('user_id', 'unit_id', 'position_id').order_by('id')
 
     def create(self, request, *args, **kwargs):
         """Override create to validate Admin role before allowing new membership creation"""

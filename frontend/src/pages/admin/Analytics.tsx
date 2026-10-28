@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { useForms, useFormAnalytics } from "@/hooks/useEvaluations";
+import { useForms, useFormAnalytics, useExportFormAnalytics } from "@/hooks/useEvaluations";
 import { toast } from "@/lib/notifications";
 
 const AdminAnalytics = () => {
@@ -58,8 +58,17 @@ const AdminAnalytics = () => {
 
   const { data: analyticsData, isLoading: isLoadingAnalytics } = useFormAnalytics(formIdToFetch);
 
-  const getExportData = () => {
-    if (!analyticsData) return null;
+  const exportMutation = useExportFormAnalytics();
+
+  const getExportData = async () => {
+    if (!formIdToFetch) return null;
+    let analyticsData;
+    try {
+      analyticsData = await exportMutation.mutateAsync(formIdToFetch);
+    } catch {
+      toast.error("Export failed", { description: "Unable to load analytics. Please try again." });
+      return null;
+    }
 
     // Aggregate the data well into a flat structure suitable for CSV or direct JSON
     return {
@@ -77,8 +86,8 @@ const AdminAnalytics = () => {
     };
   };
 
-  const handleExportJSON = () => {
-    const data = getExportData();
+  const handleExportJSON = async () => {
+    const data = await getExportData();
     if (!data) return;
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
@@ -94,8 +103,8 @@ const AdminAnalytics = () => {
     });
   };
 
-  const handleExportCSV = () => {
-    const data = getExportData();
+  const handleExportCSV = async () => {
+    const data = await getExportData();
     if (!data) return;
 
     let csvContent = "";
@@ -147,7 +156,7 @@ const AdminAnalytics = () => {
       data.raw_responses.forEach(r => {
         const escapedQuestion = `"${r.question_text.replace(/"/g, '""')}"`;
         const escapedResponse = r.text_response ? `"${r.text_response.replace(/"/g, '""')}"` : "";
-        csvContent += `"${r.evaluator_name}","${r.evaluatee_name}",${escapedQuestion},${r.score || ""},${escapedResponse},${r.submitted_at || ""}\n`;
+        csvContent += `"${r.evaluator_name}","${r.evaluatee_name}",${escapedQuestion},${r.score ?? ""},${escapedResponse},${r.submitted_at || ""}\n`;
       });
     } else {
       csvContent += "No raw responses available.\n";
@@ -199,7 +208,7 @@ const AdminAnalytics = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" disabled={!formIdToFetch || isLoading}>
+              <Button variant="outline" disabled={!formIdToFetch || isLoading || exportMutation.isPending}>
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>
