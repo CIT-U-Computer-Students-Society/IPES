@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.2...docs-v1.0.3) (2026-10-28)
+
+
+### Maintenance
+
+* **release:** promote Mantine UI and dependency cleanup ([417238b](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/417238ba324a737b8da17cb939bf734cd8ff2554))
+
 ## [1.0.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.1...docs-v1.0.2) (2026-10-28)
 
 
