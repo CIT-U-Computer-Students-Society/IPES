@@ -1,0 +1,52 @@
+name: Release Please
+
+on:
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-prs:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Prepare independent component release PRs
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          target-branch: dev
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: true
+
+  publish-releases:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout promoted history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Publish component releases promoted to main
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          script: |
+            const publish = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/publish-releases.cjs`);
+            await publish({ github, context, core });

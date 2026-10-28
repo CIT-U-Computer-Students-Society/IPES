@@ -15,6 +15,7 @@ Use the links below to navigate the guides:
 *   [Setup & Installation Guide](SETUP.md): Requirements, environment setup, database migrations, and local runner commands.
 *   [Testing Guide](TESTING.md): Run instructions for Django and Vitest unit testing suites.
 *   [Contributing Guide](CONTRIBUTING.md): Git branching policies and Conventional Commit standards.
+*   [Component Releases](RELEASING.md): Release Please setup, independent web/backend/docs versions, and publication workflow.
 
 ### System Architecture & Design
 *   [Entity Relationship Diagram (ERD)](architecture/ERD.md): Visual mapping of database tables and relationships.
