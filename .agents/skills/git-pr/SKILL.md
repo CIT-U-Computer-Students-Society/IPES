@@ -1,6 +1,6 @@
 ---
 name: git-pr
-description: Draft, create, and update pull requests with descriptive titles, change diagrams, and evidence-based testing charts. Use when preparing or editing a PR title or body; use git-commit for commit messages.
+description: Draft, create, and update focused pull requests, using stacks for dependent concerns, descriptive titles, change diagrams, and evidence-based testing charts. Use when preparing or editing PRs or PR stacks; use git-commit for commit messages.
 ---
 
 # Pull Requests
@@ -10,6 +10,23 @@ description: Draft, create, and update pull requests with descriptive titles, ch
 - Inspect the diff and commits against the intended base branch. Describe the final change, including its reason and resulting behavior.
 - Follow the repository's branch conventions; feature PRs target `dev`. For a `dev` to `main` release, also use [release-dev-to-main](../release-dev-to-main/SKILL.md) for the release changelog and body structure. The diagram and testing requirements below apply to releases too.
 - Use [git-commit](../git-commit/SKILL.md) when commits are needed. Keep PR title conventions separate from commit message conventions.
+
+## Separate concerns with stacked PRs
+
+Prefer a focused PR for each reviewable concern. When one concern depends on another, use stacked PRs rather than putting all concerns into one PR with separate commits. Keep atomic commits within each layer. Independent changes should be sibling PRs targeting `dev`; a small cohesive change can remain a single PR.
+
+- Put the lowest layer against `dev`, and each dependent layer against the branch immediately below it: `dev ← ci/release-automation ← docs/release-guide`. The `dev` → `main` production release remains a separate promotion governed by the release skill.
+- Plan branch boundaries before publishing. Inspect `git log <parent>..<layer>` and `git diff <parent>...<layer>` so each PR contains only its own concern. Preserve existing work when splitting an already-published branch; use explicit `--force-with-lease` checks for any necessary history update.
+- Use GitHub's official `gh-stack` CLI extension for native stack tracking. Check `gh stack --help` and the installed subcommand help before relying on flags. If missing, install with `gh extension install github/gh-stack` when authorized; otherwise use explicit parent bases with `gh pr create` and report that native stack linking is unavailable.
+- Keep the local trunk current with `origin/dev` without discarding local commits. Adopt existing layer branches, in bottom-to-top order, with `gh stack init --base dev <lower-branch> <upper-branch>`.
+- Prepare each PR's descriptive title, template body, diagrams, and evidence separately. Publish with `gh pr create --base <parent-branch> --head <layer-branch> --title <title> --body-file <utf8-file>`, then link the resulting PR numbers bottom-to-top with `gh stack link --base dev <lower-pr> <upper-pr>`. This preserves authored descriptions instead of relying on generated commit subjects as PR titles.
+- For an existing tracked stack, use `gh stack submit` to publish additions or `gh stack sync` to fetch, rebase, push, and refresh existing PR state as appropriate to the authorized task. Inspect the result rather than assuming a zero exit status means remote stack synchronization completed. Review generated titles and bodies before marking PRs ready.
+- Identify the stack order, parent PR, and dependencies in each body, with links once available. Describe and diagram the current layer's changes; do not repeat lower-layer changes as new work. Update links and bases when the stack changes.
+- Validate each layer's tree and name its tested revision. Reuse evidence only for checks whose relevant source and configuration are unchanged, explicitly stating the reuse. Inspect actual CI for every PR: upper layers can have different workflow triggers from a PR targeting `dev`.
+- After lower-layer edits or merges, restack remaining branches with the installed `gh stack rebase`/`sync` commands, inspect the per-layer diffs, and rerun affected checks. Account for squash/rebase merges so already-landed lower commits do not reappear in upper PRs.
+- Report every created PR in dependency order and attach each to the chat. Stack creation does not authorize merging; merge only when requested and all required checks and local suites pass.
+
+Reference: [GitHub stacked PR CLI commands](https://docs.github.com/en/pull-requests/reference/stacked-prs-cli-commands).
 
 ## Descriptive titles
 
