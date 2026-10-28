@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.3...docs-v1.0.4) (2026-10-28)
+
+
+### Documentation
+
+* **database:** document optimization migrations and test coverage ([a3111ae](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/a3111aefc3e17a9227f084d1a1fcc5861cfb648a))
+* use relative paths ([8f7d435](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/8f7d43563c6d03988231ebba8c72e6ea89d237ad))
+
 ## [1.0.3](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.2...docs-v1.0.3) (2026-10-28)
 
 
