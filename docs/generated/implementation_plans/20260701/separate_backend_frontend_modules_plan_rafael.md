@@ -43,23 +43,23 @@ We will create a new `backend` directory and move the Django files there.
 
 ### Root Directory Cleanup
 
-#### [MODIFY] [README.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/README.md)
+#### [MODIFY] [README.md](../../../../README.md)
 Update documentation paths, setup instructions, and execution commands to use the new `backend/` directory structure.
 
-#### [MODIFY] [.github/workflows/pr-validate.yml](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/.github/workflows/pr-validate.yml)
+#### [MODIFY] [.github/workflows/pr-validate.yml](../../../../.github/workflows/pr-validate.yml)
 Update the validation workflow paths to install dependencies from `backend/requirements.txt` and run `flake8` against the `backend/` directory.
 
-#### [MODIFY] [.idea/IPES.iml](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/.idea/IPES.iml)
+#### [MODIFY] [.idea/IPES.iml](../../../../.idea/IPES.iml)
 Update JetBrains Django settings paths (`settingsModule` and `manageScript`) to point to their new locations under `backend/`.
 
 ---
 
 ### Backend Components
 
-#### [NEW] [backend/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend)
+#### [NEW] [backend/](../../../../backend)
 New module folder for housing all Django backend assets.
 
-#### [MODIFY] [backend/IPES/settings.py](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/IPES/settings.py) (Moved)
+#### [MODIFY] [backend/IPES/settings.py](../../../../backend/IPES/settings.py) (Moved)
 Update `FRONTEND_DIST` path calculation to resolve from the parent directory of `BASE_DIR`, as `BASE_DIR` will now point to the `backend/` subdirectory.
 
 ```python
@@ -70,19 +70,19 @@ FRONTEND_DIST = BASE_DIR / 'frontend' / 'dist'
 FRONTEND_DIST = BASE_DIR.parent / 'frontend' / 'dist'
 ```
 
-#### [NEW] [backend/manage.py](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/manage.py) (Moved from root)
-#### [NEW] [backend/requirements.txt](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/requirements.txt) (Moved from root)
-#### [NEW] [backend/sample.env](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/sample.env) (Moved from root)
-#### [NEW] [backend/IPES/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/IPES) (Moved from root)
-#### [NEW] [backend/apps/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/apps) (Moved from root)
-#### [NEW] [backend/scripts/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/backend/scripts) (Moved from root)
+#### [NEW] [backend/manage.py](../../../../backend/manage.py) (Moved from root)
+#### [NEW] [backend/requirements.txt](../../../../backend/requirements.txt) (Moved from root)
+#### [NEW] [backend/sample.env](../../../../backend/sample.env) (Moved from root)
+#### [NEW] [backend/IPES/](../../../../backend/IPES) (Moved from root)
+#### [NEW] [backend/apps/](../../../../backend/apps) (Moved from root)
+#### [NEW] [backend/scripts/](../../../../backend/scripts) (Moved from root)
 
-#### [DELETE] [manage.py](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/manage.py)
-#### [DELETE] [requirements.txt](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/requirements.txt)
-#### [DELETE] [sample.env](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/sample.env)
-#### [DELETE] [IPES/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/IPES)
-#### [DELETE] [apps/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/apps)
-#### [DELETE] [scripts/](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/scripts)
+#### [DELETE] [manage.py](../../../../manage.py)
+#### [DELETE] [requirements.txt](../../../../requirements.txt)
+#### [DELETE] [sample.env](../../../../sample.env)
+#### [DELETE] [IPES/](../../../../IPES)
+#### [DELETE] [apps/](../../../../apps)
+#### [DELETE] [scripts/](../../../../scripts)
 
 ---
 
