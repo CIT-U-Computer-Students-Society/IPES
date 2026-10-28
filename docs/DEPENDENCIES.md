@@ -57,7 +57,7 @@ claimed without a successful comparable build.
   jsdom, jest-dom, and Vitest support the existing tests.
 - Backend requirements have not changed; this cleanup targets frontend UI code.
 
-## Existing compatibility issues
+## Compatibility issues found at the pruning baseline
 
 These issues were observed with the original dependency versions before pruning:
 
@@ -72,11 +72,18 @@ These issues were observed with the original dependency versions before pruning:
   PostCSS integration. Resolving this requires a deliberate Tailwind configuration
   migration or compatible dependency versions.
 
-Dependency compatibility repairs and a UI-library migration should be evaluated
-separately from removing unreachable code. Keep version changes scoped and rerun
-both test suites and a production build after each migration.
+The next stack layer repairs these incompatibilities: TypeScript is constrained
+to `~6.0.3`, `next-themes` moves to `^0.4.6` with React 19 support, and Tailwind 4
+uses `@tailwindcss/postcss`, an explicit legacy theme config import, and its new
+CSS entry point. Autoprefixer is removed because Tailwind 4 handles prefixing.
+Normal npm installation no longer needs peer overrides.
 
-## Verification results
+Once the linter can start, its source diagnostics are repaired without disabling
+rules: typed API data/errors, stable skeleton component definitions, guarded
+form-state synchronization, derived analytics defaults, and stable render-time
+clock snapshots. The UI library migration remains a separate stack layer.
+
+## Pruning baseline verification results
 
 | Check | Observed result |
 | --- | --- |
@@ -91,6 +98,20 @@ both test suites and a production build after each migration.
 
 No production bundle comparison or visual regression pass is available because
 the existing CSS build failure prevents rendering the built application.
+
+## Tooling repair verification
+
+The second stack layer passes a normal `npm ci --no-audit --no-fund` without
+peer overrides (451 packages installed). Backend tests pass (19 tests), frontend
+tests pass (11 tests in 3 files), and `npx tsc -p tsconfig.app.json --noEmit`
+passes. Added regressions cover profile form initialization/edit preservation and
+typed API error formatting. One sandboxed Vitest run lost temporary transform
+files; the subsequent run outside that sandbox passed all tests.
+
+`npm run lint` exits successfully with zero errors and five existing Fast Refresh
+warnings. `npm run build` succeeds; Vite still reports the large initial chunk
+(1,919.71 kB JavaScript, 428.48 kB gzip). The production build is now available
+for the Mantine layer's interaction and visual checks.
 
 ## UI library candidate
 
