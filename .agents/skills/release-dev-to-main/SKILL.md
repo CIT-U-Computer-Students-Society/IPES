@@ -7,6 +7,8 @@ description: Skill for preparing a release pull request from dev into main. Cove
 
 Use this skill whenever you are asked to merge `dev` into `main`. This is a **release event** — not a regular feature PR. The title, description, and changelog must reflect the full scope of changes being promoted to production.
 
+Also apply [git-pr](../git-pr/SKILL.md) for descriptive titles, a Mermaid change diagram, and testing charts covering automated suites, regression scenarios, and other applicable checks. Use the release body structure below in place of the standard PR template, while retaining those shared evidence requirements.
+
 > [!IMPORTANT]
 > CI enforces that `main` can **only** be updated via a PR from `dev`. Never merge any other branch directly into `main`.
 
@@ -69,16 +71,18 @@ Then group the output by Conventional Commit type. Use this mapping:
 Use the following format for the PR title:
 
 ```
-release: <short summary of the release> (YYYY-MM-DD)
+Release <short summary of the release> (YYYY-MM-DD)
 ```
 
 The summary should be a **2–5 word description** of the dominant theme of this release — what most of the changes are about.
 
+Use a descriptive title in ordinary language. Conventional Commit prefixes apply to the underlying commits, not the PR title.
+
 **Examples:**
 ```
-release: evaluation engine and analytics (2026-07-02)
-release: member dashboard and portfolio (2026-06-15)
-release: dependency updates and CI improvements (2026-07-01)
+Release evaluation engine and analytics (2026-07-02)
+Release member dashboard and portfolio (2026-06-15)
+Release dependency updates and CI improvements (2026-07-01)
 ```
 
 ---
@@ -90,7 +94,11 @@ Use this exact structure for the PR body. Fill in every section — do not leave
 ```markdown
 ## 🚀 Release — <short summary> (<YYYY-MM-DD>)
 
-> Promotes `dev` → `main`. All changes listed below are now being deployed to production.
+> Promotes `dev` → `main`. Lists the changes proposed for production.
+
+## Change overview
+
+<Mermaid diagram of the release's main workflow or component changes, with a brief explanation>
 
 ---
 
@@ -126,6 +134,14 @@ Use this exact structure for the PR body. Fill in every section — do not leave
 - [ ] `python manage.py test` — all backend tests pass
 - [ ] `npm run test` — all frontend tests pass
 - [ ] No regressions observed on the dev environment
+
+### Testing evidence
+
+<Evidence table covering automated suites, named regression scenarios, and other applicable checks; include commands or steps, observed results, and available logs or CI links>
+
+### Testing charts
+
+<Mermaid chart with Automated, Regression, and Other checks groups; show observed outcomes, including failures, skipped, blocked, unrun, or inapplicable checks>
 
 ## Type of change
 

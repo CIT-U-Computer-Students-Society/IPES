@@ -7,6 +7,15 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 jobs:
+  validate-sync-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Test branch sync automation
+        run: node --test .github/scripts/sync-dev-with-main.test.cjs
+
   validate-python:
     runs-on: ubuntu-latest
     steps:

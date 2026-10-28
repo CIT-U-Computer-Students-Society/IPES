@@ -30,6 +30,7 @@ Access the project documentation via the [Documentation Index](docs/README.md) o
 *   [Setup & Installation Guide](docs/SETUP.md)
 *   [Testing Guide](docs/TESTING.md)
 *   [Contributing Guidelines](docs/CONTRIBUTING.md)
+*   [Component Releases & Changelogs](docs/RELEASING.md)
 
 ### System Architecture
 *   [Database ERD Diagram](docs/architecture/ERD.md)
