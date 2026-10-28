@@ -1,7 +1,8 @@
 # Component releases
 
 Release Please tracks web, backend, and documentation independently. Each component
-has its own version, changelog, release PR, Git tag, and GitHub release.
+has its own version, changelog, Git tag, and GitHub release. All changed components
+share one release PR so updates to `.release-please-manifest.json` land together.
 
 | Component | Changes under | Version file | Changelog | Tag format |
 | --- | --- | --- | --- | --- |
@@ -35,22 +36,19 @@ application suites must pass before a merge.
 ```mermaid
 flowchart TD
   Changes[Conventional commits on dev] --> RP[Release Please]
-  RP --> Web[Web release PR into dev]
-  RP --> Backend[Backend release PR into dev]
-  RP --> Docs[Documentation release PR into dev]
-  Web --> Review[Review version and changelog changes]
-  Backend --> Review
-  Docs --> Review
-  Review --> Dev[Merge selected release PRs into dev]
+  RP --> Combined[Combined release PR into dev]
+  Combined --> Review[Review component versions and changelogs]
+  Review --> Dev[Merge release PR into dev]
   Dev --> Promote[Reviewed dev to main PR]
   Promote --> Check[Verify release commits are ancestors of main]
   Check --> Publish[Publish independent tags and GitHub releases]
 ```
 
 1. Merge Conventional Commits into `dev`. Release Please runs on every push and
-   opens or updates a separate PR for each changed component.
-2. Review and merge the release PRs you want to publish. These PRs contain version
-   bumps, component changelogs, and updates to `.release-please-manifest.json`.
+   opens or updates one combined PR for all changed components.
+2. Review and merge that release PR. It contains independent component version
+   bumps and changelogs, and one shared update to `.release-please-manifest.json`.
+   Components without releasable changes retain their current versions.
 3. Promote `dev` to `main` using a **merge commit**, preserving the release commits.
    Do not squash or rebase this promotion: the publisher verifies commit ancestry.
    The existing rule allowing only `dev` PRs into `main` remains in force.
@@ -90,6 +88,21 @@ the published component tags as their release boundaries. Do not move the bootst
 SHA forward during normal maintenance.
 
 ## Verification and recovery
+
+### Migrating from separate release PRs
+
+After merging the combined-PR configuration into `dev`, close any remaining
+unmerged component release PRs and run **Release Please** manually on `dev`.
+The replacement PR uses branch `release-please--branches--dev`. Review its diff
+to confirm it contains the outstanding component changes. Do not merge the old
+conflicting PRs or copy their complete manifest over the current one.
+
+Already merged component PRs remain eligible for publication after promotion to
+`main`; the publisher accepts both combined and legacy component PR branches.
+If a merged release is still `autorelease: pending`, promote and publish it before
+expecting the next release PR. Keep its pending label until publication succeeds.
+
+### Checks and publication recovery
 
 Run from the repository root:
 
