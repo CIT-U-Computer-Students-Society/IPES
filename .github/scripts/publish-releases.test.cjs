@@ -14,7 +14,7 @@ function fixture({ status = 'ahead', changed = ['frontend'], existing = [], fail
   const pr = {
     merged_at: '2026-10-28T00:00:00Z', merge_commit_sha: 'release-sha',
     base: { ref: 'dev' },
-    head: { ref: 'release-please--branches--dev--components--web', repo: { full_name: 'org/IPES' } },
+    head: { ref: 'release-please--branches--dev', repo: { full_name: 'org/IPES' } },
   };
   const issues = [{ number: 12, pull_request: {} }];
   const args = {
@@ -57,7 +57,8 @@ function fixture({ status = 'ahead', changed = ['frontend'], existing = [], fail
 
 test('configuration keeps independent components and synchronized starting versions', () => {
   const manifest = JSON.parse(readFileSync(path.join(root, '.release-please-manifest.json')));
-  assert.equal(config['separate-pull-requests'], true);
+  assert.equal(config['separate-pull-requests'], false);
+  assert.equal(config['group-pull-request-title-pattern'], 'Release components on ${branch}');
   assert.equal(config['include-component-in-tag'], true);
   assert.equal(config['tag-separator'], '-');
   assert.deepEqual(Object.keys(config.packages).sort(), ['backend', 'docs', 'frontend']);
@@ -97,6 +98,14 @@ test('multiple promoted version changes produce separate releases', async () => 
   const { args, calls } = fixture({ changed: ['frontend', 'backend', 'docs'] });
   await publish(args);
   assert.deepEqual(calls.created.map(release => release.tag_name), ['web-v0.1.0', 'backend-v0.1.0', 'docs-v0.1.0']);
+});
+
+test('legacy component PRs remain publishable during migration to a combined PR', async () => {
+  const { args, calls, pr } = fixture({ changed: ['docs'] });
+  pr.head.ref = 'release-please--branches--dev--components--docs';
+  await publish(args);
+  assert.deepEqual(calls.created.map(release => release.tag_name), ['docs-v0.1.0']);
+  assert.equal(calls.removed.length, 1);
 });
 
 test('ahead-of-main and diverged dev releases remain pending', async () => {
@@ -145,6 +154,8 @@ test('ignores issues, unmerged PRs, foreign branches, forks and other targets', 
     f => { f.pr.merged_at = null; },
     f => { f.pr.base.ref = 'main'; },
     f => { f.pr.head.ref = 'feat/unrelated'; },
+    f => { f.pr.head.ref = 'release-please--branches--development'; },
+    f => { f.pr.head.ref = 'release-please--branches--main'; },
     f => { f.pr.head.repo.full_name = 'fork/IPES'; },
   ]) {
     const f = fixture();
