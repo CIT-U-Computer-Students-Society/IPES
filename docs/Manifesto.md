@@ -45,7 +45,7 @@ IPES provides:
 ┌─────────────────────────────────────────────────────┐
 │                    FRONTEND                         │
 │  React 18  ·  TypeScript  ·  Vite 7  ·  TailwindCSS│
-│  shadcn/ui (Radix)  ·  TanStack React Query        │
+│  Mantine 9  ·  TanStack React Query        │
 │  React Router v6  ·  Recharts  ·  React Hook Form   │
 │  Zod  ·  dnd-kit  ·  Lucide Icons                  │
 ├─────────────────────────────────────────────────────┤
@@ -146,7 +146,7 @@ frontend/src/
 ├── App.tsx                  Main routing (BrowserRouter, nested layouts)
 ├── components/
 │   ├── layout/              AuthLayout, OfficerLayout, AdminLayout
-│   ├── ui/                  shadcn/ui primitives (40+ components)
+│   ├── ui/                  Mantine adapters and shared UI
 │   ├── NavLink.tsx           Active-state navigation links
 │   ├── ProfileEditorDialog   User profile edit modal
 │   ├── theme-provider        Dark/light/system theme switching
@@ -457,7 +457,7 @@ IPES/
 ├── docs/                        Developer documentation and guides
 ├── frontend/                    React SPA
 │   ├── src/
-│   │   ├── components/          Reusable UI (shadcn/ui + custom)
+│   │   ├── components/          Reusable UI (Mantine adapters + custom)
 │   │   ├── contexts/            OrganizationContext (global state)
 │   │   ├── hooks/               TanStack Query hooks for every API domain
 │   │   ├── lib/                 API client with CSRF + org-header injection

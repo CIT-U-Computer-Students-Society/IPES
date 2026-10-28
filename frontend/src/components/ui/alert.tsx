@@ -1,43 +1,7 @@
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-
-import { cn } from "@/lib/utils";
-
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
-
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} {...props} />
-));
-Alert.displayName = "Alert";
-
-const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h5 ref={ref} className={cn("mb-1 font-medium leading-none tracking-tight", className)} {...props} />
-  ),
-);
-AlertTitle.displayName = "AlertTitle";
-
-const AlertDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("text-sm [&_p]:leading-relaxed", className)} {...props} />
-  ),
-);
-AlertDescription.displayName = "AlertDescription";
-
-export { Alert, AlertTitle, AlertDescription };
+import { Alert as MantineAlert, Text, type AlertProps } from '@mantine/core';
+import type { ComponentPropsWithoutRef } from 'react';
+export function Alert({ variant = 'default', ...props }: Omit<AlertProps, 'variant'> & { variant?: 'default' | 'destructive' }) {
+  return <MantineAlert role="alert" color={variant === 'destructive' ? 'red' : undefined} variant="light" {...props} />;
+}
+export function AlertTitle(props: ComponentPropsWithoutRef<'h5'>) { return <Text component="h5" fw={600} {...props} />; }
+export function AlertDescription(props: ComponentPropsWithoutRef<'div'>) { return <Text component="div" size="sm" {...props} />; }

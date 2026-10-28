@@ -50,7 +50,7 @@ export interface EvaluateeProfile {
 }
 
 // Fetch all accomplishments
-export const useAccomplishments = (params?: { status?: string; type?: string; user_id?: number }) => {
+export const useAccomplishments = (params?: { status?: string; type?: string; user_id?: number; organization_id?: number }) => {
   const queryString = params
     ? '?' + new URLSearchParams(
       Object.entries(params).filter(([, v]) => v !== undefined).reduce((acc, [k, v]) => ({ ...acc, [k]: String(v) }), {})

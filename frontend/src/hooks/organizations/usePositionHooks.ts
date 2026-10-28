@@ -3,6 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { PositionType } from './types';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
@@ -15,7 +16,7 @@ export const usePositionTypes = (organizationId?: number) => {
     queryFn: async () => {
       if (!effectiveOrgId) return [];
       const response = await api.get(`/positions/?organization_id=${effectiveOrgId}`);
-      const data = await response.json();
+      const data = await response.json() as PositionType[] | { results: PositionType[] };
       return Array.isArray(data) ? data : data.results || [];
     },
     enabled: !!effectiveOrgId
@@ -26,7 +27,7 @@ export const useCreatePositionType = () => {
   const queryClient = useQueryClient();
   const { activeOrganizationId } = useOrganizationState();
 
-  return useMutation<any, Error, { name: string; rank: number }>({
+  return useMutation<PositionType, Error, { name: string; rank: number }>({
     mutationFn: async (data) => {
       const payload = { ...data, organization_id: activeOrganizationId };
       const response = await api.post('/positions/', payload);
@@ -42,7 +43,7 @@ export const useDeletePositionType = () => {
   const queryClient = useQueryClient();
   const { activeOrganizationId } = useOrganizationState();
 
-  return useMutation<any, Error, number>({
+  return useMutation<Response, Error, number>({
     mutationFn: async (id) => {
       const response = await api.delete(`/positions/${id}/`);
       return response;
@@ -57,7 +58,7 @@ export const useUpdatePositionType = () => {
   const queryClient = useQueryClient();
   const { activeOrganizationId } = useOrganizationState();
 
-  return useMutation<any, Error, { id: number; data: { name?: string; rank?: number } }>({
+  return useMutation<PositionType, Error, { id: number; data: { name?: string; rank?: number } }>({
     mutationFn: async ({ id, data }) => {
       const response = await api.patch(`/positions/${id}/`, data);
       return response.json();

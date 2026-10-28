@@ -32,7 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuditLogs } from "@/hooks/useAudit";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 import api from "@/lib/api";
 
 const actionIcons: Record<string, typeof LogIn> = {
@@ -212,7 +212,7 @@ const AuditLog = () => {
                           const titleMatch = inside.match(/(?:^|,\s*)(?:title|name)\s*=\s*([^,]+)/i);
                           if (titleMatch) {
                             let title = titleMatch[1].trim();
-                            title = title.replace(/^['\"]|['\"]$/g, '');
+                            title = title.replace(/^['"]|['"]$/g, '');
                             return formatted.replace(/\s*\(.*\)\s*$/, ` (${title})`);
                           } else if (!inside.includes('=')) {
                             return formatted.replace(/\s*\(.*\)\s*$/, ` (${inside.trim()})`);

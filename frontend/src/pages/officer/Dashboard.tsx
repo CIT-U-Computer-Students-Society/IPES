@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ClipboardList,
@@ -87,7 +88,8 @@ const StatCard = ({
 
 // Pending evaluation card
 const PendingEvaluationCard = ({ evaluation, basePath }: { evaluation: EvaluationAssignment, basePath: string }) => {
-  const isUrgent = evaluation.due_date && new Date(evaluation.due_date) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  const [now] = useState(Date.now);
+  const isUrgent = evaluation.due_date && new Date(evaluation.due_date) <= new Date(now + 3 * 24 * 60 * 60 * 1000);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

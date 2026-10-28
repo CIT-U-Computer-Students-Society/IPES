@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Settings,
   Save,
@@ -45,7 +45,7 @@ import { useCurrentMembership } from "@/hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
 import { formatApiError } from "@/lib/api";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
@@ -73,21 +73,22 @@ const AdminSettings = () => {
   const [deleteAdminPassword, setDeleteAdminPassword] = useState("");
 
   const [orgData, setOrgData] = useState({
-    name: "",
-    description: "",
-    email: "",
+    name: currentMembership?.organization_name || organization?.name || "",
+    description: organization?.description || "",
+    email: currentMembership?.organization_email || organization?.email || "",
   });
 
-  useEffect(() => {
+  const [orgSource, setOrgSource] = useState({ currentMembership, organization });
+  if (orgSource.currentMembership !== currentMembership || orgSource.organization !== organization) {
+    setOrgSource({ currentMembership, organization });
     if (currentMembership || organization) {
       setOrgData({
         name: currentMembership?.organization_name || organization?.name || "",
         description: organization?.description || "",
-        // @ts-ignore - Email property exist on the backend API now pending a type regeneration
         email: currentMembership?.organization_email || organization?.email || "",
       });
     }
-  }, [currentMembership, organization]);
+  }
 
   const handleSaveOrganization = () => {
     if (!activeOrganizationId) return;

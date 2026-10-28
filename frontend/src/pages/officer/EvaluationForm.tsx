@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { formatApiError } from "@/lib/api";
+import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeft, User, Trophy, Save, Send, Clock, ChevronRight, AlertCircle, Building2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupCard } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -83,11 +84,10 @@ const EvaluationForm = () => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [textAnswers, setTextAnswers] = useState<Record<number, string>>({});
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [initializedAssignmentId, setInitializedAssignmentId] = useState<string | null>(null);
 
   // Sync incoming responses initially
-  useEffect(() => {
-    if (responses && questions && !isInitialized) {
+  if (id && responses && questions && initializedAssignmentId !== id) {
       const initialAnswers: Record<number, string> = {};
       const initialTexts: Record<number, string> = {};
 
@@ -101,9 +101,8 @@ const EvaluationForm = () => {
       });
       setAnswers(initialAnswers);
       setTextAnswers(initialTexts);
-      setIsInitialized(true);
-    }
-  }, [responses, questions, isInitialized]);
+      setInitializedAssignmentId(id);
+  }
 
   // Loading and Error States
   if (aLoading || qLoading || rLoading || !assignment || !questions) {
@@ -151,7 +150,7 @@ const EvaluationForm = () => {
 
   const formatPayload = () => {
     return questions.map((q) => {
-      const resp: any = { question_id: q.id };
+      const resp: { question_id: number; score_value?: number; text?: string } = { question_id: q.id };
       if (answers[q.id]) {
         resp.score_value = Number(answers[q.id]);
       }
@@ -172,10 +171,10 @@ const EvaluationForm = () => {
         title: "Draft Saved",
         description: "Your recent answers have been saved securely.",
       });
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Error Saving Draft",
-        description: err.message || "Something went wrong.",
+        description: formatApiError(err),
         variant: "destructive"
       });
     }
@@ -220,10 +219,10 @@ const EvaluationForm = () => {
       });
       setShowSubmitDialog(false);
       navigate(`${basePath}evaluations`);
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Submission Error",
-        description: err.message || "Failed to submit evaluation.",
+        description: formatApiError(err),
         variant: "destructive"
       });
     }
@@ -360,27 +359,23 @@ const EvaluationForm = () => {
 
             {q.input_type === 'rating' || q.input_type === 'number' ? (
               <RadioGroup
+                aria-label={q.text}
                 value={answers[q.id] || ""}
                 onValueChange={(value) => handleRatingChange(q.id, value)}
                 className="flex flex-wrap gap-2"
                 disabled={isCompleted}
               >
                 {getRatingContext(q.min_value, q.max_value).map((rating) => (
-                  <div key={rating.value} className="flex-1 min-w-[60px]">
-                    <RadioGroupItem
+                    <RadioGroupCard
+                      key={rating.value}
                       value={rating.value}
                       id={`q${q.id}-${rating.value}`}
-                      className="peer sr-only"
+                      className="flex-1 min-w-[60px]"
                       disabled={isCompleted}
-                    />
-                    <Label
-                      htmlFor={`q${q.id}-${rating.value}`}
-                      className={`flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-3 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 transition-all ${isCompleted ? 'opacity-70 cursor-not-allowed' : 'hover:bg-accent/50 hover:border-primary/50 cursor-pointer'}`}
                     >
                       <span className="text-lg font-semibold">{rating.value}</span>
                       {rating.label && <span className="text-xs text-muted-foreground mt-1">{rating.label}</span>}
-                    </Label>
-                  </div>
+                    </RadioGroupCard>
                 ))}
               </RadioGroup>
             ) : (

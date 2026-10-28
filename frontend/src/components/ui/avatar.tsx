@@ -1,38 +1,12 @@
-import * as React from "react";
-import * as AvatarPrimitive from "@radix-ui/react-avatar";
-
-import { cn } from "@/lib/utils";
-
-const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className)}
-    {...props}
-  />
-));
-Avatar.displayName = AvatarPrimitive.Root.displayName;
-
-const AvatarImage = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image ref={ref} className={cn("aspect-square h-full w-full", className)} {...props} />
-));
-AvatarImage.displayName = AvatarPrimitive.Image.displayName;
-
-const AvatarFallback = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn("flex h-full w-full items-center justify-center rounded-full bg-muted", className)}
-    {...props}
-  />
-));
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
-
-export { Avatar, AvatarImage, AvatarFallback };
+import { Children, isValidElement, type ComponentPropsWithoutRef } from 'react';
+import { Avatar as MantineAvatar } from '@mantine/core';
+type ImageProps = ComponentPropsWithoutRef<'img'>;
+export function AvatarImage(_props: ImageProps) { return null; }
+export function AvatarFallback({ children, ...props }: ComponentPropsWithoutRef<'span'>) { return <span {...props}>{children}</span>; }
+export function Avatar({ children, ...props }: ComponentPropsWithoutRef<'div'>) {
+  const nodes = Children.toArray(children);
+  const image = nodes.find(node => isValidElement<ImageProps>(node) && node.type === AvatarImage);
+  const fallback = nodes.find(node => isValidElement(node) && node.type === AvatarFallback);
+  return <MantineAvatar radius="xl" src={isValidElement<ImageProps>(image) ? image.props.src : undefined}
+    alt={isValidElement<ImageProps>(image) ? image.props.alt : undefined} {...props}>{fallback}</MantineAvatar>;
+}
