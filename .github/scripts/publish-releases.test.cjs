@@ -138,6 +138,22 @@ test('API failures keep pending labels for retry', async () => {
   assert.equal(calls.removed.length, 0);
 });
 
+test('a retry after label permission failure reuses the release and finalizes labels', async () => {
+  const first = fixture();
+  first.args.github.rest.issues.addLabels = async () => {
+    throw Object.assign(new Error('Resource not accessible by integration'), { status: 403 });
+  };
+  await assert.rejects(publish(first.args), /Resource not accessible/);
+  assert.deepEqual(first.calls.created.map(release => release.tag_name), ['web-v0.1.0']);
+  assert.equal(first.calls.removed.length, 0);
+
+  const retry = fixture({ existing: ['web-v0.1.0'] });
+  await publish(retry.args);
+  assert.equal(retry.calls.created.length, 0);
+  assert.deepEqual(retry.calls.labelled[0].labels, ['autorelease: tagged']);
+  assert.equal(retry.calls.removed[0].name, 'autorelease: pending');
+});
+
 test('permission and server errors are not treated as absent releases', async () => {
   const { args, calls } = fixture();
   args.github.rest.repos.getReleaseByTag = async () => {
