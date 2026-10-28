@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMyAccomplishments, useCreateAccomplishment, useUpdateAccomplishment, AccomplishmentCreate, Accomplishment } from "@/hooks/usePortfolio";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 import { formatApiError } from "@/lib/api";
 
 const getStatusBadge = (status: string) => {

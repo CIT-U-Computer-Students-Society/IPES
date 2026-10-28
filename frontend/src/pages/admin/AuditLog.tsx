@@ -32,7 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuditLogs } from "@/hooks/useAudit";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 import api from "@/lib/api";
 
 const actionIcons: Record<string, typeof LogIn> = {

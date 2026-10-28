@@ -5,10 +5,10 @@ import { ArrowLeft, User, Trophy, Save, Send, Clock, ChevronRight, AlertCircle, 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupCard } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -359,27 +359,23 @@ const EvaluationForm = () => {
 
             {q.input_type === 'rating' || q.input_type === 'number' ? (
               <RadioGroup
+                aria-label={q.text}
                 value={answers[q.id] || ""}
                 onValueChange={(value) => handleRatingChange(q.id, value)}
                 className="flex flex-wrap gap-2"
                 disabled={isCompleted}
               >
                 {getRatingContext(q.min_value, q.max_value).map((rating) => (
-                  <div key={rating.value} className="flex-1 min-w-[60px]">
-                    <RadioGroupItem
+                    <RadioGroupCard
+                      key={rating.value}
                       value={rating.value}
                       id={`q${q.id}-${rating.value}`}
-                      className="peer sr-only"
+                      className="flex-1 min-w-[60px]"
                       disabled={isCompleted}
-                    />
-                    <Label
-                      htmlFor={`q${q.id}-${rating.value}`}
-                      className={`flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-3 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 transition-all ${isCompleted ? 'opacity-70 cursor-not-allowed' : 'hover:bg-accent/50 hover:border-primary/50 cursor-pointer'}`}
                     >
                       <span className="text-lg font-semibold">{rating.value}</span>
                       {rating.label && <span className="text-xs text-muted-foreground mt-1">{rating.label}</span>}
-                    </Label>
-                  </div>
+                    </RadioGroupCard>
                 ))}
               </RadioGroup>
             ) : (

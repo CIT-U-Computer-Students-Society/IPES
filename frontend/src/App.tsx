@@ -1,5 +1,4 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { OrganizationProvider } from "./contexts/OrganizationContext";
@@ -38,11 +37,10 @@ import AdminSettings from "./pages/admin/Settings";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+  <ThemeProvider>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
         <OrganizationProvider>
-          <Toaster />
+          <Notifications position="top-right" zIndex={1000} />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -90,7 +88,6 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </OrganizationProvider>
-    </TooltipProvider>
   </QueryClientProvider>
   </ThemeProvider>
 );

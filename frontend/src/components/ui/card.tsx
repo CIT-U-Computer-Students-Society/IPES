@@ -1,43 +1,12 @@
-import * as React from "react";
-
-import { cn } from "@/lib/utils";
-
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...props} />
-));
-Card.displayName = "Card";
-
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
-  ),
-);
-CardHeader.displayName = "CardHeader";
-
-const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />
-  ),
-);
-CardTitle.displayName = "CardTitle";
-
-const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-  ),
-);
-CardDescription.displayName = "CardDescription";
-
-const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />,
-);
-CardContent.displayName = "CardContent";
-
-const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
-  ),
-);
-CardFooter.displayName = "CardFooter";
-
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+import { forwardRef, type ComponentPropsWithoutRef } from 'react';
+import { Box, Card as MantineCard, Text, Title } from '@mantine/core';
+import { cn } from '@/lib/utils';
+type DivProps = ComponentPropsWithoutRef<'div'>;
+export const Card = forwardRef<HTMLDivElement, DivProps>(function Card({ className, ...props }, ref) {
+  return <MantineCard ref={ref} withBorder padding={0} shadow="xs" className={cn('rounded-xl bg-card text-card-foreground', className)} {...props} />;
+});
+export function CardHeader({ className, ...props }: DivProps) { return <Box className={cn('flex flex-col gap-1.5 p-6', className)} {...props} />; }
+export function CardContent({ className, ...props }: DivProps) { return <Box className={cn('p-6 pt-0', className)} {...props} />; }
+export function CardFooter({ className, ...props }: DivProps) { return <Box className={cn('flex items-center p-6 pt-0', className)} {...props} />; }
+export function CardTitle({ className, ...props }: ComponentPropsWithoutRef<'h3'>) { return <Title order={3} className={cn('text-xl font-semibold tracking-tight', className)} {...props} />; }
+export function CardDescription({ className, ...props }: ComponentPropsWithoutRef<'p'>) { return <Text component="p" size="sm" c="dimmed" className={className} {...props} />; }

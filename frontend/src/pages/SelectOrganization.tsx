@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { BuildingIcon, ArrowRight, ShieldIcon, UserIcon, PlusIcon, LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
+import { toast } from '@/lib/notifications';
 import {
     Dialog,
     DialogContent,

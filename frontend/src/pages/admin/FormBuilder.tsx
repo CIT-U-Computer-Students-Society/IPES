@@ -66,7 +66,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 import { formatApiError } from "@/lib/api";
 
 import {

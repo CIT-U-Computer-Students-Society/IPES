@@ -57,7 +57,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 import { useUsers, useCurrentUser, type User } from "@/hooks/useUsers";
 
 // Organization unit options

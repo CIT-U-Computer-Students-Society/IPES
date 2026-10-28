@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useForms, useFormAnalytics } from "@/hooks/useEvaluations";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 
 const AdminAnalytics = () => {
   const { data: forms, isLoading: isLoadingForms } = useForms(); // Fetch all forms for the org

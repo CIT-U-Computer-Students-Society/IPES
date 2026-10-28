@@ -73,8 +73,8 @@
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 35% 35%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 210 45% 75%;
+    --primary-foreground: 222 47% 11%;
 
     --secondary: 32 95% 73%;
     --secondary-foreground: 222 47% 11%;
@@ -96,16 +96,16 @@
 
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 210 35% 35%;
+    --ring: 210 45% 75%;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 35% 35%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 210 45% 75%;
+    --sidebar-primary-foreground: 222 47% 11%;
     --sidebar-accent: 217 33% 17%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 210 35% 35%;
+    --sidebar-ring: 210 45% 75%;
     --font-sans: Montserrat, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   }
 }
@@ -167,4 +167,10 @@
   .gradient-hero {
     background: var(--gradient-hero);
   }
+}
+
+/* Mantine surfaces use the same semantic palette as page layouts. */
+:root {
+  --mantine-color-body: hsl(var(--background));
+  --mantine-color-text: hsl(var(--foreground));
 }

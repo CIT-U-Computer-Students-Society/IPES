@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAccomplishments, useVerifyAccomplishment, Accomplishment } from "@/hooks/usePortfolio";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
 
 const AdminAccomplishments = () => {

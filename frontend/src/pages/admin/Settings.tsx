@@ -45,7 +45,7 @@ import { useCurrentMembership } from "@/hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
 import { formatApiError } from "@/lib/api";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast } from "@/lib/notifications";
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({

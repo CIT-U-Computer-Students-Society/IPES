@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { ThemeProvider } from '../theme-provider';
 import { ProfileEditorDialog } from '../ProfileEditorDialog';
 
 const { updateProfile, user } = vi.hoisted(() => ({
@@ -17,7 +18,7 @@ vi.mock('@/contexts/OrganizationContext', () => ({
 
 describe('ProfileEditorDialog', () => {
   it('seeds cached profile data when opened and preserves edits across rerenders', () => {
-    const view = <ProfileEditorDialog><button>Open profile</button></ProfileEditorDialog>;
+    const view = <ThemeProvider><ProfileEditorDialog><button>Open profile</button></ProfileEditorDialog></ThemeProvider>;
     const { rerender } = render(view);
     fireEvent.click(screen.getByRole('button', { name: 'Open profile' }));
     expect(screen.getByLabelText('First Name')).toHaveValue('Ava');

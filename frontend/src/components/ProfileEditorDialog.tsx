@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCurrentUser, useUpdateCurrentUser } from "@/hooks/useUsers";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
-import { toast } from "sonner";
+import { toast } from "@/lib/notifications";
 
 export function ProfileEditorDialog({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = useState(false);
