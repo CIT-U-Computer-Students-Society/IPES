@@ -27,8 +27,8 @@ IPES/
 ├── .agents/skills/              # Agent skills (see Section 7)
 ├── .github/                     # CI/CD workflows and PR template
 │   ├── workflows/
-│   │   ├── pr-validate.yml      # Runs backend + frontend tests on PRs
-│   │   ├── pr-branch-check.yml  # Validates branch naming conventions
+│   │   ├── pr-validate.yml      # Runs linting and frontend build on dev PRs
+│   │   ├── pr-branch-check.yml  # Enforces dev as the source for main PRs
 │   │   └── stale.yml            # Auto-closes stale issues/PRs
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── backend/                     # Django 6.0 REST API
@@ -210,7 +210,8 @@ The project ships with skills that agents **must** use for specific tasks. Skill
 
 | Skill | When to Use |
 |---|---|
-| [`git-commit-and-pr`](.agents/skills/git-commit-and-pr/SKILL.md) | When staging commits or drafting pull requests. Follow Conventional Commits and separate concerns into atomic commits. |
+| [`git-commit`](.agents/skills/git-commit/SKILL.md) | When staging commits or drafting commit messages. Use Conventional Commits and separate concerns into atomic commits. |
+| [`git-pr`](.agents/skills/git-pr/SKILL.md) | When drafting, creating, or updating pull requests. Use descriptive titles, change diagrams, and testing charts based on actual evidence. |
 | [`write-implementation-plans`](.agents/skills/write-implementation-plans/SKILL.md) | When drafting technical implementation plans. Plans must go in `docs/generated/implementation_plans/YYYYMMDD/` following the required naming and structure conventions. |
 | [`release-dev-to-main`](.agents/skills/release-dev-to-main/SKILL.md) | When merging `dev` into `main` for a production release. Covers pre-flight checks, changelog generation from Conventional Commits, PR title format, and post-merge release tagging. |
 
@@ -220,7 +221,9 @@ The project ships with skills that agents **must** use for specific tasks. Skill
 
 ### Branch Naming
 
-Branch naming conventions are **automatically validated** by `pr-branch-check.yml`. Follow the repository's existing branch naming rules.
+Follow the repository's branch naming rules. `pr-branch-check.yml` enforces the allowed source branch for PRs targeting `main`.
+
+Never prepend `codex/` to branch names. Use conventional prefixes such as `feat/`, `fix/`, or `refactor/`, or the user's exact requested name.
 
 ### Commit Messages
 
@@ -240,18 +243,20 @@ Separate unrelated changes into distinct commits — do not bundle documentation
 
 ### Pull Requests
 
-All PRs must follow the template at [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md):
+Use a descriptive, outcome-focused PR title in ordinary language, without a Conventional Commit prefix. Conventional Commits apply to commit subjects and messages. Use the `git-pr` skill for PR authoring and the release skill as well for `dev` to `main` releases.
 
-1. **Description** — What changed and why
+Regular PRs must follow the template at [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Release PRs use the release skill's body structure and share the diagram and testing evidence requirements:
+
+1. **Description** — What changed and why, with a Mermaid diagram of the changed behavior or workflow
 2. **Type of change** — Select the relevant checkboxes
-3. **How Has This Been Tested?** — Provide commands and output
+3. **How Has This Been Tested?** — Provide commands, observed output, and charts covering automated tests, regression scenarios, and other applicable checks; label failures, skipped, blocked, unrun, or inapplicable checks explicitly
 4. **Checklist** — Self-review, tests passing, docs updated
 
-CI runs automatically on every PR:
-- `pr-validate.yml` — Executes `python manage.py test` and `npm run test`
-- `pr-branch-check.yml` — Validates branch naming
+Inspect actual CI results separately from local test evidence:
+- `pr-validate.yml` — Runs backend linting and frontend linting/build on PRs targeting `dev`; it currently does not execute either test suite
+- `pr-branch-check.yml` — Enforces that PRs targeting `main` originate from `dev`
 
-**Do not merge** unless both CI checks pass.
+**Do not merge** unless all required CI checks for the target branch pass and both test suites pass locally.
 
 ---
 
