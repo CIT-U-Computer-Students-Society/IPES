@@ -28,7 +28,11 @@ without Python package version metadata. No npm or Python package is published.
    usual reviewed PR. The workflows become available on their respective branches.
 
 The workflow's `issues: write` permission is used for release lifecycle labels.
-It does not grant automatic approval or merging. Required CI checks and both local
+Production publication uses the job's `GITHUB_TOKEN`, with `contents: write`,
+`issues: write`, and `pull-requests: write`, to create releases and update labels
+on release PRs. The optional `RELEASE_PLEASE_TOKEN` is used only to prepare PRs on
+`dev`; its permissions do not control production publication.
+These permissions do not grant automatic approval or merging. Required CI checks and both local
 application suites must pass before a merge.
 
 ## Release flow
@@ -122,6 +126,12 @@ the pending label stays until every component in that PR has published. Never
 remove that label manually to bypass an error. A manual run on `dev` refreshes
 release PRs; it does not publish production releases. No workflow auto-merges PRs
 or changes deployment settings.
+
+If a release was published but updating its PR labels returned HTTP 403, correct
+the publication job's token permissions, promote that workflow fix to `main`,
+then run **Release Please** on `main` again. A rerun of the old failed run still
+uses the old workflow revision. The publisher skips the existing release and
+retries the label updates; do not delete or recreate the release or its tag.
 
 Upstream references: [Release Please Action](https://github.com/googleapis/release-please-action)
 and [manifest configuration](https://github.com/googleapis/release-please/blob/main/docs/manifest-releaser.md).
