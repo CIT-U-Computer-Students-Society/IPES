@@ -14,6 +14,7 @@ Use the links below to navigate the guides:
 ### Setup & Getting Started
 *   [Setup & Installation Guide](SETUP.md): Requirements, environment setup, database migrations, and local runner commands.
 *   [Testing Guide](TESTING.md): Run instructions for Django and Vitest unit testing suites.
+*   [Dependency Audit](DEPENDENCIES.md): Dependency cleanup, retained UI packages, and existing compatibility issues.
 *   [Contributing Guide](CONTRIBUTING.md): Git branching policies and Conventional Commit standards.
 *   [Component Releases](RELEASING.md): Release Please setup, independent web/backend/docs versions, and publication workflow.
 
