@@ -6,26 +6,32 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response as DRFResponse
 from django.db import models
+from django.db import transaction
+from apps.organizations.access import active_organization, EvaluationOrganizationPermission
+from django.shortcuts import get_object_or_404
 
 from ..models import EvaluationForm, Question, EvaluationAssignment, Response
-from ..serializers import QuestionSerializer
+from ..serializers import QuestionSerializer, QuestionBatchSerializer
+from apps.validation import positive_id
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """ViewSet for Question CRUD operations"""
     queryset = Question.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, EvaluationOrganizationPermission]
 
     def get_serializer_class(self):
         return QuestionSerializer
 
     def get_queryset(self):
         """Filter questions based on form"""
-        queryset = Question.objects.all()
+        queryset = Question.objects.filter(
+            form_id__organization_id=active_organization(self.request), form_id__is_deleted=False,
+        )
         form_id = self.request.query_params.get('form_id')
 
         if form_id:
-            queryset = queryset.filter(form_id=form_id)
+            queryset = queryset.filter(form_id=positive_id(form_id, 'form_id'))
 
         return queryset.order_by('order')
 
@@ -38,7 +44,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         EvaluationAssignment.objects.filter(
             form_id=form_id,
             status='Completed'
-        ).update(status='In Progress', submitted_at=None)
+        ).update(status='In Progress', submitted_at=None, total_score=None)
 
     def _question_content_changed(self, old_question, new_data):
         """Check if question content (not just order) has changed"""
@@ -87,29 +93,20 @@ class QuestionViewSet(viewsets.ModelViewSet):
     # ------------------------------------------------------------------
 
     @action(detail=False, methods=['post'])
+    @transaction.atomic
     def bulk_create(self, request):
         """Bulk create questions for a form"""
-        form_id = request.data.get('form_id')
-        questions_data = request.data.get('questions', [])
+        payload = QuestionBatchSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        form_id = payload.validated_data['form_id']
+        questions_data = payload.validated_data['questions']
 
-        if not form_id:
-            return DRFResponse(
-                {'error': 'form_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            form = EvaluationForm.objects.get(id=form_id)
-        except EvaluationForm.DoesNotExist:
-            return DRFResponse(
-                {'error': 'Form not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        created_questions = []
-        for question_data in questions_data:
-            question = Question.objects.create(form_id=form, **question_data)
-            created_questions.append(question)
+        form = get_object_or_404(
+            EvaluationForm, id=form_id, organization_id=active_organization(request), is_deleted=False,
+        )
+        created_questions = Question.objects.bulk_create([
+            Question(form_id=form, **question_data) for question_data in questions_data
+        ])
 
         if created_questions:
             self._reset_completed_assignments(form_id)
@@ -118,6 +115,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return DRFResponse(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'])
+    @transaction.atomic
     def reorder(self, request, pk=None):
         """Update question order"""
         question = self.get_object()
@@ -131,8 +129,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         old_order = question.order
 
-        question.order = new_order
-        question.save()
+        serializer = self.get_serializer(question, data={'order': new_order}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        new_order = serializer.validated_data['order']
+        serializer.save()
 
         if new_order > old_order:
             Question.objects.filter(

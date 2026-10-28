@@ -2,13 +2,15 @@
 EvaluationAssignment ViewSet — CRUD, pending/completed lists, performance data, submit.
 """
 
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response as DRFResponse
+from rest_framework.exceptions import PermissionDenied
 from django.db import models
-from django.utils import timezone
+from apps.organizations.access import active_organization, is_organization_admin
+from ..services import save_answers, weighted_average
+from apps.validation import positive_id
 
-from apps.audit.utils import log_action, AuditActions
 
 from ..models import EvaluationForm, Question, EvaluationAssignment, Response
 from ..serializers import (
@@ -17,7 +19,7 @@ from ..serializers import (
 )
 
 
-class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
+class EvaluationAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for EvaluationAssignment CRUD operations"""
     queryset = EvaluationAssignment.objects.all()
     serializer_class = EvaluationAssignmentSerializer
@@ -31,20 +33,12 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
         # Exclude assignments for deleted forms
         queryset = queryset.filter(form_id__is_deleted=False)
 
-        org_id = self.request.query_params.get('organization_id')
+        org_id = active_organization(self.request)
         form_id = self.request.query_params.get('form_id')
         evaluator_id = self.request.query_params.get('evaluator_id')
         status_param = self.request.query_params.get('status')
 
-        is_admin = user.is_superuser
-        if not is_admin and org_id:
-            from apps.organizations.models import OrganizationRole
-            is_admin = OrganizationRole.objects.filter(
-                user=user,
-                organization_id=org_id,
-                role='Admin',
-                is_active=True
-            ).exists()
+        is_admin = is_organization_admin(self.request, org_id)
 
         if org_id:
             queryset = queryset.filter(form_id__organization_id=org_id)
@@ -57,9 +51,9 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(form_id__organization_id=org_id)
 
         if form_id:
-            queryset = queryset.filter(form_id=form_id)
+            queryset = queryset.filter(form_id=positive_id(form_id, 'form_id'))
         if evaluator_id:
-            queryset = queryset.filter(evaluator_id=evaluator_id)
+            queryset = queryset.filter(evaluator_id=positive_id(evaluator_id, 'evaluator_id'))
         if status_param:
             queryset = queryset.filter(status=status_param)
 
@@ -92,11 +86,11 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
         """Get aggregate performance data from received evaluations for a specific form or latest released form"""
         user = request.user
         form_id = request.query_params.get('form_id')
-        org_id = request.query_params.get('organization_id')
+        org_id = active_organization(request)
 
         all_evaluatee_assignments = EvaluationAssignment.objects.filter(
             evaluatee_id=user,
-            status='Completed'
+            status='Completed', form_id__is_deleted=False,
         ).select_related('form_id')
 
         if org_id:
@@ -146,17 +140,10 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
 
         # Overall max score
         form_questions = Question.objects.filter(form_id_id=selected_form_id)
-        if form_questions.exists():
-            total_weighted_max = 0
-            total_weight = 0
-            for q in form_questions:
-                q_max = q.max_value if q.max_value is not None else (100 if q.input_type == 'number' else 5)
-                if q.weight:
-                    total_weighted_max += q_max * q.weight
-                    total_weight += q.weight
-            overall_max_score = round(total_weighted_max / total_weight, 1) if total_weight > 0 else 5
-        else:
-            overall_max_score = 5
+        overall_max_score = weighted_average([
+            (q.score_bounds()[1], q.weight) for q in form_questions if q.weight
+        ])
+        overall_max_score = round(overall_max_score, 1) if overall_max_score is not None else 5
 
         # Evaluation history
         history_map = {}
@@ -195,12 +182,11 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
             question_max = question.max_value if question.max_value is not None else (100 if question.input_type == 'number' else 5)
 
             if category not in category_map:
-                category_map[category] = {'score_sum': 0, 'weight_sum': 0, 'max_score_sum': 0}
+                category_map[category] = {'scores': [], 'maximums': []}
 
             if response.score_value is not None and question.weight:
-                category_map[category]['score_sum'] += response.score_value * question.weight
-                category_map[category]['weight_sum'] += question.weight
-                category_map[category]['max_score_sum'] += question_max * question.weight
+                category_map[category]['scores'].append((response.score_value, question.weight))
+                category_map[category]['maximums'].append((question_max, question.weight))
 
             if response.text and response.text.strip():
                 feedback_type = 'info'
@@ -217,9 +203,9 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
 
         category_scores = []
         for name, data in category_map.items():
-            if data['weight_sum'] > 0:
-                avg_score = round(data['score_sum'] / data['weight_sum'], 1)
-                avg_max = round(data['max_score_sum'] / data['weight_sum'], 1)
+            if data['scores']:
+                avg_score = round(weighted_average(data['scores']), 1)
+                avg_max = round(weighted_average(data['maximums']), 1)
                 category_scores.append({
                     'name': name,
                     'score': avg_score,
@@ -241,7 +227,9 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
     def responses(self, request, pk=None):
         """Get all responses for an assignment"""
         assignment = self.get_object()
-        responses = Response.objects.filter(assignment_id=assignment)
+        if assignment.evaluator_id_id != request.user.pk and not is_organization_admin(request, active_organization(request)):
+            raise PermissionDenied('Only the evaluator or an administrator can view these answers.')
+        responses = Response.objects.filter(assignment_id=assignment).select_related('question_id')
         serializer = ResponseSerializer(responses, many=True)
         return DRFResponse(serializer.data)
 
@@ -249,73 +237,9 @@ class EvaluationAssignmentViewSet(viewsets.ModelViewSet):
     def submit(self, request, pk=None):
         """Submit an evaluation with responses"""
         assignment = self.get_object()
-
-        if assignment.status == 'Completed':
-            return DRFResponse(
-                {'error': 'Evaluation has already been submitted'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if assignment.evaluator_id != request.user:
-            return DRFResponse(
-                {'error': 'You are not authorized to submit this evaluation'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        responses_data = request.data.get('responses', [])
-
-        if not responses_data:
-            return DRFResponse(
-                {'error': 'At least one response is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        total_score = 0
-        total_weight = 0
-
-        created_responses = []
-        for response_data in responses_data:
-            question_id = response_data.get('question_id')
-            score_value = response_data.get('score_value')
-
-            response = Response.objects.create(
-                assignment_id=assignment,
-                question_id_id=question_id,
-                score_value=score_value,
-                text=response_data.get('text', '')
-            )
-            created_responses.append(response)
-
-            try:
-                question = Question.objects.get(id=question_id)
-                if question.weight and score_value is not None:
-                    total_score += score_value * question.weight
-                    total_weight += question.weight
-            except Question.DoesNotExist:
-                pass
-
-        assignment.status = 'Completed'
-        assignment.submitted_at = timezone.now()
-
-        if total_weight > 0:
-            assignment.total_score = total_score / total_weight
-        else:
-            assignment.total_score = None
-
-        assignment.save()
-
-        log_action(
-            request.user,
-            AuditActions.EVALUATION_SUBMITTED,
-            request,
-            assignment_id=str(assignment.id),
-            evaluatee_id=str(assignment.evaluatee_id.id),
-            score=str(assignment.total_score)
-        )
-
-        serializer = EvaluationAssignmentSerializer(assignment)
+        assignment, responses = save_answers(request, assignment.pk, request.data, submit=True)
         return DRFResponse({
             'message': 'Evaluation submitted successfully',
-            'assignment': serializer.data,
-            'responses': ResponseSerializer(created_responses, many=True).data
+            'assignment': EvaluationAssignmentSerializer(assignment).data,
+            'responses': ResponseSerializer(responses, many=True).data,
         })

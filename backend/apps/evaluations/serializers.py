@@ -1,9 +1,32 @@
 from rest_framework import serializers
 from .models import EvaluationForm, Question, EvaluationAssignment, AssignmentRule, Response
+from apps.validation import ValidatedModelSerializer, FiniteFloatField
+from apps.organizations.access import active_organization
 
 
-class QuestionSerializer(serializers.ModelSerializer):
+class ScopedEvaluationSerializer(ValidatedModelSerializer):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get('request')
+        if request:
+            org_id = active_organization(request)
+            organization = attrs.get('organization_id')
+            form = attrs.get('form_id')
+            if organization and organization.pk != org_id:
+                raise serializers.ValidationError({'organization_id': 'Use the active organization.'})
+            if form and (form.organization_id_id != org_id or form.is_deleted):
+                raise serializers.ValidationError({'form_id': 'Form must belong to the active organization.'})
+        if self.instance:
+            for name in ('organization_id', 'form_id'):
+                value = attrs.get(name)
+                if value and value.pk != getattr(self.instance, name + '_id'):
+                    raise serializers.ValidationError({name: 'The parent relationship cannot be changed.'})
+        return attrs
+
+
+class QuestionSerializer(ScopedEvaluationSerializer):
     """Serializer for Question model"""
+    weight = FiniteFloatField(required=False, allow_null=True)
     
     class Meta:
         model = Question
@@ -11,8 +34,9 @@ class QuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class QuestionCreateSerializer(serializers.ModelSerializer):
+class QuestionCreateSerializer(ValidatedModelSerializer):
     """Serializer for creating questions with validation"""
+    weight = FiniteFloatField(required=False, allow_null=True)
     
     class Meta:
         model = Question
@@ -29,7 +53,7 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
         return value
 
 
-class EvaluationFormSerializer(serializers.ModelSerializer):
+class EvaluationFormSerializer(ScopedEvaluationSerializer):
     """Serializer for EvaluationForm model"""
     questions = QuestionSerializer(many=True, read_only=True)
     created_by_name = serializers.CharField(source='created_by.email', read_only=True)
@@ -44,7 +68,7 @@ class EvaluationFormSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
 
 
-class EvaluationFormCreateSerializer(serializers.ModelSerializer):
+class EvaluationFormCreateSerializer(ScopedEvaluationSerializer):
     """Serializer for creating evaluation forms with nested questions"""
     questions = QuestionCreateSerializer(many=True, required=False)
     
@@ -58,6 +82,7 @@ class EvaluationFormCreateSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         """Validate form dates"""
+        attrs = super().validate(attrs)
         start_date = attrs.get('start_date')
         end_date = attrs.get('end_date')
         
@@ -79,7 +104,7 @@ class EvaluationFormCreateSerializer(serializers.ModelSerializer):
         return form
 
 
-class AssignmentRuleSerializer(serializers.ModelSerializer):
+class AssignmentRuleSerializer(ScopedEvaluationSerializer):
     """Serializer for AssignmentRule model"""
     evaluator_unit_name     = serializers.CharField(source='evaluator_unit.name', read_only=True, default=None)
     evaluator_position_name = serializers.CharField(source='evaluator_position.name', read_only=True, default=None)
@@ -142,60 +167,22 @@ class ResponseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class ResponseCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating responses"""
-    
-    class Meta:
-        model = Response
-        fields = ['id', 'question_id', 'score_value', 'text']
-        read_only_fields = ['id']
-    
-    def validate(self, attrs):
-        """Validate response based on question type"""
-        question = attrs.get('question_id')
-        score_value = attrs.get('score_value')
-        text = attrs.get('text')
-        
-        if question.input_type in ['rating', 'number', 'dropdown']:
-            if score_value is None:
-                if question.is_required:
-                    raise serializers.ValidationError({
-                        'score_value': f"This question requires a score value for {question.input_type} type"
-                    })
-            else:
-                min_val = question.min_value if question.min_value is not None else 0
-                max_val = question.max_value if question.max_value is not None else 10
-                if score_value < min_val or score_value > max_val:
-                    raise serializers.ValidationError({
-                        'score_value': f'Score must be between {min_val} and {max_val}'
-                    })
-        
-        if question.input_type in ['text', 'textarea']:
-            if not text or not text.strip():
-                if question.is_required:
-                    raise serializers.ValidationError({
-                        'text': 'This question requires a text response'
-                    })
-        
-        return attrs
+class AnswerSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField(min_value=1)
+    score_value = FiniteFloatField(required=False, allow_null=True, default=None)
+    text = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
 
 
-class EvaluationSubmitSerializer(serializers.Serializer):
-    """Serializer for submitting evaluations with multiple responses"""
-    assignment_id = serializers.IntegerField()
-    responses = ResponseCreateSerializer(many=True)
-    
-    def validate_assignment_id(self, value):
-        """Validate assignment exists and is pending"""
-        try:
-            assignment = EvaluationAssignment.objects.get(id=value)
-            if assignment.status == 'Completed':
-                raise serializers.ValidationError('This evaluation has already been submitted')
-        except EvaluationAssignment.DoesNotExist:
-            raise serializers.ValidationError('Assignment not found')
-        return value
-    
-    def validate_responses(self, responses):
-        """Validate all responses are for questions in the assignment's form"""
-        # This validation will be done in the view for access to the assignment
-        return responses
+class AnswerBatchSerializer(serializers.Serializer):
+    responses = AnswerSerializer(many=True)
+
+    def validate_responses(self, answers):
+        ids = [answer['question_id'] for answer in answers]
+        if len(ids) != len(set(ids)):
+            raise serializers.ValidationError('Each question may appear only once.')
+        return answers
+
+
+class QuestionBatchSerializer(serializers.Serializer):
+    form_id = serializers.IntegerField(min_value=1, max_value=2147483647)
+    questions = QuestionCreateSerializer(many=True)

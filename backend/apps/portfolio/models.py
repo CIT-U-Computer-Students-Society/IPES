@@ -14,3 +14,11 @@ class Accomplishment(models.Model):
     comments = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        indexes = [models.Index(
+            fields=['organization_id', 'status', '-date_completed', '-id'], name='accomplishment_queue_idx',
+        )]
+        constraints = [models.CheckConstraint(
+            condition=models.Q(status__in=['Pending', 'Verified', 'Rejected']), name='accomplishment_status_valid',
+        )]

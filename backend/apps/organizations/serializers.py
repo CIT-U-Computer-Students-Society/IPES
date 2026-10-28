@@ -1,8 +1,20 @@
 from rest_framework import serializers
 from .models import Organization, UnitType, OrganizationUnit, PositionType, Membership, JoinRequest
+from apps.validation import ValidatedModelSerializer
+from .access import active_organization
 
 
-class OrganizationSerializer(serializers.ModelSerializer):
+class OrganizationChildSerializer(ValidatedModelSerializer):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get('request')
+        organization = attrs.get('organization_id') or (self.instance.organization_id if self.instance else None)
+        if request and organization and organization.pk != active_organization(request):
+            raise serializers.ValidationError({'organization_id': 'Use the active organization.'})
+        return attrs
+
+
+class OrganizationSerializer(ValidatedModelSerializer):
     """Serializer for Organization model"""
     
     class Meta:
@@ -14,7 +26,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class UnitTypeSerializer(serializers.ModelSerializer):
+class UnitTypeSerializer(OrganizationChildSerializer):
     """Serializer for UnitType model"""
     organization_name = serializers.CharField(source='organization_id.name', read_only=True)
     
@@ -24,7 +36,7 @@ class UnitTypeSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class OrganizationUnitSerializer(serializers.ModelSerializer):
+class OrganizationUnitSerializer(OrganizationChildSerializer):
     """Serializer for OrganizationUnit model"""
     organization_name = serializers.CharField(source='organization_id.name', read_only=True)
     type_name = serializers.CharField(source='type_id.name', read_only=True)
@@ -39,7 +51,7 @@ class OrganizationUnitSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class PositionTypeSerializer(serializers.ModelSerializer):
+class PositionTypeSerializer(OrganizationChildSerializer):
     """Serializer for PositionType model"""
     organization_name = serializers.CharField(source='organization_id.name', read_only=True)
     
@@ -49,7 +61,7 @@ class PositionTypeSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class MembershipSerializer(serializers.ModelSerializer):
+class MembershipSerializer(ValidatedModelSerializer):
     """Serializer for Membership model"""
     user_email = serializers.CharField(source='user_id.email', read_only=True)
     unit_name = serializers.CharField(source='unit_id.name', read_only=True)
@@ -67,6 +79,10 @@ class MembershipSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Ensure uniqueness: a user cannot have the exact same unit+position entry twice."""
+        data = super().validate(data)
+        unit = data.get('unit_id') or (self.instance.unit_id if self.instance else None)
+        if unit and self.context.get('request') and unit.organization_id_id != active_organization(self.context['request']):
+            raise serializers.ValidationError({'unit_id': 'Use a unit in the active organization.'})
         # Only enforce on create (instance is None) or when unit/position/user are being changed
         user = data.get('user_id') or (self.instance.user_id if self.instance else None)
         unit = data.get('unit_id') or (self.instance.unit_id if self.instance else None)

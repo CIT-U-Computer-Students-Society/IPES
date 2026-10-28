@@ -25,7 +25,7 @@ To establish a professional, developer-friendly repository:
 ## 2. User Review Required
 
 > [!NOTE]
-> All links from the root `README.md` and the `docs/README.md` index will use clickable local file paths referencing the workspace files using the `file:///` scheme.
+> All links from the root `README.md` and the `docs/README.md` index will use repository-relative paths.
 
 There are no other breaking changes, code alterations, or critical dependencies introduced by this change.
 
@@ -43,35 +43,35 @@ We will create several new documentation files under the `docs/` folder and edit
 
 ### Documentation Index & Navigation
 
-#### [MODIFY] [README.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/README.md)
+#### [MODIFY] [README.md](../../../../README.md)
 Prune the ERD, sequence diagrams, setup, run, test, and API sections. Retain the banner, tech stack, and project structure, and add a "Documentation Guide" section linking to the new docs.
 
-#### [NEW] [docs/README.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/README.md)
+#### [NEW] [docs/README.md](../../../../docs/README.md)
 Navigation README for developers linking to the modular guides.
 
 ---
 
 ### Technical Modules
 
-#### [NEW] [docs/architecture/ERD.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/architecture/ERD.md)
+#### [NEW] [docs/architecture/ERD.md](../../../../docs/architecture/ERD.md)
 Houses the Mermaid database ERD.
 
-#### [NEW] [docs/architecture/sequence_diagrams/evaluation_form_lifecycle.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/architecture/sequence_diagrams/evaluation_form_lifecycle.md)
+#### [NEW] [docs/architecture/sequence_diagrams/evaluation_form_lifecycle.md](../../../../docs/architecture/sequence_diagrams/evaluation_form_lifecycle.md)
 Houses the sequence diagram mapping the evaluation flow.
 
-#### [NEW] [docs/architecture/sequence_diagrams/accomplishment_verification.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/architecture/sequence_diagrams/accomplishment_verification.md)
+#### [NEW] [docs/architecture/sequence_diagrams/accomplishment_verification.md](../../../../docs/architecture/sequence_diagrams/accomplishment_verification.md)
 Houses the sequence diagram mapping the accomplishment approval flow.
 
-#### [NEW] [docs/SETUP.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/SETUP.md)
+#### [NEW] [docs/SETUP.md](../../../../docs/SETUP.md)
 Prerequisites, virtual environment setups, dependencies, and launch commands.
 
-#### [NEW] [docs/TESTING.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/TESTING.md)
+#### [NEW] [docs/TESTING.md](../../../../docs/TESTING.md)
 Instructions on running backend Django tests and frontend Vitest suites.
 
-#### [NEW] [docs/API_Design.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/API_Design.md)
+#### [NEW] [docs/API_Design.md](../../../../docs/API_Design.md)
 The Django REST Framework endpoints registry.
 
-#### [NEW] [docs/CONTRIBUTING.md](file:///C:/Users/Rafael/.gemini/antigravity/worktrees/IPES/separate-backend-frontend-modules/docs/CONTRIBUTING.md)
+#### [NEW] [docs/CONTRIBUTING.md](../../../../docs/CONTRIBUTING.md)
 Developer guide explaining strict branching policy and conventional commit rules.
 
 ---

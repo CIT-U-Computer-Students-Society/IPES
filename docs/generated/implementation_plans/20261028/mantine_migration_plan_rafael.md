@@ -30,21 +30,21 @@ use component regressions and mocked API browser checks for deterministic UI QA.
 
 ## 4. Proposed Changes
 
-#### [MODIFY] [Application providers](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/App.tsx)
+#### [MODIFY] [Application providers](../../../../frontend/src/App.tsx)
 
 Mount the Mantine theme and notifications once, replacing the old tooltip/toast
 provider tree. Preserve query, organization, and router providers.
 
-#### [MODIFY] [Theme provider](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/components/theme-provider.tsx)
+#### [MODIFY] [Theme provider](../../../../frontend/src/components/theme-provider.tsx)
 
 Define branded Mantine colors, typography, and color-scheme persistence. Bridge
 the computed scheme to the page layout's existing `.dark` CSS selector.
 
-#### [MODIFY] [Theme toggle](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/components/theme-toggle.tsx)
+#### [MODIFY] [Theme toggle](../../../../frontend/src/components/theme-toggle.tsx)
 
 Use Mantine's computed color scheme and an accessible icon button.
 
-#### [MODIFY] [Shared UI modules](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/components/ui)
+#### [MODIFY] [Shared UI modules](../../../../frontend/src/components/ui)
 
 Replace buttons, inputs, textareas, cards, badges, avatars, tabs, tables,
 progress, radios, switches, dividers, skeletons, alerts, menus, selects, and
@@ -52,35 +52,35 @@ dialogs with Mantine implementations. Remove unused legacy exports and packages.
 Keep destructive confirmations explicit and cancel-first. Keep the form helper
 compatible with React Hook Form without Radix's Slot or Label.
 
-#### [NEW] [Notification adapter](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/lib/notifications.ts)
+#### [NEW] [Notification adapter](../../../../frontend/src/lib/notifications.ts)
 
 Route the application's existing notification calls to Mantine Notifications,
 preserving titles, descriptions, and success/error semantics.
 
-#### [MODIFY] [Global styles](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/index.css)
+#### [MODIFY] [Global styles](../../../../frontend/src/index.css)
 
 Layer Mantine styles between page resets and Tailwind overrides. Preserve
 application color variables and responsive layouts. Import library styles from
 `main.tsx`, with `styles/layers.css` declaring their cascade order before the
 Tailwind entry. Raise dark-mode primary contrast for page text and icons.
 
-#### [MODIFY] [Organization context](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/contexts/OrganizationContext.tsx)
+#### [MODIFY] [Organization context](../../../../frontend/src/contexts/OrganizationContext.tsx)
 
 Keep the cleanup callback stable so selecting an organization does not rerun
 the selector effect and erase the selection before dashboard navigation.
 Browser QA reproduced this loop; add a route-guard regression.
 
-#### [MODIFY] [Package manifest](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/package.json)
+#### [MODIFY] [Package manifest](../../../../frontend/package.json)
 
 Add exact Mantine 9.7.4 packages, remove replaced UI packages, regenerate npm's
 lockfile, and verify a clean install without peer overrides.
 
-#### [MODIFY] [Agent conventions](C:/Users/Rafael/.codex/worktrees/40b9/IPES/AGENTS.md)
+#### [MODIFY] [Agent conventions](../../../../AGENTS.md)
 
 Update the shared-component convention to Mantine, reflecting the authorized
 migration while retaining API, organization, and form requirements.
 
-#### [NEW] [UI interaction tests](C:/Users/Rafael/.codex/worktrees/40b9/IPES/frontend/src/components/__tests__/mantine-ui.test.tsx)
+#### [NEW] [UI interaction tests](../../../../frontend/src/components/__tests__/mantine-ui.test.tsx)
 
 Cover meaningful interactions through the shared API and Mantine provider,
 including selection, dialogs, menus, themes, and disabled controls. Update the
@@ -110,7 +110,7 @@ visible and accessible after removing Radix-specific peer styling.
 ### Recorded outcome
 
 Both suites, clean installation, lint, app type checking, and build passed.
-See [the dependency audit](C:/Users/Rafael/.codex/worktrees/40b9/IPES/docs/DEPENDENCIES.md)
+See [the dependency audit](../../../../docs/DEPENDENCIES.md)
 for exact counts, measured bundle sizes, remaining warnings, and browser scenarios.
 Wide-screen fixture checks passed; narrow-screen browser testing and a live
 backend end-to-end run were not performed.

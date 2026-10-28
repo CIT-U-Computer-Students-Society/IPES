@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v1.0.1...web-v1.0.2) (2026-10-28)
+
+
+### Performance
+
+* **frontend:** load routes and desktop animation on demand ([a8099a8](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/a8099a8c759f005b81c0999677a0bdd4b7defd37))
+
+
+### Maintenance
+
+* **release:** promote Mantine UI and dependency cleanup ([417238b](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/417238ba324a737b8da17cb939bf734cd8ff2554))
+
 ## [1.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v1.0.0...web-v1.0.1) (2026-10-28)
 
 

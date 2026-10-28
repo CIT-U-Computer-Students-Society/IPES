@@ -181,33 +181,42 @@ export const useFormAnalytics = (formId: number | undefined) => {
     queryKey: ['forms', formId, 'analytics'],
     queryFn: async () => {
       const response = await api.get(`/forms/${formId}/analytics/`);
-      return response.json() as Promise<{
-        form_details: {
-          title: string;
-          description: string;
-          created_at: string | null;
-          end_date: string | null;
-          is_active: boolean;
-          results_released: boolean;
-        };
-        overall_score: number;
-        total_evaluations: number;
-        participation_rate: number;
-        category_data: { name: string; score: number }[];
-        trend_data: { month: string; score: number }[];
-        top_performers: { rank: number; name: string; unit: string; score: number; trend: string }[];
-        unit_breakdown: { unit: string; members: number; avgScore: number; completion: number }[];
-        unit_data: { name: string; value: number; color: string }[];
-        raw_data: {
-          evaluator_name: string;
-          evaluatee_name: string;
-          question_text: string;
-          score: number | null;
-          text_response: string | null;
-          submitted_at: string | null;
-        }[];
-      }>;
+      return response.json() as Promise<FormAnalytics>;
     },
     enabled: !!formId,
   });
 };
+
+export type FormAnalytics = {
+  form_details: {
+    title: string;
+    description: string;
+    created_at: string | null;
+    end_date: string | null;
+    is_active: boolean;
+    results_released: boolean;
+  };
+  overall_score: number;
+  total_evaluations: number;
+  participation_rate: number;
+  category_data: { name: string; score: number }[];
+  trend_data: { month: string; score: number }[];
+  top_performers: { rank: number; name: string; unit: string; score: number; trend: string }[];
+  unit_breakdown: { unit: string; members: number; avgScore: number; completion: number }[];
+  unit_data: { name: string; value: number; color: string }[];
+  raw_data: {
+    evaluator_name: string;
+    evaluatee_name: string;
+    question_text: string;
+    score: number | null;
+    text_response: string | null;
+    submitted_at: string | null;
+  }[];
+};
+
+export const useExportFormAnalytics = () => useMutation({
+  mutationFn: async (formId: number) => {
+    const response = await api.get(`/forms/${formId}/analytics_export/`);
+    return response.json() as Promise<FormAnalytics>;
+  },
+});
