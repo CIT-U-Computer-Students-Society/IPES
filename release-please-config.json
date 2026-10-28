@@ -1,13 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "bootstrap-sha": "5357621691101232005144b389a899361e9993ef",
-  "separate-pull-requests": true,
+  "separate-pull-requests": false,
+  "group-pull-request-title-pattern": "Release components on ${branch}",
   "include-component-in-tag": true,
   "include-v-in-tag": true,
   "tag-separator": "-",
   "bump-minor-pre-major": true,
   "pull-request-title-pattern": "Release${component} ${version}",
-  "pull-request-header": "## Description\n\nPrepare an independent component release. Merge this PR into `dev`, then promote `dev` to `main` to publish its tag and GitHub release.\n\n```mermaid\nflowchart LR\n  Changes --> ReleasePR[Component release PR]\n  ReleasePR --> dev\n  dev --> main\n  main --> Tag[Component tag and GitHub release]\n```",
+  "pull-request-header": "## Description\n\nPrepare component releases together in one PR. Each component keeps its own version and changelog. Merge this PR into `dev`, then promote `dev` to `main` to publish independent component tags and GitHub releases.\n\n```mermaid\nflowchart LR\n  Changes --> ReleasePR[Combined release PR]\n  ReleasePR --> dev\n  dev --> main\n  main --> Tags[Component tags and GitHub releases]\n```",
   "pull-request-footer": "## Type of change\n\n- [x] This change requires a documentation update\n\n## How Has This Been Tested?\n\n| Check | Command or evidence | Status |\n| --- | --- | --- |\n| Backend suite | `cd backend && python manage.py test` | Unrun by release automation; record local results before merging |\n| Frontend suite | `cd frontend && npm run test -- --run` | Unrun by release automation; record local results before merging |\n| Release regression tests | `node --test .github/scripts/publish-releases.test.cjs` | Inspect Release Automation Tests workflow |\n| CI | PR Validation workflow | Inspect actual check results separately |\n| Regression scenarios | Review component changes listed above | Unrun by release automation |\n\n## Checklist\n\n- [ ] Self-review completed\n- [ ] Both test suites pass locally\n- [ ] Required CI checks pass\n- [ ] Changelog and version changes reviewed",
   "changelog-sections": [
     { "type": "feat", "section": "Features" },

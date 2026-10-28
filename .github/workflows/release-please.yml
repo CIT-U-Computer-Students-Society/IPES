@@ -21,7 +21,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - name: Prepare independent component release PRs
+      - name: Prepare combined component release PR
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
