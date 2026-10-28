@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { RouteLoading } from "@/components/RouteLoading";
+import { Suspense, useState } from "react";
 import { Link, useLocation, Outlet, Navigate } from "react-router-dom";
 import { useCurrentUser, useLogout } from "@/hooks/useUsers";
 import { useOrganizationState } from "@/contexts/OrganizationContext";
@@ -181,7 +182,9 @@ const OfficerLayout = () => {
 
         {/* Page content */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          <Outlet />
+          <Suspense fallback={<RouteLoading />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
