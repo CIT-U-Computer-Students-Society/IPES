@@ -4,7 +4,14 @@ import { Outlet } from "react-router-dom";
 import { useMediaQuery } from "@mantine/hooks";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const DotLottieReact = lazy(() => import("@lottiefiles/dotlottie-react").then((module) => ({ default: module.DotLottieReact })));
+const DotLottieReact = lazy(async () => {
+  const [module, wasm] = await Promise.all([
+    import("@lottiefiles/dotlottie-react"),
+    import("@lottiefiles/dotlottie-web/dist/dotlottie-player.wasm?url"),
+  ]);
+  module.setWasmUrl(wasm.default);
+  return { default: module.DotLottieReact };
+});
 
 export default function AuthLayout() {
   const showAnimation = useMediaQuery("(min-width: 1024px)");

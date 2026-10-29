@@ -42,7 +42,7 @@ class AccomplishmentCreateSerializer(serializers.ModelSerializer):
         from django.core.validators import URLValidator
         from django.core.exceptions import ValidationError
         
-        validator = URLValidator()
+        validator = URLValidator(schemes=['http', 'https'])
         try:
             validator(value)
         except ValidationError:
@@ -107,7 +107,7 @@ class AccomplishmentUpdateSerializer(serializers.ModelSerializer):
         from django.core.validators import URLValidator
         from django.core.exceptions import ValidationError
         
-        validator = URLValidator()
+        validator = URLValidator(schemes=['http', 'https'])
         try:
             validator(value)
         except ValidationError:

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -70,6 +71,22 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "IPES.urls"
+
+# Also protect HTML served by Django. Static frontend builds carry their own
+# matching policy; additional API origins apply only to connect-src.
+SECURE_CSP = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'", "'wasm-unsafe-eval'"],
+    'script-src-attr': ["'none'"],
+    'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+    'font-src': ["'self'", 'https://fonts.gstatic.com'],
+    'img-src': ["'self'", 'https:', 'data:', 'blob:'],
+    'connect-src': ["'self'", *config('CSP_CONNECT_SRC', default='', cast=lambda v: v.split())],
+    'object-src': ["'none'"],
+    'base-uri': ["'none'"],
+    'form-action': ["'self'"],
+    'frame-ancestors': ["'none'"],
+}
 
 TEMPLATES = [
     {

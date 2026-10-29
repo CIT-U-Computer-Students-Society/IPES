@@ -1,3 +1,4 @@
+import { ProofLink } from "@/components/ProofLink";
 import { useState } from "react";
 import {
   Trophy,
@@ -245,13 +246,9 @@ const AdminAccomplishments = () => {
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         {acc.proof_link && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(acc.proof_link, '_blank')}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
+                          <ProofLink url={acc.proof_link} className="inline-flex rounded p-2 hover:bg-muted">
+                            <ExternalLink className="w-4 h-4" aria-label="View proof" />
+                          </ProofLink>
                         )}
                         <Button
                           variant="ghost"
@@ -299,14 +296,12 @@ const AdminAccomplishments = () => {
               {selectedAccomplishment.proof_link && (
                 <div>
                   <Label className="text-muted-foreground">Proof Link</Label>
-                  <a
-                    href={selectedAccomplishment.proof_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <ProofLink
+                    url={selectedAccomplishment.proof_link}
                     className="text-primary hover:underline flex items-center gap-1"
                   >
                     View Documentation <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </ProofLink>
                 </div>
               )}
 
