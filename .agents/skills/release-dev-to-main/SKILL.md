@@ -10,7 +10,7 @@ Use this skill whenever you are asked to merge `dev` into `main`. This is a **re
 Also apply [git-pr](../git-pr/SKILL.md) for descriptive titles, a Mermaid change diagram, and testing charts covering automated suites, regression scenarios, and other applicable checks. Use the release body structure below in place of the standard PR template, while retaining those shared evidence requirements.
 
 > [!IMPORTANT]
-> CI enforces that `main` can **only** be updated via a PR from `dev`. Never merge any other branch directly into `main`.
+> CI permits ordinary promotion PRs into `main` only from `dev`. The same-repository `release-please--branches--main` branch is also allowed for automated component version and changelog PRs; see [the release guide](../../../docs/RELEASING.md). Other branches must go through `dev`.
 
 ---
 

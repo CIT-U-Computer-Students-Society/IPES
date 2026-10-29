@@ -30,8 +30,8 @@ without Python package version metadata. No npm or Python package is published.
 The workflow's `issues: write` permission is used for release lifecycle labels.
 Production publication uses the job's `GITHUB_TOKEN`, with `contents: write`,
 `issues: write`, and `pull-requests: write`, to create releases and update labels
-on release PRs. The optional `RELEASE_PLEASE_TOKEN` is used only to prepare PRs on
-`dev`; its permissions do not control production publication.
+on release PRs. The optional `RELEASE_PLEASE_TOKEN` is used only to prepare PRs into
+`main`; its permissions do not control production publication.
 These permissions do not grant automatic approval or merging. Required CI checks and both local
 application suites must pass before a merge.
 
@@ -39,36 +39,32 @@ application suites must pass before a merge.
 
 ```mermaid
 flowchart TD
-  Changes[Conventional commits on dev] --> RP[Release Please]
-  RP --> Combined[Combined release PR into dev]
-  Combined --> Review[Review component versions and changelogs]
-  Review --> Dev[Merge release PR into dev]
-  Dev --> Promote[Reviewed dev to main PR]
-  Promote --> Check[Verify release commits are ancestors of main]
-  Check --> Publish[Publish independent tags and GitHub releases]
+  Changes[Conventional commits on dev] --> Promote[Reviewed dev to main PR]
+  Promote --> RP[Release Please on main]
+  RP --> Combined[Combined release PR into main]
+  Combined --> Review[Review versions, changelogs, and CI]
+  Review --> Merge[Merge release PR into main]
+  Merge --> Publish[Publish independent tags and GitHub releases]
+  Merge --> Sync[Sync main back into dev via PR]
 ```
 
-1. Merge Conventional Commits into `dev`. Release Please runs on every push and
-   opens or updates one combined PR for all changed components.
-2. Review and merge that release PR. It contains independent component version
-   bumps and changelogs, and one shared update to `.release-please-manifest.json`.
-   Components without releasable changes retain their current versions.
-3. Promote `dev` to `main` using a **merge commit**, preserving the release commits.
-   Do not squash or rebase this promotion: the publisher verifies commit ancestry.
-   The existing rule allowing only `dev` PRs into `main` remains in force.
-4. The `main` workflow finds merged Release Please PRs still labelled
-   `autorelease: pending`. It publishes only those whose merge commits are reachable
-   from the workflow's production commit. Newer work on `dev` remains unpublished.
-5. For each changed manifest version, the publisher creates a component tag at
-   that release commit and a GitHub release with that version's changelog entry.
-   Successful PRs become `autorelease: tagged`. Independent releases do not compete
-   for the repository's single GitHub “latest release” designation.
+1. Merge Conventional Commits into `dev`, then promote application work to `main`
+   through a reviewed PR. Release Please reads the commits already on `main`.
+2. On each push to `main`, publish pending releases first, then prepare or update
+   one combined release PR targeting `main`. Components without releasable changes
+   retain their versions. Publication failures stop preparation until recovery.
+3. Review the independent version bumps, changelogs, shared manifest, and CI.
+   The branch check permits the same-repository `release-please--branches--main`
+   branch as well as ordinary `dev` promotion PRs. Validation runs for both targets.
+4. Merge the release PR into `main`. The next workflow publishes component tags
+   at its merge commit with the corresponding changelog entries, then marks the
+   PR `autorelease: tagged`. Releases do not compete for the GitHub latest label.
+5. Merge the existing main-to-dev sync PR to bring release metadata back to `dev`.
 
-Release Please pauses creation of further release PRs while merged release PRs
-remain pending. Promote those PRs and publish them before preparing the next cycle.
-Components need not share version numbers, and a documentation-only release does
-not increment either application version. Promotion still deploys everything
-included in `dev`; this automation separates release metadata, not deployment jobs.
+Release Please pauses new release PR creation while merged releases remain pending.
+Rerun publication to finish those releases before starting the next cycle.
+Components have independent version numbers; a docs-only release does not bump
+application versions. No workflow auto-merges release PRs.
 
 ## Commit conventions and changelogs
 
@@ -93,18 +89,17 @@ SHA forward during normal maintenance.
 
 ## Verification and recovery
 
-### Migrating from separate release PRs
+### Migrating release PRs from dev to main
 
-After merging the combined-PR configuration into `dev`, close any remaining
-unmerged component release PRs and run **Release Please** manually on `dev`.
-The replacement PR uses branch `release-please--branches--dev`. Review its diff
-to confirm it contains the outstanding component changes. Do not merge the old
-conflicting PRs or copy their complete manifest over the current one.
+Promote this configuration to `main` through the usual reviewed `dev` PR. Close
+unmerged Release Please PRs targeting `dev`, then run **Release Please** on `main`
+to create the replacement branch `release-please--branches--main`. Review the
+replacement diff rather than copying an old manifest.
 
-Already merged component PRs remain eligible for publication after promotion to
-`main`; the publisher accepts both combined and legacy component PR branches.
-If a merged release is still `autorelease: pending`, promote and publish it before
-expecting the next release PR. Keep its pending label until publication succeeds.
+Already merged combined and legacy component release PRs targeting `dev` remain
+eligible for publication once their merge commits are ancestors of `main`. Preserve
+those commits with a merge promotion. Keep pending labels until publication succeeds.
+New release PRs target `main` directly and need no additional promotion.
 
 ### Checks and publication recovery
 
@@ -123,8 +118,7 @@ failures, retries, and rejection of unrelated PRs. Before merging, also run
 To recover a failed publication, rerun the failed workflow or manually run
 **Release Please** with branch `main` selected. Existing releases are skipped;
 the pending label stays until every component in that PR has published. Never
-remove that label manually to bypass an error. A manual run on `dev` refreshes
-release PRs; it does not publish production releases. No workflow auto-merges PRs
+remove that label manually to bypass an error. Manual dispatch must select `main`; a run on `dev` skips both jobs. No workflow auto-merges PRs
 or changes deployment settings.
 
 If a release was published but updating its PR labels returned HTTP 403, correct
