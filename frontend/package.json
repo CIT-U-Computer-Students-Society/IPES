@@ -11,7 +11,14 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "test:e2e:all": "node scripts/run-e2e.mjs --all",
+    "test:e2e:headed": "node scripts/run-e2e.mjs --headed",
+    "test:requirements": "node scripts/validate-requirements.mjs",
+    "test:e2e:types": "tsc -p tsconfig.e2e.json",
+    "test:harness": "node --test scripts/verify-evidence.test.mjs",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

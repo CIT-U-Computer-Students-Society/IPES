@@ -113,6 +113,7 @@ jobs:
       - name: Test frontend
         run: |
           npm run test:coverage
+          npm run test:harness
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -121,3 +122,6 @@ jobs:
           path: frontend/coverage/unit/
           retention-days: 14
           if-no-files-found: error
+
+  validate-e2e:
+    uses: ./.github/workflows/e2e.yml
