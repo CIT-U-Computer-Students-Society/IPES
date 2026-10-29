@@ -28,3 +28,15 @@ db.sqlite3
 # Frontend
 frontend/node_modules/
 frontend/dist/
+
+# Disposable testing runtime and evidence (synthetic authentication may be in traces)
+backend/.e2e/
+backend/.coverage
+backend/.coverage.*
+backend/coverage/
+frontend/dist-e2e/
+frontend/coverage/
+frontend/e2e-artifacts/
+frontend/playwright-report/
+frontend/test-results/
+frontend/.auth/

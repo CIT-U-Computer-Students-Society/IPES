@@ -1,44 +1,61 @@
-# Testing Guide
+# Testing IPES
 
-This document describes how to execute the test suites for both the backend (Django) and frontend (React/Vitest) applications.
+All database-backed tests use an isolated PostgreSQL service. Frontend component tests run independently of PostgreSQL.
 
----
+## Start PostgreSQL locally
 
-## 🧪 Testing the Application
+From the repository root, with Docker Desktop running Linux containers:
 
-The project uses Django's built-in testing framework for the backend and Vitest/React Testing Library for the frontend.
+```powershell
+docker compose --env-file backend/test.env.example -f compose.test.yml up -d --wait
+```
 
-### Backend Tests
+The explicit environment file avoids loading the application's root `.env` through Compose. PostgreSQL binds to `127.0.0.1:55432` and uses disposable tmpfs storage. The `ipes_test` role can create databases but cannot act as a superuser or manage roles. The bootstrap role initializes this test cluster only.
 
-To run the backend tests, ensure your virtual environment is active and you are in the `backend` directory.
+PostgreSQL 17 is the test baseline. Confirm the production major version and update the Compose/CI image together if it differs. Tests record the actual server version; matching the engine alone does not establish parity with managed Supabase configuration/storage.
 
-The project is configured to automatically use a local **SQLite** database for tests to ensure speed and isolation.
+A native local PostgreSQL service is also supported: initialize a dedicated control database and roles with `backend/scripts/init-test-postgres.sql`, then set `IPES_TEST_HOST`, `IPES_TEST_PORT` and `IPES_TEST_PASSWORD` in the shell. These never inherit application `DB_*` credentials. Remote hosts are rejected; CI also supports the service hostname `postgres`.
 
-```bash
-# Navigate to backend directory
-cd backend
+## Backend tests and coverage
 
-# Run all backend tests
+From `backend/`, with the virtual environment activated:
+
+```powershell
+. .\.venv\Scripts\Activate.ps1
+uv pip install --python .venv/Scripts/python.exe -r requirements-dev.txt
+python scripts/test_database.py check
 python manage.py test
-
-# Run tests for specific apps
-python manage.py test apps.users apps.organizations
+python -m coverage run --context=backend-tests manage.py test
+python -m coverage html
+python -m coverage xml
 ```
 
-> [!NOTE]
-> The test runner automatically overrides the `DATABASES` setting to use SQLite when the `test` command is detected. This prevents session conflicts and permission issues often encountered when testing against a remote PostgreSQL instance (like Supabase). If you need to test Postgres-specific features, you can temporarily disable this override in `IPES/settings.py`.
+On Linux activate `.venv/bin/activate`; `pip install -r requirements-dev.txt` is also supported. The test bootstrap selects `IPES.settings_test`. Django creates/migrates/drops a fresh `test_ipes_unit_*` database. PostgreSQL unavailability fails the command. There is no SQLite fallback, and the row-lock test must execute.
 
-### Frontend Tests
+Reports are under `backend/coverage/unit/`. Pure guard checks can run without PostgreSQL:
 
-The frontend uses Vitest for rapid execution and React Testing Library for simulating user interactions. Navigate to the `frontend` directory:
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Run frontend tests in the console
-npm run test
-
-# Run tests with a visual, interactive dashboard in your browser
-npm run test:ui
+```powershell
+python -m unittest tests.test_database_safety
 ```
+
+These guard checks do not verify database/application correctness.
+
+## Frontend tests and coverage
+
+From `frontend/`:
+
+```powershell
+npm ci
+npm run test -- --run
+npm run test:coverage
+npm run build
+npm run lint
+```
+
+Unit coverage includes application TS/TSX files, including untested files, and generates HTML, LCOV and JSON under `frontend/coverage/unit/`. Measure a baseline before choosing percentage gates.
+
+## Stop the test service
+
+Run from the repository root: `docker compose --env-file backend/test.env.example -f compose.test.yml down`.
+
+The validation workflow runs backend tests on PostgreSQL and frontend tests independently, publishing separate coverage artifacts. Browser support is delivered in the later testing layers.

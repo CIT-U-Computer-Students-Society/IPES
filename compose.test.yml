@@ -1,0 +1,19 @@
+name: ipes-tests
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: ipes_test_bootstrap
+      POSTGRES_PASSWORD: ipes_test_bootstrap_local
+      POSTGRES_DB: ipes_test_control
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - ./backend/scripts/init-test-postgres.sql:/docker-entrypoint-initdb.d/01-test-role.sql:ro
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ipes_test_bootstrap -d ipes_test_control"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
