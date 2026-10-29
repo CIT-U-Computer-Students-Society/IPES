@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/scripts/**'
       - '.github/workflows/release-*.yml'
+      - '.github/workflows/pr-branch-check.yml'
+      - '.github/workflows/pr-validate.yml'
       - 'release-please-config.json'
       - '.release-please-manifest.json'
   workflow_dispatch:

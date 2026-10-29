@@ -13,8 +13,8 @@ function fixture({ status = 'ahead', changed = ['frontend'], existing = [], fail
   const after = { ...before, ...Object.fromEntries(changed.map(key => [key, '0.1.0'])) };
   const pr = {
     merged_at: '2026-10-28T00:00:00Z', merge_commit_sha: 'release-sha',
-    base: { ref: 'dev' },
-    head: { ref: 'release-please--branches--dev', repo: { full_name: 'org/IPES' } },
+    base: { ref: 'main' },
+    head: { ref: 'release-please--branches--main', repo: { full_name: 'org/IPES' } },
   };
   const issues = [{ number: 12, pull_request: {} }];
   const args = {
@@ -76,6 +76,47 @@ test('configuration keeps independent components and synchronized starting versi
   assert.ok(config['changelog-sections'].some(section => section.type === 'docs' && !section.hidden));
 });
 
+test('release PRs target main after publication and validation covers main', () => {
+  const workflow = readFileSync(path.join(root, '.github/workflows/release-please.yml'), 'utf8');
+  assert.match(workflow, /branches: \[main\]/);
+  assert.match(workflow, /release-prs:\s+needs: publish-releases\s+if: github.ref == 'refs\/heads\/main'/);
+  assert.match(workflow, /target-branch: main/);
+  assert.doesNotMatch(workflow, /target-branch: dev/);
+  assert.match(config['pull-request-header'], /PR into `main`/);
+  const validation = readFileSync(path.join(root, '.github/workflows/pr-validate.yml'), 'utf8');
+  assert.match(validation, /branches:\s+- dev\s+- main/);
+});
+
+test('main branch policy admits same-repository promotion and release PRs only', () => {
+  const workflow = readFileSync(path.join(root, '.github/workflows/pr-branch-check.yml'), 'utf8');
+  const script = workflow.split('script: |')[1];
+  const check = new Function('context', 'core', script);
+  for (const [branch, repo, allowed] of [
+    ['dev', 'org/IPES', true],
+    ['release-please--branches--main', 'org/IPES', true],
+    ['feat/unrelated', 'org/IPES', false],
+    ['release-please--branches--dev', 'org/IPES', false],
+    ['release-please--branches--main--unexpected', 'org/IPES', false],
+    ['release-please--branches--main', 'fork/IPES', false],
+    ['dev', 'fork/IPES', false],
+  ]) {
+    let failed = false;
+    check({ payload: { pull_request: {
+      head: { ref: branch, repo: { full_name: repo } },
+      base: { repo: { full_name: 'org/IPES' } },
+    } } }, { setFailed() { failed = true; }, info() {} });
+    assert.equal(!failed, allowed, `${repo}:${branch}`);
+  }
+});
+
+test('already merged combined dev releases remain publishable after promotion', async () => {
+  const { args, calls, pr } = fixture();
+  pr.base.ref = 'dev';
+  pr.head.ref = 'release-please--branches--dev';
+  await publish(args);
+  assert.equal(calls.created.length, 1);
+});
+
 test('publishes only the changed web component at its promoted release commit', async () => {
   const { args, calls } = fixture();
   await publish(args);
@@ -102,6 +143,7 @@ test('multiple promoted version changes produce separate releases', async () => 
 
 test('legacy component PRs remain publishable during migration to a combined PR', async () => {
   const { args, calls, pr } = fixture({ changed: ['docs'] });
+  pr.base.ref = 'dev';
   pr.head.ref = 'release-please--branches--dev--components--docs';
   await publish(args);
   assert.deepEqual(calls.created.map(release => release.tag_name), ['docs-v0.1.0']);
@@ -168,10 +210,10 @@ test('ignores issues, unmerged PRs, foreign branches, forks and other targets', 
   for (const mutation of [
     f => { delete f.issues[0].pull_request; },
     f => { f.pr.merged_at = null; },
-    f => { f.pr.base.ref = 'main'; },
+    f => { f.pr.base.ref = 'feature'; },
     f => { f.pr.head.ref = 'feat/unrelated'; },
     f => { f.pr.head.ref = 'release-please--branches--development'; },
-    f => { f.pr.head.ref = 'release-please--branches--main'; },
+    f => { f.pr.head.ref = 'release-please--branches--dev'; },
     f => { f.pr.head.repo.full_name = 'fork/IPES'; },
   ]) {
     const f = fixture();
