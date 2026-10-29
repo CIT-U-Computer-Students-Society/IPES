@@ -3,9 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { api } from '@/lib/api';
-import { useUpdateCurrentUser } from '../useUsers';
+import { useLogout, useUpdateCurrentUser } from '../useUsers';
+import { toast } from '@/lib/notifications';
 
-vi.mock('@/lib/api', () => ({ api: { patch: vi.fn() } }));
+vi.mock('@/lib/api', () => ({ api: { patch: vi.fn(), post: vi.fn() } }));
+vi.mock('@/lib/notifications', () => ({ toast: { error: vi.fn() } }));
 vi.mock('@/contexts/OrganizationContext', () => ({ useOrganizationState: () => ({ activeOrganizationId: 1 }) }));
 
 describe('profile update transport and cache', () => {
@@ -43,4 +45,17 @@ describe('profile update transport and cache', () => {
     await act(async () => { await result.current.mutateAsync(values); });
     expect(api.patch).toHaveBeenCalledWith('/auth/me/', values);
   });
+});
+
+it('keeps the session UI and cache when server logout fails', async () => {
+  vi.mocked(api.post).mockRejectedValueOnce(new Error('Offline'));
+  localStorage.setItem('activeOrganizationId', '1');
+  const client = new QueryClient();
+  client.setQueryData(['users', 'current'], { id: 1 });
+  const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  const { result } = renderHook(() => useLogout(), { wrapper });
+  await act(async () => { await result.current.logout(); });
+  expect(toast.error).toHaveBeenCalledWith('Could not sign out. Please retry.');
+  expect(client.getQueryData(['users', 'current'])).toEqual({ id: 1 });
+  expect(localStorage.getItem('activeOrganizationId')).toBe('1');
 });

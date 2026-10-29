@@ -11,7 +11,7 @@ const animationLoaded = vi.hoisted(() => vi.fn());
 
 vi.mock('@lottiefiles/dotlottie-react', () => {
   animationLoaded();
-  return { DotLottieReact: () => <canvas /> };
+  return { DotLottieReact: () => <canvas />, setWasmUrl: vi.fn() };
 });
 
 vi.mock('@/pages/admin/Analytics', async () => {
@@ -22,7 +22,7 @@ vi.mock('@/pages/admin/Analytics', async () => {
 vi.mock('@/pages/admin/Dashboard', () => ({ default: () => <h1>Admin dashboard content</h1> }));
 vi.mock('@/pages/officer/Dashboard', () => ({ default: () => <h1>Member dashboard content</h1> }));
 vi.mock('@/hooks/useUsers', () => ({
-  useCurrentUser: () => ({ data: { first_name: 'Alex', memberships: [{
+  useCurrentUser: () => ({ data: window.location.pathname === '/login' ? undefined : { first_name: 'Alex', memberships: [{
     organization_id: 1, organization_name: 'Research Society', role: 'Admin',
     unit_name: 'Research Committee',
   }] }, isLoading: false }),
@@ -55,7 +55,6 @@ it('renders login without loading analytics or the hidden desktop animation', as
 });
 
 it('keeps admin navigation visible while loading a page and supports member overlay routes', async () => {
-  localStorage.setItem('authToken', 'local-test-token');
   localStorage.setItem('activeOrganizationId', '1');
   window.history.replaceState(null, '', '/admin/dashboard');
   render(<App />);

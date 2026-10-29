@@ -18,6 +18,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.4.0",
     "@lottiefiles/dotlottie-react": "^0.17.14",
+    "@lottiefiles/dotlottie-web": "^0.62.0",
     "@mantine/core": "9.7.4",
     "@mantine/hooks": "9.7.4",
     "@mantine/notifications": "9.7.4",

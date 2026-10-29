@@ -5,7 +5,7 @@
  * to the Django REST Framework backend.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 /**
  * Get the full API URL for an endpoint
@@ -83,12 +83,6 @@ export const apiRequest = async (
     ? {}
     : { 'Content-Type': 'application/json' };
 
-  // Include CSRF token if available (for Django)
-  const csrfToken = getCsrfToken();
-  if (csrfToken) {
-    defaultHeaders['X-CSRFToken'] = csrfToken;
-  }
-
   // Include active Organization ID for tenant scoping & audit trails
   // (skip during login/register to avoid CORS preflight on first request)
   const activeOrgId = localStorage.getItem('activeOrganizationId');
@@ -97,19 +91,20 @@ export const apiRequest = async (
     defaultHeaders['X-Organization-Id'] = activeOrgId;
   }
 
-  // Include token authorization header if present
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    defaultHeaders['Authorization'] = `Token ${token}`;
+  // Discard credentials left by older releases; only HttpOnly cookies authenticate.
+  localStorage.removeItem('authToken');
+  const headers = new Headers({ ...defaultHeaders });
+  new Headers(options.headers).forEach((value, name) => headers.set(name, value));
+  headers.delete('Authorization');
+  const method = (options.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method)) {
+    headers.set('X-CSRFToken', await getCsrfToken());
   }
 
   const response = await fetch(url, {
     ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers,
-    },
-    credentials: 'same-origin', // only send cookies for same-origin (not needed for token)
+    headers,
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -125,18 +120,24 @@ export const apiRequest = async (
   return response;
 };
 
-/**
- * Get CSRF token from cookies
- */
-const getCsrfToken = (): string | null => {
-  const cookies = document.cookie.split(';');
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'csrftoken') {
-      return value;
-    }
+// Share only in-flight bootstraps. Fetch again for each mutation so login,
+// logout, or another tab rotating the CSRF cookie cannot leave a cached token.
+let csrfRequest: Promise<string> | null = null;
+const getCsrfToken = (): Promise<string> => {
+  if (!csrfRequest) {
+    csrfRequest = (async () => {
+      const response = await fetch(getApiUrl('/auth/csrf/'), {
+        credentials: 'include', cache: 'no-store',
+      });
+      if (!response.ok) throw new ApiError(response.status, response.statusText, null);
+      const data = await response.json();
+      if (typeof data.csrfToken !== 'string' || !data.csrfToken) {
+        throw new Error('Unable to initialize request protection. Please retry.');
+      }
+      return data.csrfToken;
+    })().finally(() => { csrfRequest = null; });
   }
-  return null;
+  return csrfRequest;
 };
 
 /**

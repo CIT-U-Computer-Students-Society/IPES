@@ -1,3 +1,4 @@
+import { ProofLink } from "@/components/ProofLink";
 import { useState } from "react";
 import { Trophy, Plus, ExternalLink, Clock, CheckCircle2, XCircle, Pencil, Loader2, AlertCircle, RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -432,15 +433,13 @@ const OfficerAccomplishments = () => {
                       <span>{new Date(item.date_completed).toLocaleDateString()}</span>
                       <span className="capitalize px-2 py-0.5 rounded-full bg-secondary/50 text-secondary-foreground">{item.type}</span>
                       {item.proof_link && (
-                        <a
-                          href={item.proof_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <ProofLink
+                          url={item.proof_link}
                           className="flex items-center gap-1 text-primary hover:underline"
                         >
                           <ExternalLink className="w-3 h-3" />
                           View proof
-                        </a>
+                        </ProofLink>
                       )}
                     </div>
                     {item.status === 'Rejected' && item.comments && (

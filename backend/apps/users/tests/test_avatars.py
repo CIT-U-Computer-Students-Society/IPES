@@ -138,7 +138,7 @@ class AvatarTests(APITestCase):
 
     def test_anonymous_upload_is_rejected(self):
         self.client.force_authenticate(None)
-        self.assertEqual(self.upload().status_code, 401)
+        self.assertEqual(self.upload().status_code, 403)
 
     def test_private_urls_are_signed_and_expire(self):
         storage = S3Storage(

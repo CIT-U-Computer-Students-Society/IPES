@@ -25,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.13'
           cache: 'pip'
           cache-dependency-path: 'backend/requirements.txt'
 
@@ -37,6 +37,16 @@ jobs:
       - name: Lint with flake8
         run: flake8 backend
         continue-on-error: true
+
+      - name: Test backend with SQLite
+        working-directory: ./backend
+        env:
+          SECRET_KEY: ci-only-not-a-production-secret
+          DEBUG: 'False'
+          DB_NAME: unused
+          DB_USER: unused
+          DB_PASSWORD: unused
+        run: python manage.py test
 
   validate-node:
     runs-on: ubuntu-latest
@@ -63,3 +73,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Test frontend
+        run: npm run test -- --run

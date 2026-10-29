@@ -3,6 +3,10 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import login, logout
+from django.middleware.csrf import get_token
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
 from botocore.exceptions import BotoCoreError, ClientError
 
 from apps.audit.utils import log_action, AuditActions
@@ -18,9 +22,16 @@ from .serializers import (
 
 from .permissions import IsAdmin
 
+@method_decorator([csrf_protect, never_cache], name='dispatch')
 class AuthViewSet(viewsets.ViewSet):
     """ViewSet for authentication endpoints"""
     permission_classes = [AllowAny]
+
+    @action(detail=False, methods=['get'], url_path='csrf')
+    def csrf(self, request):
+        # Return a masked token for SPAs on a different origin, where the API's
+        # host-only HttpOnly cookie cannot be read by frontend JavaScript.
+        return Response({'csrfToken': get_token(request)})
 
     @action(detail=False, methods=['post'], url_path='login', permission_classes=[AllowAny])
     def login(self, request):
@@ -43,13 +54,8 @@ class AuthViewSet(viewsets.ViewSet):
         # Log successful login
         log_action(user, AuditActions.USER_LOGIN, request)
 
-        # Generate or retrieve token for API authentication
-        from rest_framework.authtoken.models import Token
-        token, _ = Token.objects.get_or_create(user=user)
-
         return Response({
             'user': UserSerializer(user).data,
-            'token': token.key,
             'message': 'Login successful'
         })
 
@@ -63,12 +69,6 @@ class AuthViewSet(viewsets.ViewSet):
         # Log logout if user was authenticated
         if user:
             log_action(user, AuditActions.USER_LOGOUT, request)
-            # delete auth token so it cannot be reused
-            try:
-                from rest_framework.authtoken.models import Token
-                Token.objects.filter(user=user).delete()
-            except Exception:
-                pass
 
         return Response({'message': 'Logout successful'})
         
@@ -95,13 +95,8 @@ class AuthViewSet(viewsets.ViewSet):
         login(request, user)
         log_action(user, AuditActions.USER_LOGIN, request)
         
-        # Generate token for API authentication
-        from rest_framework.authtoken.models import Token
-        token, _ = Token.objects.get_or_create(user=user)
-        
         return Response({
             'user': UserSerializer(user).data,
-            'token': token.key,
             'message': 'Registration successful'
         }, status=status.HTTP_201_CREATED)
 

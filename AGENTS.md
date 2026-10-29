@@ -149,9 +149,9 @@ npm run build
 
 1. **Organization Scoping**: Every API request carries an `X-Organization-Id` header. All views **must** filter querysets by the active organization — never return cross-organization data.
 
-2. **Authentication**: The project uses **session-based authentication** (not JWT). Sessions use `SameSite=None; Secure; HttpOnly` cookies for cross-origin support.
+2. **Authentication**: The project uses **session-based authentication** (not JWT). Sessions use host-only HttpOnly cookies, Secure in production. `COOKIE_SAMESITE` is configurable (production defaults to `None`, development to `Lax`). Do not introduce bearer tokens in browser storage.
 
-3. **CSRF**: Every mutation must pass the `X-CSRFToken` header. The token is read from the session cookie on the frontend.
+3. **CSRF**: Every mutation must pass the `X-CSRFToken` header. The frontend bootstraps a masked token from `/api/auth/csrf/` before mutations; session and CSRF cookies are HttpOnly. Login and registration also require CSRF.
 
 4. **Soft Deletes**: Users, organizations, and evaluation forms are **never physically deleted**. Always set `is_active = False` or `is_deleted = True`.
 
@@ -253,7 +253,7 @@ Regular PRs must follow the template at [`.github/PULL_REQUEST_TEMPLATE.md`](.gi
 4. **Checklist** — Self-review, tests passing, docs updated
 
 Inspect actual CI results separately from local test evidence:
-- `pr-validate.yml` — Runs backend linting and frontend linting/build on PRs targeting `dev`; it currently does not execute either test suite
+- `pr-validate.yml` — Runs backend linting and frontend linting/build on PRs targeting `dev`; it also executes both test suites
 - `pr-branch-check.yml` — Enforces that PRs targeting `main` originate from `dev`
 
 **Do not merge** unless all required CI checks for the target branch pass and both test suites pass locally.
