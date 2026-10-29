@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.5](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.4...docs-v1.0.5) (2026-10-29)
+
+
+### Documentation
+
+* **security:** explain session migration and hosting requirements ([fdd34d2](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/fdd34d218c48b0d78d6cc3a4f37b2bd0c71d1375))
+* **setup:** document private avatars and root environment template ([09baeeb](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/09baeeb03f6af215153e502cd057137689d9007c))
+
 ## [1.0.4](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.3...docs-v1.0.4) (2026-10-28)
 
 
