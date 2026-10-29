@@ -80,9 +80,9 @@ Create frontend environment file:
 cp .env.example .env.local
 ```
 
-Edit `frontend/.env.local` and set your API base URL (default: `http://localhost:8000/api`):
+Edit `frontend/.env.local` and set your API base URL (default: `/api`, using the Vite proxy):
 ```env
-VITE_API_BASE_URL=http://localhost:8000/api
+VITE_API_BASE_URL=/api
 ```
 
 Return to project root:
@@ -195,3 +195,8 @@ npm run build
 ```
 
 The compiled files will be located in `frontend/dist/` and can be served by Django static files configurations or a dedicated web server.
+
+### Authentication and browser security
+
+See [SECURITY.md](SECURITY.md) before deployment, including session-cookie migration,
+CSRF bootstrapping, separate frontend/API origins and Content Security Policy.
