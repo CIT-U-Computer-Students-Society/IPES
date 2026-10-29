@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v2.0.0...web-v3.0.0) (2026-10-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **auth:** browser clients must use session cookies and CSRF bootstrapping. Existing clients must sign in again; legacy token headers no longer authenticate.
+
+### Features
+
+* **users:** add private profile picture uploads ([f58366a](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f58366ab110338e9f3acfb650699b3c8f4143b04))
+
+
+### Bug Fixes
+
+* **auth:** replace browser bearer tokens with protected sessions ([b700e1a](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/b700e1ad3e3c513c56dd3cb78be0a6748711c7aa))
+* **security:** enforce browser policy and safe proof links ([1899454](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/1899454af08e1f6c3a9f86281b6c590b2ab7167e))
+
+
+### Build and Dependencies
+
+* **security:** declare CSP and local animation dependencies ([8b54f7b](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/8b54f7b60cd7da559b60265d7be5142403103a0d))
+
 ## [2.0.0](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v1.0.2...web-v2.0.0) (2026-10-28)
 
 

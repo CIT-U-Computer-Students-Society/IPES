@@ -14,13 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check source branch for main target
-        if: github.base_ref == 'main' && github.head_ref != 'dev'
-        run: |
-          echo "::error::Strict Branching Policy: The 'main' branch can only be updated from the 'dev' branch via PR."
-          echo "Your PR is currently attempting to merge '${{ github.head_ref }}' into 'main'."
-          exit 1
-      
-      - name: Success message
-        if: github.base_ref == 'main' && github.head_ref == 'dev'
-        run: |
-          echo "Branch check passed: Merging 'dev' into 'main' is allowed."
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
+            const allowed = sameRepo && (
+              pr.head.ref === 'dev' ||
+              pr.head.ref === 'release-please--branches--main'
+            );
+            if (!allowed) {
+              core.setFailed('Main accepts only dev promotion PRs or the combined Release Please PR from this repository.');
+            } else {
+              core.info('Branch check passed.');
+            }

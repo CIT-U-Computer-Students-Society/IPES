@@ -32,10 +32,12 @@ async function publish({ github, context, core, read = readAtCommit }) {
   for (const issue of pending) {
     if (!issue.pull_request) continue;
     const { data: pr } = await github.rest.pulls.get({ ...repo, pull_number: issue.number });
-    if (!pr.merged_at || pr.base.ref !== 'dev' ||
+    // Accept old dev PRs during migration, and new release PRs into main.
+    const branch = pr.base.ref;
+    if (!pr.merged_at || !['dev', 'main'].includes(branch) ||
         pr.head.repo?.full_name !== `${repo.owner}/${repo.repo}` ||
-        !(pr.head.ref === 'release-please--branches--dev' ||
-          pr.head.ref.startsWith('release-please--branches--dev--components--'))) continue;
+        !(pr.head.ref === `release-please--branches--${branch}` ||
+          pr.head.ref.startsWith(`release-please--branches--${branch}--components--`))) continue;
 
     const sha = pr.merge_commit_sha;
     // Comparing release commit...main proves the release commit is in production.
