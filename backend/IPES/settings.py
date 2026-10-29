@@ -166,6 +166,32 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# Private user avatars use Supabase's S3-compatible endpoint. Static files and
+# organization uploads retain Django's default storage behavior.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+    'avatars': {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': config('AWS_ACCESS_KEY_ID', default=''),
+            'secret_key': config('AWS_SECRET_ACCESS_KEY', default=''),
+            'endpoint_url': config('AWS_S3_ENDPOINT_URL', default=''),
+            'region_name': config('AWS_S3_REGION_NAME', default=''),
+            'bucket_name': config('AWS_STORAGE_BUCKET_NAME', default='avatars'),
+            'signature_version': 's3v4',
+            'addressing_style': 'path',
+            'default_acl': None,
+            'custom_domain': None,
+            'querystring_auth': True,
+            'querystring_expire': 3600,
+            'file_overwrite': False,
+        },
+    },
+}
+
 AUTH_USER_MODEL = "users.User"
 
 # CORS Configuration

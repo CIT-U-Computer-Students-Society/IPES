@@ -27,6 +27,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 import { ProfileEditorDialog } from "@/components/ProfileEditorDialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -238,9 +239,10 @@ const AdminLayout = () => {
           <div className="p-4 border-t border-border">
             <ProfileEditorDialog>
               <div className="flex items-center gap-3 mb-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Shield className="w-4 h-4 text-primary" />
-                </div>
+                <Avatar className="!w-9 !h-9 shrink-0">
+                  <AvatarImage src={user.display_picture || undefined} alt={`${fullName}'s profile picture`} />
+                  <AvatarFallback>{`${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase() || 'U'}</AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{fullName}</p>
                   <p className="text-xs text-muted-foreground truncate">System Administrator</p>

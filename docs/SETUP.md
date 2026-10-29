@@ -94,15 +94,14 @@ cd ..
 
 ## 🔑 Environment Variables
 
-### Backend Setup (`backend/.env`)
+### Backend Setup (`.env` in the repository root)
 
-Navigate to the `backend` directory and copy the example environment file:
+From the repository root, copy the example environment file:
 ```bash
-cd backend
 cp sample.env .env
 ```
 
-Edit `.env` and update it with your local secrets (e.g. database, secret key, debug mode). Your `.env` file should look like this:
+Edit the root `.env` and update it with your local secrets (e.g. database, secret key, debug mode). Django discovers it through python-decouple's parent-directory search. Your `.env` file should look like this:
 
 ```env
 SECRET_KEY=mysecretkey
@@ -116,6 +115,37 @@ DB_PORT=5432
 
 > [!WARNING]
 > Never commit `.env` or `.env.local` — they contain sensitive credentials and keys.
+
+### Profile picture storage
+
+Create a **private** Supabase Storage bucket named `avatars`. Restrict uploads to
+2 MB and MIME types `image/jpeg,image/png,image/webp`. Under Storage's S3
+configuration, generate server-only access keys and copy the endpoint and region.
+Set these variables in the root `.env` (or in the backend hosting environment):
+
+```env
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+AWS_S3_ENDPOINT_URL=https://your-project-ref.storage.supabase.co/storage/v1/s3
+AWS_S3_REGION_NAME=your-region
+AWS_STORAGE_BUCKET_NAME=avatars
+```
+
+Install the updated backend requirements, run `python manage.py migrate` from
+`backend/`, and restart Django. The existing `display_picture` column stores the
+object path; the migration updates its storage and allowed formats. Existing
+local profile images must be copied to the private bucket under their existing
+paths before switching storage. Organization pictures use their original storage.
+
+Open **My Profile → Edit** to upload, replace, or remove a picture. Django validates
+the decoded image, limits dimensions to 16 million pixels, crops to 256 × 256,
+and re-encodes as WebP without the original metadata. Replaced files are removed
+after a successful database commit. Authenticated profile responses and scoped
+admin user listings return signed image URLs valid for one hour; open frontend
+views refresh them every 45 minutes. Anyone holding a signed URL can use it until
+expiry, so keep credentials and signed URLs out of public logs. Supabase S3 keys
+bypass storage RLS; Django checks who may update and view profiles. No browser
+storage key or public bucket policy is needed.
 
 ---
 

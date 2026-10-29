@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User
 from apps.organizations.models import OrganizationRole
+from django.db import transaction
+from .avatars import prepare_avatar, delete_avatar
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'display_picture', 'is_active', 'date_joined', 'memberships'
         ]
-        read_only_fields = ['id', 'date_joined']
+        read_only_fields = ['id', 'date_joined', 'display_picture']
         
     def get_memberships(self, obj):
         """
@@ -140,6 +142,32 @@ class PasswordResetSerializer(serializers.Serializer):
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     """Serializer for regular users to update their own profile"""
+    # Decode with a bounded validator rather than trusting the MIME type.
+    display_picture = serializers.FileField(required=False, allow_null=True)
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'display_picture']
+
+    def validate_display_picture(self, value):
+        return prepare_avatar(value) if value is not None else None
+
+    def update(self, instance, validated_data):
+        replacing = 'display_picture' in validated_data
+        storage = instance.display_picture.storage
+        # Serialize replacements for one user so concurrent saves cannot orphan
+        # an intermediate avatar. Cleanup runs only after the database commits.
+        with transaction.atomic():
+            locked = User.objects.select_for_update().get(pk=instance.pk)
+            old_name = locked.display_picture.name
+            try:
+                user = super().update(locked, validated_data)
+            except Exception:
+                new_picture = locked.display_picture
+                if (replacing and new_picture._committed
+                        and new_picture.name != old_name):
+                    delete_avatar(storage, new_picture.name)
+                raise
+            if replacing and old_name and old_name != user.display_picture.name:
+                transaction.on_commit(lambda: delete_avatar(storage, old_name))
+        return user

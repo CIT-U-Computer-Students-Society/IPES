@@ -78,9 +78,10 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = getApiUrl(endpoint);
 
-  const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+  // The browser must supply the multipart boundary for file uploads.
+  const defaultHeaders: Record<string, string> = options.body instanceof FormData
+    ? {}
+    : { 'Content-Type': 'application/json' };
 
   // Include CSRF token if available (for Django)
   const csrfToken = getCsrfToken();
@@ -147,19 +148,19 @@ export const api = {
   post: (endpoint: string, data?: unknown) =>
     apiRequest(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     }),
 
   put: (endpoint: string, data?: unknown) =>
     apiRequest(endpoint, {
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     }),
 
   patch: (endpoint: string, data?: unknown) =>
     apiRequest(endpoint, {
       method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     }),
 
   delete: (endpoint: string) => apiRequest(endpoint, { method: 'DELETE' }),

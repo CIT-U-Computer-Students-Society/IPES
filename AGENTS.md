@@ -40,8 +40,7 @@ IPES/
 │   │   └── users/               # Custom user model + auth
 │   ├── IPES/                    # Django project settings and URL routing
 │   ├── manage.py
-│   ├── requirements.txt
-│   └── sample.env
+│   └── requirements.txt
 ├── frontend/                    # React 18 + TypeScript SPA (Vite)
 │   ├── src/
 │   │   ├── components/          # Reusable UI (Mantine adapters + custom)
@@ -57,6 +56,7 @@ IPES/
 ├── docs/                        # Project documentation
 │   └── generated/
 │       └── implementation_plans/ # Agent-generated implementation plans
+├── sample.env                   # Backend environment template (copy to root .env)
 ├── Manifesto.md                 # Canonical architecture and design reference
 └── README.md                    # Human setup instructions
 ```
@@ -278,8 +278,8 @@ When adding new backend features, add tests to the relevant `apps/<app>/tests/` 
 
 ## 10. Environment Variables
 
-### Backend (`backend/.env`)
-Copy from `backend/sample.env`. Required variables:
+### Backend (`.env` in the repository root)
+Copy from the root `sample.env`. Django discovers it through python-decouple's parent-directory search. Required variables:
 
 | Variable | Description |
 |---|---|
