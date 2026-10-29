@@ -1,0 +1,18 @@
+[run]
+branch = True
+source = apps
+relative_files = True
+omit =
+    */migrations/*
+    */tests/*
+    */test*.py
+    apps/e2e_support/*
+
+[report]
+show_missing = True
+
+[html]
+directory = coverage/unit/html
+
+[xml]
+output = coverage/unit/coverage.xml

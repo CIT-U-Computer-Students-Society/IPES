@@ -1,0 +1,1 @@
+"""Infrastructure safety tests."""

@@ -10,6 +10,8 @@ Use the links below to navigate the guides:
 
 ### General / Overview
 *   [Project Manifesto](Manifesto.md): Core goals, objectives, and foundational values of the IPES project.
+*   [Requirements Traceability Matrix](testing/requirements_traceability_matrix.md): Concise requirement IDs, planned checks, and coverage gaps.
+*   [Core Business Features and Reliability Assessment](generated/business_features_and_reliability_20261029.md): Dated feature requirements, GitHub failure mappings, known reliability blockers, and verification limits.
 
 ### Setup & Getting Started
 *   [Setup & Installation Guide](SETUP.md): Requirements, environment setup, database migrations, and local runner commands.
