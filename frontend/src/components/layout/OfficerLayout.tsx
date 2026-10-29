@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 import { ProfileEditorDialog } from "@/components/ProfileEditorDialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const navigation = [
   { name: "Dashboard", href: "/member/dashboard", icon: LayoutDashboard },
@@ -34,11 +35,6 @@ const OfficerLayout = () => {
   const { data: user, isLoading, isError } = useCurrentUser();
   const { activeOrganizationId } = useOrganizationState();
   const { logout } = useLogout();
-
-  // Protect against back-button caching unauthenticated states
-  if (!localStorage.getItem('authToken')) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
 
   if (isLoading) {
     return (
@@ -145,9 +141,10 @@ const OfficerLayout = () => {
           <div className="p-4 border-t border-border">
             <ProfileEditorDialog>
               <div className="flex items-center gap-3 mb-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-medium text-primary">{initials}</span>
-                </div>
+                <Avatar className="!w-9 !h-9 shrink-0">
+                  <AvatarImage src={user.display_picture || undefined} alt={`${fullName}'s profile picture`} />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{fullName}</p>
                   <p className="text-xs text-muted-foreground truncate">{activeMembership.unit_name} • {activeMembership.position_name}</p>

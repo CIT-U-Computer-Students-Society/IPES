@@ -69,7 +69,7 @@ IPES provides:
 
 | Decision | Rationale |
 |---|---|
-| **Session-based authentication** (not JWT) | Simpler CSRF-protected flow; cookies with `SameSite=None` + `Secure` for cross-origin production deployment. |
+| **Session-based authentication** (not JWT) | Simpler CSRF-protected flow; host-only HttpOnly cookies, Secure in production; configurable SameSite for deployment. |
 | **Organization-scoped multi-tenancy** | Each request carries an `X-Organization-Id` header; backend views filter all queries by the active organization. |
 | **Soft deletes** | Users, organizations, and evaluation forms are never physically deleted — they are deactivated (`is_active = False` or `is_deleted = True`). |
 | **SQLite for tests** | Avoids remote database permission issues and session conflicts; tests run faster in full isolation. |
@@ -298,7 +298,7 @@ The system is built on **12 core tables** organized across three domains:
 
 ## 7. API Surface
 
-All endpoints are prefixed with `/api/` and require session authentication (except login/register). The API follows RESTful conventions via DRF ViewSets with custom actions.
+All endpoints are prefixed with `/api/` and require session authentication (except login/register and CSRF bootstrap). The API follows RESTful conventions via DRF ViewSets with custom actions.
 
 ### Endpoint Categories
 
@@ -352,9 +352,9 @@ All endpoints are prefixed with `/api/` and require session authentication (exce
 |---|---|
 | **Authentication** | Django session-based auth with CSRF protection |
 | **Authorization** | Role-based: Admin vs. Member per organization (`OrganizationRole`) |
-| **CSRF** | Token extracted from cookie; passed via `X-CSRFToken` header on every mutation |
+| **CSRF** | Masked token from `/api/auth/csrf/`; passed via `X-CSRFToken` on every mutation, including login/register |
 | **CORS** | Whitelisted origins; `credentials: include` for cross-origin cookie support |
-| **Production Cookies** | `SameSite=None`, `Secure=True`, `HttpOnly` for session cookies |
+| **Production Cookies** | Host-only HttpOnly session/CSRF cookies, `Secure=True`; configurable `SameSite` |
 | **Soft Deletes** | No physical data destruction; all entities can be deactivated and audited |
 | **Audit Trail** | Every significant action logged with user ID, IP address, and timestamp |
 | **Input Validation** | Zod (frontend) + DRF serializer validation (backend) |
@@ -452,8 +452,8 @@ IPES/
 │   │   └── api.py               API root endpoint listing all available routes
 │   ├── scripts/                 Utility scripts for testing and verification
 │   ├── manage.py                Django CLI entry point
-│   ├── requirements.txt         Python dependencies
-│   └── sample.env               Environment variable template
+│   └── requirements.txt         Python dependencies
+├── sample.env                   Backend environment template (copy to root .env)
 ├── docs/                        Developer documentation and guides
 ├── frontend/                    React SPA
 │   ├── src/
@@ -485,7 +485,7 @@ git clone https://github.com/CIT-U-Computer-Students-Society/IPES.git && cd IPES
 cd backend
 python -m venv .venv && .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-cp sample.env .env                 # Edit with your DB credentials
+cp ../sample.env ../.env           # Edit root .env with your DB credentials
 
 # 3. Database
 python manage.py migrate

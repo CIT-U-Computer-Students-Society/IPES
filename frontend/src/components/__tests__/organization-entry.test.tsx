@@ -25,7 +25,7 @@ function DashboardGuard() {
   return activeOrganizationId === 1 ? <h1>Organization dashboard</h1> : <Navigate to="/select-organization" replace />;
 }
 
-beforeEach(() => { localStorage.clear(); localStorage.setItem('authToken', 'local-test-token'); });
+beforeEach(() => { localStorage.clear(); });
 afterEach(() => { cleanup(); localStorage.clear(); });
 
 it('keeps the selected organization through the dashboard route guard', async () => {

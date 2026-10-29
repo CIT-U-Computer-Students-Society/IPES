@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCurrentUser } from "@/hooks/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,11 +18,12 @@ interface RegisterResponse {
         is_active: boolean;
     };
     message: string;
-    token: string;
 }
 
 const Register = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const { data: currentUser, isFetching, isError } = useCurrentUser();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -35,11 +38,11 @@ const Register = () => {
 
     // Redirect if already logged in - prevents back navigation to register after logging in
     useEffect(() => {
-        const user = localStorage.getItem("user");
-        if (user) {
+        const user = currentUser;
+        if (user && !isFetching && !isError) {
             navigate("/select-organization", { replace: true });
         }
-    }, [navigate]);
+    }, [navigate, currentUser, isFetching, isError]);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,9 +65,11 @@ const Register = () => {
             });
             const data: RegisterResponse = await response.json();
 
-            // Store user info and token in localStorage
-            localStorage.setItem("user", JSON.stringify(data.user));
-            localStorage.setItem("authToken", data.token);
+            // Refresh the profile without persisting credentials
+            queryClient.clear();
+            queryClient.setQueryData(["users", "current"], data.user);
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("user");
 
             // Redirect to Organization Selector Hub with replace to prevent back navigation
             navigate("/select-organization", { replace: true });

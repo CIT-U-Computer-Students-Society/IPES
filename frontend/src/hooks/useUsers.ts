@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/notifications';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
 // User type definition
@@ -25,6 +26,7 @@ export interface Membership {
 
 export interface User {
   id: number;
+  display_picture?: string | null;
   email: string;
   first_name: string;
   last_name: string;
@@ -47,6 +49,15 @@ export interface UserUpdate {
   is_active?: boolean;
 }
 
+export interface ProfileUpdate {
+  first_name: string;
+  last_name: string;
+  display_picture?: File | null;
+}
+
+// Renew private image URLs before their one-hour expiry while a view is open.
+const AVATAR_REFRESH_INTERVAL = 45 * 60 * 1000;
+
 // Fetch all users
 export const useUsers = (params?: { is_active?: boolean; role?: string; organization_id?: number }) => {
   const { activeOrganizationId } = useOrganizationState();
@@ -60,6 +71,7 @@ export const useUsers = (params?: { is_active?: boolean; role?: string; organiza
 
   return useQuery({
     queryKey: ['users', effectiveParams],
+    refetchInterval: AVATAR_REFRESH_INTERVAL,
     queryFn: async () => {
       const response = await api.get(`/users/${queryString}`);
       const data = await response.json() as { results: User[]; count: number } | User[];
@@ -73,6 +85,7 @@ export const useUsers = (params?: { is_active?: boolean; role?: string; organiza
 export const useUser = (id: number) => {
   return useQuery({
     queryKey: ['users', id],
+    refetchInterval: AVATAR_REFRESH_INTERVAL,
     queryFn: async () => {
       const response = await api.get(`/users/${id}/`);
       return response.json() as Promise<User>;
@@ -130,6 +143,8 @@ export const useDeleteUser = () => {
 export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['users', 'current'],
+    retry: false,
+    refetchInterval: AVATAR_REFRESH_INTERVAL,
     queryFn: async () => {
       const response = await api.get('/auth/me/');
       return response.json() as Promise<User>;
@@ -141,14 +156,21 @@ export const useCurrentUser = () => {
 export const useUpdateCurrentUser = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<User, Error, UserUpdate>({
-    mutationFn: async (data: UserUpdate) => {
-      const response = await api.patch('/auth/me/', data);
+  return useMutation<User, Error, ProfileUpdate>({
+    mutationFn: async (data: ProfileUpdate) => {
+      let payload: ProfileUpdate | FormData = data;
+      if (data.display_picture instanceof File) {
+        payload = new FormData();
+        payload.append('first_name', data.first_name);
+        payload.append('last_name', data.last_name);
+        payload.append('display_picture', data.display_picture);
+      }
+      const response = await api.patch('/auth/me/', payload);
       return response.json() as Promise<User>;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['users', 'current'], data);
-      queryClient.invalidateQueries({ queryKey: ['users', 'current'] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 };
@@ -195,7 +217,8 @@ export const useLogout = () => {
       // Call the backend logout endpoint to clear session
       await api.post('/auth/logout/', {});
     } catch {
-      // Continue with client-side cleanup even if API fails
+      toast.error('Could not sign out. Please retry.');
+      return;
     }
 
     // Clear all user data from localStorage
