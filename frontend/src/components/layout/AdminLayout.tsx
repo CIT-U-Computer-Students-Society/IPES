@@ -54,11 +54,6 @@ const AdminLayout = () => {
   const pendingJoinCount = pendingRequests?.length || 0;
   const pendingAccomplishmentCount = pendingAccomplishments?.length || 0;
 
-  // Protect against back-button caching unauthenticated states
-  if (!localStorage.getItem('authToken')) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

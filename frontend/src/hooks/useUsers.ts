@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/notifications';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
 // User type definition
@@ -142,6 +143,7 @@ export const useDeleteUser = () => {
 export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['users', 'current'],
+    retry: false,
     refetchInterval: AVATAR_REFRESH_INTERVAL,
     queryFn: async () => {
       const response = await api.get('/auth/me/');
@@ -215,7 +217,8 @@ export const useLogout = () => {
       // Call the backend logout endpoint to clear session
       await api.post('/auth/logout/', {});
     } catch {
-      // Continue with client-side cleanup even if API fails
+      toast.error('Could not sign out. Please retry.');
+      return;
     }
 
     // Clear all user data from localStorage

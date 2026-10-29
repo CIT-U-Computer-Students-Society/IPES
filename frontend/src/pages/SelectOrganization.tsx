@@ -32,7 +32,7 @@ import { ProfileEditorDialog } from '@/components/ProfileEditorDialog';
 const SelectOrganization = () => {
     const navigate = useNavigate();
 
-    const { data: user, isLoading } = useCurrentUser();
+    const { data: user, isLoading, isError } = useCurrentUser();
     const { setActiveOrganizationId, clearOrganizationState } = useOrganizationState();
     const { logout } = useLogout();
 
@@ -145,11 +145,6 @@ const SelectOrganization = () => {
         });
     };
 
-    // Protect against back-button caching unauthenticated states
-    if (!localStorage.getItem('authToken')) {
-        return <Navigate to="/login" replace />;
-    }
-
     if (isLoading) {
         return (
             <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">
@@ -163,6 +158,8 @@ const SelectOrganization = () => {
             </div>
         );
     }
+
+    if (!user || isError) return <Navigate to="/login" replace />;
 
     return (
         <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">

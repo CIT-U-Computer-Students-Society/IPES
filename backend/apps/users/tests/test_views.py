@@ -64,4 +64,4 @@ class AuthViewSetTest(APITestCase):
     def test_me_endpoint_unauthenticated(self):
         url = reverse('auth-me')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

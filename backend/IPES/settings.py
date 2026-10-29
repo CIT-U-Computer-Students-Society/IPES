@@ -48,7 +48,6 @@ INSTALLED_APPS = [
 
     # Third-party apps
     "rest_framework",
-    "rest_framework.authtoken",  # token authentication
     "corsheaders",
 
     # Local apps
@@ -217,38 +216,20 @@ CSRF_TRUSTED_ORIGINS = config(
     cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
 )
 
-# Production-Specific Security Settings (Render/SSL)
+# Keep credentials host-only and inaccessible to JavaScript. CSRF tokens are
+# obtained from /api/auth/csrf/, including for separately hosted frontends.
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_NAME = 'ipes_sessionid'
+CSRF_COOKIE_NAME = 'ipes_csrftoken'
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+# Preserve cross-site production support; same-site deployments can select Lax.
+SESSION_COOKIE_SAMESITE = config('COOKIE_SAMESITE', default='Lax' if DEBUG else 'None')
+CSRF_COOKIE_SAMESITE = SESSION_COOKIE_SAMESITE
 if not DEBUG:
-    # Ensure cookies are only sent over HTTPS
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    
-    # Allow cookies to be sent in cross-site requests (frontend and backend on different domains)
-    # Required for browsers to support credentials (sessionid/csrftoken) over HTTPS
-    CSRF_COOKIE_SAMESITE = 'None'
-    SESSION_COOKIE_SAMESITE = 'None'
-    
-    # Optional: strict security headers
-    SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Session and CSRF Cookie Configuration
-CSRF_COOKIE_HTTPONLY = False  # Allow JS to read the CSRF token
-
-if DEBUG:
-    # Dev: Vite proxy makes API requests same-origin, so default Lax cookies work.
-    # No special SameSite or Secure settings needed.
-    pass
-else:
-    # Prod: Frontend and API are on different subdomains (cross-origin).
-    # SameSite=None + Secure=True required for cross-origin cookies.
-    SESSION_COOKIE_SAMESITE = 'None'
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SAMESITE = 'None'
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_DOMAIN = config('SESSION_COOKIE_DOMAIN', default=None)
-    CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN', default=None)
 
 from corsheaders.defaults import default_headers
 CORS_ALLOW_HEADERS = list(default_headers) + [
@@ -274,8 +255,7 @@ if DEBUG:
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',  # fallback for browsable API
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

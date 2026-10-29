@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCurrentUser } from "@/hooks/useUsers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +22,8 @@ interface LoginResponse {
 
 const Login = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: currentUser, isFetching, isError } = useCurrentUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,11 +33,11 @@ const Login = () => {
 
   // Redirect if already logged in - prevents back navigation to login after logging in
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
+    const user = currentUser;
+    if (user && !isFetching && !isError) {
       navigate("/select-organization", { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, currentUser, isFetching, isError]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +47,13 @@ const Login = () => {
 
     try {
       const response = await api.post("/auth/login/", { email, password });
-      const data: LoginResponse & { token: string } = await response.json();
+      const data: LoginResponse = await response.json();
 
-      // Store user info & token in localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("authToken", data.token);
+      // Refresh the authenticated profile without persisting credentials
+      queryClient.clear();
+      queryClient.setQueryData(["users", "current"], data.user);
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
 
       // Redirect to Organization Selector Hub with replace to prevent back navigation
       navigate("/select-organization", { replace: true });
