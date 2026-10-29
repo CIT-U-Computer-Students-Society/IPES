@@ -1,3 +1,4 @@
+Django>=6.0,<6.2
 python-decouple
 psycopg[binary]
 pillow
