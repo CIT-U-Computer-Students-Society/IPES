@@ -27,8 +27,8 @@ IPES/
 ├── .agents/skills/              # Agent skills (see Section 7)
 ├── .github/                     # CI/CD workflows and PR template
 │   ├── workflows/
-│   │   ├── pr-validate.yml      # Runs linting and frontend build on dev PRs
-│   │   ├── pr-branch-check.yml  # Enforces dev as the source for main PRs
+│   │   ├── pr-validate.yml      # Validates PRs targeting dev and main
+│   │   ├── pr-branch-check.yml  # Allows dev and the Release Please branch for main PRs
 │   │   └── stale.yml            # Auto-closes stale issues/PRs
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── backend/                     # Django 6.0 REST API
@@ -253,8 +253,8 @@ Regular PRs must follow the template at [`.github/PULL_REQUEST_TEMPLATE.md`](.gi
 4. **Checklist** — Self-review, tests passing, docs updated
 
 Inspect actual CI results separately from local test evidence:
-- `pr-validate.yml` — Runs backend linting and frontend linting/build on PRs targeting `dev`; it also executes both test suites
-- `pr-branch-check.yml` — Enforces that PRs targeting `main` originate from `dev`
+- `pr-validate.yml` — Runs backend linting and frontend linting/build on PRs targeting `dev` or `main`; it also executes both test suites
+- `pr-branch-check.yml` — Allows PRs targeting `main` from `dev` or the same-repository `release-please--branches--main` branch
 
 **Do not merge** unless all required CI checks for the target branch pass and both test suites pass locally.
 

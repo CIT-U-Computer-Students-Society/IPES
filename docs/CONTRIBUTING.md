@@ -92,8 +92,8 @@ We follow the Conventional Commits specification to maintain a clean git history
 
 ## Component releases
 
-Release Please prepares one combined release PR into `dev` for web, backend, and
-documentation, keeping their versions independent. After that PR is reviewed and
-merged, promote `dev` to `main` with a merge commit to publish their independent
-tags and GitHub releases. See the
+Release Please prepares one combined release PR into `main` for web, backend, and
+documentation, keeping their versions independent. Promote application work from
+`dev` to `main` first; merging the release PR publishes the independent tags and
+GitHub releases. See the
 [release guide](RELEASING.md) for setup, changelogs, validation, and recovery.
