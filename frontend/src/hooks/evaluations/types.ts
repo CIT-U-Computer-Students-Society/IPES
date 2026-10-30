@@ -51,6 +51,9 @@ export interface EvaluationAssignment {
   evaluatee_name?: string;
   form_id: number;
   form_title?: string;
+  form_is_active?: boolean;
+  form_results_released?: boolean;
+  is_closed?: boolean;
   status: 'Pending' | 'In Progress' | 'Completed';
   submitted_at?: string;
   total_score?: number;
