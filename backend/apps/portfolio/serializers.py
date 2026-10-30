@@ -132,6 +132,22 @@ class AccomplishmentUpdateSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def update(self, instance, validated_data):
+        current_status = (
+            Accomplishment.objects.filter(pk=instance.pk)
+            .values_list('status', flat=True)
+            .first()
+        )
+        if current_status not in ['Pending', 'Rejected']:
+            raise serializers.ValidationError(
+                {
+                    'error': (
+                        'You can only edit pending or rejected accomplishments'
+                    )
+                }
+            )
+        return super().update(instance, validated_data)
+
 
 class AccomplishmentVerifySerializer(serializers.Serializer):
     """Serializer for verifying/rejecting accomplishments"""

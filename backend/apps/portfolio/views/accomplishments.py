@@ -9,7 +9,9 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Count
+from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
 from apps.organizations.access import active_organization
@@ -150,22 +152,37 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         )
 
     def update(self, request, *args, **kwargs):
-        """Override update to allow only owners to edit pending/rejected accomplishments"""
-        accomplishment = self.get_object()
-
-        if accomplishment.user_id != request.user:
-            return Response(
-                {'error': 'You can only edit your own accomplishments'},
-                status=status.HTTP_403_FORBIDDEN
+        """Allow only owners to edit accomplishments under lock."""
+        with transaction.atomic():
+            accomplishment = (
+                Accomplishment.objects.select_for_update()
+                .filter(pk=kwargs.get('pk'))
+                .first()
             )
+            if not accomplishment:
+                return Response(
+                    {'detail': 'Not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        if accomplishment.status not in ['Pending', 'Rejected']:
-            return Response(
-                {'error': 'You can only edit pending or rejected accomplishments'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if accomplishment.user_id != request.user:
+                return Response(
+                    {'error': 'You can only edit your own accomplishments'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
-        return super().update(request, *args, **kwargs)
+            if accomplishment.status not in ['Pending', 'Rejected']:
+                return Response(
+                    {
+                        'error': (
+                            'You can only edit pending or rejected'
+                            ' accomplishments'
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """Allow only owners to delete pending or rejected accomplishments."""
@@ -330,48 +347,82 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
             if not _check_org_admin(user, org_id):
                 return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Ensure accomplishment belongs to the org
-        if not is_global_admin and org_id:
-            if str(accomplishment.organization_id_id) != str(org_id):
-                return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        with transaction.atomic():
+            accomplishment = (
+                Accomplishment.objects.select_for_update()
+                .filter(pk=pk)
+                .first()
+            )
+            if not accomplishment:
+                return Response(
+                    {'detail': 'Not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        if accomplishment.status != 'Pending':
-            return Response(
-                {'error': 'Can only verify pending accomplishments'},
-                status=status.HTTP_400_BAD_REQUEST
+            # Ensure accomplishment belongs to the org
+            if not is_global_admin and org_id:
+                if str(accomplishment.organization_id_id) != str(org_id):
+                    return Response(
+                        {'error': 'Unauthorized'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+
+            if accomplishment.status != 'Pending':
+                return Response(
+                    {'error': 'Can only verify pending accomplishments'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            serializer = AccomplishmentVerifySerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            new_status = serializer.validated_data['status']
+            has_comments = 'comments' in serializer.validated_data
+            comments = serializer.validated_data.get('comments')
+
+            update_fields = {
+                'status': new_status,
+                'verified_by': request.user,
+                'updated_at': timezone.now(),
+            }
+            if has_comments:
+                update_fields['comments'] = comments
+
+            updated_count = Accomplishment.objects.filter(
+                pk=accomplishment.pk, status='Pending'
+            ).update(**update_fields)
+            if updated_count == 0:
+                return Response(
+                    {'error': 'Can only verify pending accomplishments'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            accomplishment.refresh_from_db()
+
+            audit_action = (
+                AuditActions.ACCOMPLISHMENT_VERIFIED
+                if accomplishment.status == 'Verified'
+                else AuditActions.ACCOMPLISHMENT_REJECTED
+            )
+            log_action(
+                request.user,
+                audit_action,
+                request,
+                organization_id=accomplishment.organization_id_id,
+                accomplishment_id=str(accomplishment.id),
+                title=accomplishment.title,
+                status=accomplishment.status
             )
 
-        serializer = AccomplishmentVerifySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        accomplishment.status = serializer.validated_data['status']
-        accomplishment.verified_by = request.user
-
-        if 'comments' in serializer.validated_data:
-            accomplishment.comments = serializer.validated_data['comments']
-
-        accomplishment.save()
-
-        audit_action = (
-            AuditActions.ACCOMPLISHMENT_VERIFIED
-            if accomplishment.status == 'Verified'
-            else AuditActions.ACCOMPLISHMENT_REJECTED
-        )
-        log_action(
-            request.user,
-            audit_action,
-            request,
-            organization_id=accomplishment.organization_id_id,
-            accomplishment_id=str(accomplishment.id),
-            title=accomplishment.title,
-            status=accomplishment.status
-        )
-
-        response_serializer = AccomplishmentSerializer(accomplishment)
-        return Response({
-            'message': f'Accomplishment {serializer.validated_data["status"].lower()} successfully',
-            'accomplishment': response_serializer.data
-        })
+            response_serializer = AccomplishmentSerializer(accomplishment)
+            return Response({
+                'message': (
+                    f'Accomplishment '
+                    f'{serializer.validated_data["status"].lower()} '
+                    f'successfully'
+                ),
+                'accomplishment': response_serializer.data
+            })
 
     @action(detail=False, methods=['get'])
     def evaluatee_profile(self, request):
