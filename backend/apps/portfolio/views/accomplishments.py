@@ -109,34 +109,27 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
             else None
         )
 
-        if not org_id and not is_global_admin:
-            return (
-                queryset.filter(user_id=user)
-                .select_related('user_id', 'verified_by')
-                .order_by('-date_completed', '-id')
-            )
-
         is_org_admin = False
-        if org_id and not is_global_admin:
+        if not org_id and not is_global_admin:
+            queryset = queryset.filter(user_id=user)
+        elif org_id and not is_global_admin:
             is_org_admin = _check_org_admin(user, org_id)
-
             if not is_org_admin:
-                return (
-                    queryset.filter(user_id=user, organization_id=org_id)
-                    .select_related('user_id', 'verified_by')
-                    .order_by('-date_completed', '-id')
+                queryset = queryset.filter(
+                    user_id=user,
+                    organization_id=org_id,
                 )
-
-            queryset = queryset.filter(organization_id=org_id)
-
+            else:
+                queryset = queryset.filter(organization_id=org_id)
         elif org_id and is_global_admin:
             queryset = queryset.filter(organization_id=org_id)
+
+        if user_id and (is_global_admin or is_org_admin):
+            queryset = queryset.filter(user_id=user_id)
 
         status_param = self.request.query_params.get('status')
         type_param = self.request.query_params.get('type')
 
-        if user_id and (is_global_admin or is_org_admin):
-            queryset = queryset.filter(user_id=user_id)
         if status_param:
             queryset = queryset.filter(status=status_param)
         if type_param:
