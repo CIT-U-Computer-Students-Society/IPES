@@ -125,6 +125,7 @@ export const AUDIT_ACTIONS = {
   USER_DELETED: 'user.deleted',
   FORM_CREATED: 'form.created',
   FORM_PUBLISHED: 'form.published',
+  FORM_RESULTS_RELEASED: 'evaluation.results_released',
   FORM_UPDATED: 'form.updated',
   FORM_DELETED: 'form.deleted',
   EVALUATION_SUBMITTED: 'evaluation.submitted',
