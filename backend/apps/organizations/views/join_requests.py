@@ -1,38 +1,56 @@
 """
-JoinRequest ViewSet — CRUD, approve, and reject actions.
+JoinRequest ViewSet — scoped reads, approve, and reject actions.
 """
 
-from rest_framework import viewsets, permissions, status
+from rest_framework import mixins, viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
+from apps.organizations.access import is_organization_admin
+from apps.validation import positive_id
 
 from ..models import (
-    OrganizationUnit, PositionType, Membership, JoinRequest, OrganizationRole,
+    Organization, OrganizationUnit, PositionType, Membership, JoinRequest, OrganizationRole,
 )
 from ..serializers import JoinRequestSerializer
 
 
-class JoinRequestViewSet(viewsets.ModelViewSet):
-    """ViewSet for JoinRequest CRUD and approvals"""
+class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """Scoped join request reads and explicit approval actions."""
     queryset = JoinRequest.objects.all()
     serializer_class = JoinRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        org_id = self.request.query_params.get('organization_id')
-        user_id = self.request.query_params.get('user_id')
-        req_status = self.request.query_params.get('status')
+        request = self.request
+        header = request.headers.get('X-Organization-Id')
+        parameter = request.query_params.get('organization_id')
+        header_id = positive_id(header, 'organization_id') if header else None
+        parameter_id = positive_id(parameter, 'organization_id') if parameter else None
+        if header_id and parameter_id and header_id != parameter_id:
+            raise ValidationError({'organization_id': 'Organization header and parameter must match.'})
+        org_id = header_id or parameter_id
+
+        # A requester can inspect their own application even before joining.
+        # Administrators can inspect their active organization's applications.
+        visible = Q(user_id=request.user.pk)
+        if org_id and Organization.objects.filter(pk=org_id, is_active=True).exists():
+            if is_organization_admin(request, org_id):
+                visible |= Q(organization_id=org_id)
+        queryset = JoinRequest.objects.filter(visible)
         if org_id:
             queryset = queryset.filter(organization_id=org_id)
+        user_id = request.query_params.get('user_id')
         if user_id:
-            queryset = queryset.filter(user_id=user_id)
+            queryset = queryset.filter(user_id=positive_id(user_id, 'user_id'))
+        req_status = request.query_params.get('status')
         if req_status:
             queryset = queryset.filter(status=req_status)
-        return queryset
+        return queryset.select_related('organization', 'user').order_by('-id')
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
