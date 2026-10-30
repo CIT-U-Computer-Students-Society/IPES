@@ -9,6 +9,7 @@ import csv
 
 from .models import AuditLog
 from .serializers import AuditLogSerializer, AuditLogListSerializer
+from .utils import sanitize_csv_cell
 
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
@@ -233,11 +234,11 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         
         for log in queryset:
             writer.writerow([
-                log.datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                log.user_id.get_full_name() if log.user_id else 'System',
-                log.user_id.email if log.user_id else 'N/A',
-                log.action,
-                log.ip_address or 'N/A'
+                sanitize_csv_cell(log.datetime.strftime('%Y-%m-%d %H:%M:%S')),
+                sanitize_csv_cell(log.user_id.get_full_name() if log.user_id else 'System'),
+                sanitize_csv_cell(log.user_id.email if log.user_id else 'N/A'),
+                sanitize_csv_cell(log.action),
+                sanitize_csv_cell(log.ip_address or 'N/A')
             ])
             
         return response
