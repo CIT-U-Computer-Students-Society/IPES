@@ -112,6 +112,7 @@ class AuditActions:
     FORM_UNPUBLISHED = 'evaluation.form_unpublished'
     FORM_DELETED = 'evaluation.form_deleted'
     FORM_DUPLICATED = 'evaluation.form_duplicated'
+    FORM_RESULTS_RELEASED = 'evaluation.results_released'
 
     # Evaluation submission actions
     EVALUATION_STARTED = 'evaluation.started'
