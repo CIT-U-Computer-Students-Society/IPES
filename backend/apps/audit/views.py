@@ -1,15 +1,63 @@
-from rest_framework import viewsets, permissions, status
+import csv
+import ipaddress
+from datetime import datetime, time, timedelta
+
+from django.db.models import Count, Q
+from django.http import HttpResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Q
-from django.utils import timezone
-from django.http import HttpResponse
-from datetime import timedelta
-import csv
 
+from apps.validation import positive_id
 from .models import AuditLog
-from .serializers import AuditLogSerializer, AuditLogListSerializer
+from .serializers import AuditLogListSerializer, AuditLogSerializer
 from .utils import sanitize_csv_cell
+
+
+def parse_audit_date_bound(raw_value, field_name, is_end_bound=False):
+    """
+    Parse a date or datetime string for audit filtering.
+    For an end bound given as date-only (e.g. YYYY-MM-DD), returns the start
+    of the next day with an exclusive upper-bound lookup ('__lt') so the entire
+    selected day is included.
+    """
+    if not isinstance(raw_value, str) or not raw_value.strip():
+        raise serializers.ValidationError({
+            field_name: 'Enter a valid date or datetime.'
+        })
+
+    val = raw_value.strip()
+    has_time = 'T' in val or (' ' in val and ':' in val)
+
+    if not has_time:
+        d = parse_date(val)
+        if d is not None:
+            if is_end_bound:
+                next_day = d + timedelta(days=1)
+                bound_dt = timezone.make_aware(
+                    datetime.combine(next_day, time.min),
+                    timezone.get_current_timezone()
+                )
+                return bound_dt, '__lt'
+            else:
+                bound_dt = timezone.make_aware(
+                    datetime.combine(d, time.min),
+                    timezone.get_current_timezone()
+                )
+                return bound_dt, '__gte'
+
+    dt = parse_datetime(val)
+    if dt is not None:
+        if timezone.is_naive(dt):
+            dt = timezone.make_aware(dt, timezone.get_current_timezone())
+        lookup = '__lte' if is_end_bound else '__gte'
+        return dt, lookup
+
+    raise serializers.ValidationError({
+        field_name: f'Enter a valid date or datetime for {field_name}.'
+    })
 
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
@@ -19,13 +67,20 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         """Filter audit logs based on user role and parameters"""
         queryset = AuditLog.objects.all()
-        
-        is_global_admin = self.request.user.is_staff or self.request.user.is_superuser
-        org_id = self.request.query_params.get('organization_id')
+
+        is_global_admin = (
+            self.request.user.is_staff or self.request.user.is_superuser
+        )
+        raw_org_id = self.request.query_params.get('organization_id')
+        org_id = (
+            positive_id(raw_org_id, 'organization_id')
+            if raw_org_id is not None
+            else None
+        )
 
         # Organization scoping & Authorization
         if not is_global_admin:
@@ -33,7 +88,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 # Regular users MUST supply an organization_id to view logs,
                 # otherwise return nothing to prevent cross-tenant data leakage
                 return AuditLog.objects.none()
-                
+
             from apps.organizations.models import OrganizationRole
             is_org_admin = OrganizationRole.objects.filter(
                 user=self.request.user,
@@ -41,37 +96,64 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 role='Admin',
                 is_active=True
             ).exists()
-            
+
             if not is_org_admin:
                 return AuditLog.objects.none()
-                
+
         if org_id:
             queryset = queryset.filter(organization_id=org_id)
-        
+
         # Filter by user
-        user_id = self.request.query_params.get('user_id')
-        if user_id:
+        raw_user_id = self.request.query_params.get('user_id')
+        if raw_user_id is not None:
+            user_id = positive_id(raw_user_id, 'user_id')
             queryset = queryset.filter(user_id=user_id)
-        
+
         # Filter by action
         action_param = self.request.query_params.get('action')
         if action_param:
             queryset = queryset.filter(action__icontains=action_param)
-        
+
         # Filter by date range
-        start_date = self.request.query_params.get('start_date')
-        end_date = self.request.query_params.get('end_date')
-        
-        if start_date:
-            queryset = queryset.filter(datetime__gte=start_date)
-        if end_date:
-            queryset = queryset.filter(datetime__lte=end_date)
-        
+        start_date_param = self.request.query_params.get('start_date')
+        end_date_param = self.request.query_params.get('end_date')
+
+        start_dt = None
+        start_lookup = None
+        end_dt = None
+        end_lookup = None
+
+        if start_date_param:
+            start_dt, start_lookup = parse_audit_date_bound(
+                start_date_param, 'start_date', is_end_bound=False
+            )
+        if end_date_param:
+            end_dt, end_lookup = parse_audit_date_bound(
+                end_date_param, 'end_date', is_end_bound=True
+            )
+
+        if start_dt and end_dt:
+            if start_dt > end_dt:
+                raise serializers.ValidationError({
+                    'end_date': 'end_date must be on or after start_date.'
+                })
+
+        if start_dt:
+            queryset = queryset.filter(**{f'datetime{start_lookup}': start_dt})
+        if end_dt:
+            queryset = queryset.filter(**{f'datetime{end_lookup}': end_dt})
+
         # Filter by IP
-        ip_address = self.request.query_params.get('ip_address')
-        if ip_address:
-            queryset = queryset.filter(ip_address=ip_address)
-            
+        raw_ip = self.request.query_params.get('ip_address')
+        if raw_ip:
+            try:
+                ipaddress.ip_address(raw_ip.strip())
+            except ValueError:
+                raise serializers.ValidationError({
+                    'ip_address': 'Enter a valid IPv4 or IPv6 address.'
+                })
+            queryset = queryset.filter(ip_address=raw_ip.strip())
+
         # General search query
         q = self.request.query_params.get('q')
         if q:
@@ -82,66 +164,66 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(user_id__first_name__icontains=q) |
                 Q(user_id__last_name__icontains=q)
             )
-        
-        return queryset.select_related('user_id', 'organization_id').order_by('-datetime')
-    
+
+        return queryset.select_related(
+            'user_id', 'organization_id'
+        ).order_by('-datetime')
+
     @action(detail=False, methods=['get'])
     def recent(self, request):
         """Get recent audit logs (last 100)"""
         logs = self.get_queryset()[:100]
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def by_user(self, request):
         """Get audit logs for a specific user"""
         user_id = request.query_params.get('user_id')
-        
+
         if not user_id:
             return Response(
                 {'error': 'user_id parameter is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        logs = self.get_queryset().filter(user_id=user_id)
+
+        logs = self.get_queryset()
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def by_action(self, request):
         """Get audit logs by action type"""
         action_param = request.query_params.get('action')
-        
+
         if not action_param:
             return Response(
                 {'error': 'action parameter is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         logs = self.get_queryset().filter(
             action__icontains=action_param
         )
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def by_date(self, request):
         """Get audit logs within a date range"""
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
-        
+
         if not start_date or not end_date:
             return Response(
                 {'error': 'start_date and end_date parameters are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        logs = self.get_queryset().filter(
-            datetime__range=[start_date, end_date]
-        )
+
+        logs = self.get_queryset()
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def today(self, request):
         """Get today's audit logs"""
@@ -149,10 +231,10 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         logs = self.get_queryset().filter(
             datetime__date=today
         )
-        
+
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def this_week(self, request):
         """Get this week's audit logs"""
@@ -160,60 +242,54 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         logs = self.get_queryset().filter(
             datetime__gte=week_ago
         )
-        
+
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def search(self, request):
         """Search audit logs by keyword"""
         keyword = request.query_params.get('q')
-        
+
         if not keyword:
             return Response(
                 {'error': 'q (search query) parameter is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         logs = self.get_queryset().filter(
             Q(action__icontains=keyword) |
             Q(ip_address__icontains=keyword) |
             Q(user_id__email__icontains=keyword)
         )
-        
+
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get audit log statistics"""
-        from django.db.models import Count
-        
         base_qs = self.get_queryset()
-        
-        # Total count
+
         total = base_qs.count()
-        
-        # Today's count
+
         today = timezone.now().date()
         today_count = base_qs.filter(datetime__date=today).count()
-        
-        # Count by action type (top 10)
+
         action_counts = dict(
             base_qs.values('action')
             .annotate(count=Count('id'))
             .order_by('-count')[:10]
             .values_list('action', 'count')
         )
-        
-        # Count by user (top 10)
+
         user_counts = dict(
             base_qs.values('user_id__email')
             .annotate(count=Count('id'))
             .order_by('-count')[:10]
             .values_list('user_id__email', 'count')
         )
-        
+
         return Response({
             'total': total,
             'today': today_count,
@@ -225,20 +301,27 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     def export_csv(self, request):
         """Export audit logs to CSV"""
         queryset = self.get_queryset()
-        
+
+        now_str = timezone.now().strftime("%Y%m%d_%H%M%S")
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="audit_log_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-        
+        response['Content-Disposition'] = (
+            f'attachment; filename="audit_log_{now_str}.csv"'
+        )
+
         writer = csv.writer(response)
-        writer.writerow(['Timestamp', 'User Name', 'User Email', 'Action', 'IP Address'])
-        
+        writer.writerow([
+            'Timestamp', 'User Name', 'User Email', 'Action', 'IP Address'
+        ])
+
         for log in queryset:
             writer.writerow([
                 sanitize_csv_cell(log.datetime.strftime('%Y-%m-%d %H:%M:%S')),
-                sanitize_csv_cell(log.user_id.get_full_name() if log.user_id else 'System'),
+                sanitize_csv_cell(
+                    log.user_id.get_full_name() if log.user_id else 'System'
+                ),
                 sanitize_csv_cell(log.user_id.email if log.user_id else 'N/A'),
                 sanitize_csv_cell(log.action),
                 sanitize_csv_cell(log.ip_address or 'N/A')
             ])
-            
+
         return response
