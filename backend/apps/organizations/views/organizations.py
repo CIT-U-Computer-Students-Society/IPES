@@ -5,10 +5,12 @@ Organization ViewSet — CRUD, join-by-code, member management, analytics.
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed, PermissionDenied
 from django.db.models import Count, Avg, Q
 from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
+from apps.organizations.access import active_organization, is_organization_admin
 
 from ..models import (
     Organization, UnitType, OrganizationUnit, PositionType,
@@ -22,6 +24,30 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.filter(is_active=True)
     serializer_class = OrganizationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        org = self.get_object()
+        org_id = active_organization(request)
+        if org.pk != org_id or not is_organization_admin(request, org_id):
+            raise PermissionDenied('Only an administrator of the active organization can update it.')
+        return super().update(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        previous = serializer.instance
+        changed_fields = sorted(
+            name for name, value in serializer.validated_data.items()
+            if getattr(previous, name) != value
+        )
+        org = serializer.save()
+        if changed_fields:
+            log_action(
+                self.request.user, AuditActions.ORG_UPDATED, self.request,
+                organization_id=org.pk, fields=','.join(changed_fields),
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        """Organization removal must use the confirmed soft-deactivation flow."""
+        raise MethodNotAllowed('DELETE', detail='Use the delete-organization action to deactivate an organization.')
 
     def create(self, request, *args, **kwargs):
         """Override create to provide specific validation errors for duplicate codes."""

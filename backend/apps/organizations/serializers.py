@@ -17,6 +17,11 @@ class OrganizationChildSerializer(ValidatedModelSerializer):
 class OrganizationSerializer(ValidatedModelSerializer):
     """Serializer for Organization model"""
     
+    def validate_is_active(self, value):
+        if self.instance and value != self.instance.is_active:
+            raise serializers.ValidationError('Use the confirmed organization deactivation action.')
+        return value
+
     class Meta:
         model = Organization
         fields = [
