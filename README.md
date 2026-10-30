@@ -23,6 +23,9 @@ We hope that this system will help in minimizing manual effort, reducing errors,
 
 Access the project documentation via the [Documentation Index](docs/README.md) or use the quick links below:
 
+### Public Portal & User Guides
+*   [Official Static Website & Visual Guides](https://cit-u-computer-students-society.github.io/IPES)
+
 ### General Overview
 *   [Project Manifesto](docs/Manifesto.md)
 
@@ -63,5 +66,9 @@ IPES/
 │   │   ├── lib/        # Utility functions and API configuration
 │   │   ├── pages/      # View components (Admin, Officer, Auth)
 │   │   └── App.tsx     # Main routing and layout wrapper
+│   └── package.json
+├── website/            # Static Landing Page & User Guides (Astro + Starlight)
+│   ├── src/            # Landing page & guide documentation content
+│   ├── public/         # Annotated screenshots and visual diagrams
 │   └── package.json
 ```

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-violet-lm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+    <marker id="arrow-amber-lm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+  </defs>
+
+  <!-- Frame -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cc/member/evaluations/form/39</text>
+
+  <!-- Form Header -->
+  <text x="50" y="85" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Evaluating: Juan dela Cruz</text>
+  <text x="50" y="105" font-size="12" fill="#64748b">Role: Senior Research Associate · Committee on Research</text>
+
+  <!-- Category Block 1 -->
+  <rect x="50" y="125" width="780" height="155" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="50" y="125" width="780" height="32" rx="8" fill="#eef4f9"/>
+  <text x="65" y="146" font-size="12" font-weight="700" fill="#293f55">CATEGORY: EXECUTION &amp; TIMELINESS (WEIGHT: 35%)</text>
+
+  <!-- Question 1: Likert -->
+  <text x="65" y="180" font-size="13" font-weight="600" fill="#0f172a">1. Reliably delivers assigned research milestones on or before deadlines.</text>
+  
+  <!-- Likert Options -->
+  <rect x="65" y="195" width="135" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="80" y="217" font-size="12" fill="#64748b">1 - Unsatisfactory</text>
+  
+  <rect x="210" y="195" width="135" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="235" y="217" font-size="12" fill="#64748b">2 - Needs Imp.</text>
+
+  <rect x="355" y="195" width="135" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="385" y="217" font-size="12" fill="#64748b">3 - Good</text>
+
+  <rect x="500" y="195" width="135" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="525" y="217" font-size="12" fill="#64748b">4 - Very Good</text>
+
+  <!-- Option 5 Selected (Highlight) -->
+  <rect x="645" y="195" width="145" height="34" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="665" cy="212" r="5" fill="#f59e0b"/>
+  <text x="678" y="217" font-size="12" font-weight="700" fill="#b45309">5 - Outstanding</text>
+
+  <!-- Category Block 2: Qualitative -->
+  <rect x="50" y="295" width="780" height="115" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <rect x="50" y="295" width="780" height="30" rx="8" fill="#f5f3ff"/>
+  <text x="65" y="315" font-size="12" font-weight="700" fill="#7c3aed">CONSTRUCTIVE QUALITATIVE FEEDBACK</text>
+  <text x="65" y="345" font-size="12" fill="#334155">What are this officer's core strengths and growth opportunities?</text>
+  <rect x="65" y="355" width="750" height="42" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="75" y="378" font-size="12" fill="#0f172a">Exceptional diligence in gathering data; could communicate bottlenecks earlier.</text>
+
+  <!-- Footer Actions -->
+  <rect x="510" y="425" width="130" height="38" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="545" y="449" font-size="13" font-weight="600" fill="#475569">Save Draft</text>
+
+  <rect id="btn-final-submit" x="655" y="425" width="175" height="38" rx="6" fill="#293f55"/>
+  <text x="675" y="449" font-size="13" font-weight="700" fill="#ffffff">Submit Final Evaluation</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1: Points to Likert Selection -->
+  <circle cx="825" cy="212" r="14" fill="#f59e0b"/>
+  <text x="820" y="217" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 808 212 L 792 212" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm4)"/>
+
+  <!-- Callout 2: Points to Qualitative Textarea -->
+  <circle cx="840" cy="376" r="14" fill="#8b5cf6"/>
+  <text x="835" y="381" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 823 376 L 805 376" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm4)"/>
+
+  <!-- Callout 3: Points to Submit Final Button -->
+  <circle cx="625" cy="444" r="14" fill="#8b5cf6"/>
+  <text x="620" y="449" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 642 444 L 653 444" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm4)"/>
+</svg>

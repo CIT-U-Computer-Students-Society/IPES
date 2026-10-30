@@ -1,0 +1,427 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
+/* ==========================================================================
+   IPES Documentation & Landing Portal Theme (Matching Main IPES Light Mode)
+   ========================================================================== */
+
+/* Default Light Theme (Matches IPES Application) */
+:root,
+:root[data-theme='light'] {
+  --sl-font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --sl-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* IPES Brand Navy: #293F55 & CIT-U Amber: #F59E0B */
+  --sl-color-accent-low: #eef4f9;
+  --sl-color-accent: #293f55;
+  --sl-color-accent-high: #1b2a4a;
+
+  /* Neutrals (Crisp Light Mode Palette) */
+  --sl-color-white: #0f172a;       /* Headings & primary text */
+  --sl-color-gray-1: #1e293b;     /* Body high-contrast text */
+  --sl-color-gray-2: #334155;     /* Secondary text */
+  --sl-color-gray-3: #64748b;     /* Muted text / labels */
+  --sl-color-gray-4: #cbd5e1;     /* Borders & dividers */
+  --sl-color-gray-5: #e2e8f0;     /* Card borders */
+  --sl-color-gray-6: #f8fafc;     /* Page background */
+  --sl-color-black: #ffffff;      /* Surface / card white */
+
+  /* IPES Application Tokens */
+  --ipes-bg: #f8fafc;
+  --ipes-card: #ffffff;
+  --ipes-card-border: #e2e8f0;
+  --ipes-navy: #293f55;
+  --ipes-navy-dark: #1b2a4a;
+  --ipes-amber: #f59e0b;
+  --ipes-amber-hover: #d97706;
+  --ipes-amber-light: #fff7ed;
+  --ipes-cyan: #06b6d4;
+  --ipes-emerald: #10b981;
+  --ipes-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --ipes-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --ipes-shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+}
+
+/* Dark Theme (Toggleable) */
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #1b2a4a;
+  --sl-color-accent: #f59e0b;
+  --sl-color-accent-high: #fef3c7;
+
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eceef2;
+  --sl-color-gray-2: #cbd5e1;
+  --sl-color-gray-3: #94a3b8;
+  --sl-color-gray-4: #475569;
+  --sl-color-gray-5: #1e293b;
+  --sl-color-gray-6: #0f172a;
+  --sl-color-black: #0b0f19;
+
+  --ipes-bg: #0b0f19;
+  --ipes-card: #111827;
+  --ipes-card-border: #1e293b;
+  --ipes-navy: #7095c0;
+  --ipes-navy-dark: #90aecf;
+  --ipes-amber-light: #291800;
+  --ipes-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --ipes-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --ipes-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Smooth Light/Dark Mode Color Transitions */
+html,
+body,
+header,
+main,
+section,
+footer,
+article,
+div[class*="bg-"],
+div[class*="border-"],
+nav,
+aside {
+  transition-property: color, background-color, border-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 400ms;
+}
+
+/* Typography Headings in Montserrat */
+h1, h2, h3, h4, h5, h6, .hero h1 {
+  font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif !important;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* Header & Navbar Styling */
+header.header {
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  backdrop-filter: blur(12px);
+}
+
+/* Hero Section Refinements */
+.hero {
+  position: relative;
+  overflow: visible;
+  padding: 3rem 1rem 4rem !important;
+}
+
+.hero .tagline {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  max-width: 44rem;
+  color: var(--sl-color-gray-2);
+}
+
+/* ==========================================================================
+   3D Rotating IPES Logo
+   ========================================================================== */
+
+.logo-3d-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1200px;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.logo-3d-stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  transform-style: preserve-3d;
+  animation: float 6s ease-in-out infinite;
+}
+
+.logo-3d-rotator {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: spin3d 14s linear infinite;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-3d-rotator:hover {
+  animation-play-state: paused;
+}
+
+/* Ambient Ring / Platform */
+.logo-3d-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  height: 320px;
+  margin-top: -160px;
+  margin-left: -160px;
+  border-radius: 50%;
+  border: 2px dashed rgba(245, 158, 11, 0.35);
+  transform: rotateX(75deg);
+  pointer-events: none;
+  animation: ringPulse 4s ease-in-out infinite;
+}
+
+/* Ambient Radial Glow */
+.logo-3d-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  margin-top: -140px;
+  margin-left: -140px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(41, 63, 85, 0.12) 50%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(24px);
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* Front & Back Faces of 3D Coin/Shield */
+.logo-3d-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  backface-visibility: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%);
+  border: 4px solid #f59e0b;
+  box-shadow: 
+    0 20px 40px -10px rgba(41, 63, 85, 0.25),
+    0 0 30px rgba(245, 158, 11, 0.2),
+    inset 0 0 15px rgba(245, 158, 11, 0.15);
+}
+
+:root[data-theme='dark'] .logo-3d-face {
+  background: radial-gradient(circle at 35% 35%, #1e293b 0%, #0f172a 60%, #090d16 100%);
+  border-color: #f59e0b;
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(245, 158, 11, 0.25),
+    inset 0 0 15px rgba(245, 158, 11, 0.1);
+}
+
+.logo-3d-front {
+  transform: translateZ(12px);
+}
+
+.logo-3d-back {
+  transform: rotateY(180deg) translateZ(12px);
+}
+
+/* Extruded Depth Layers */
+.logo-3d-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #d97706;
+  opacity: 0.9;
+}
+
+.logo-3d-layer-1 { transform: translateZ(6px); }
+.logo-3d-layer-2 { transform: translateZ(0px); background: #293f55; }
+.logo-3d-layer-3 { transform: translateZ(-6px); }
+
+/* Keyframe Animations */
+@keyframes spin3d {
+  0% {
+    transform: rotateY(0deg) rotateX(10deg);
+  }
+  50% {
+    transform: rotateY(180deg) rotateX(-8deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(10deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes ringPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: rotateX(75deg) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: rotateX(75deg) scale(1.06);
+  }
+}
+
+/* ==========================================================================
+   UI / UX Landing Page Standards Components
+   ========================================================================== */
+
+/* Trust & Badge Pill */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  background-color: var(--sl-color-accent-low);
+  border: 1px solid rgba(41, 63, 85, 0.12);
+  color: var(--sl-color-accent);
+  font-size: 0.825rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--ipes-shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trust-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ipes-shadow-md);
+}
+
+/* Institutional Partner Logos Bar */
+.partners-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  padding: 1.5rem 0;
+  margin: 2rem 0;
+  border-top: 1px solid var(--sl-color-gray-5);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+.partner-logo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--sl-color-gray-3);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.partner-logo-item:hover {
+  color: var(--sl-color-white);
+}
+
+.partner-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Standardized Step Badges (Violet, Amber, Cyan) */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 9999px;
+  background-color: #8b5cf6;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-right: 0.6rem;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+  vertical-align: middle;
+}
+
+.step-badge-amber {
+  background-color: #f59e0b;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.step-badge-navy {
+  background-color: #293f55;
+  box-shadow: 0 2px 4px rgba(41, 63, 85, 0.3);
+}
+
+/* Screenshot Display */
+.guide-screenshot {
+  border-radius: 0.75rem;
+  border: 1px solid var(--sl-color-gray-5);
+  background-color: var(--sl-color-black);
+  box-shadow: var(--ipes-shadow-md);
+  margin: 1.5rem 0 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.guide-screenshot:hover {
+  box-shadow: var(--ipes-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Comparison Table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--ipes-shadow-sm);
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--sl-color-gray-5);
+}
+
+.comparison-table th {
+  background-color: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.comparison-table td {
+  font-size: 0.925rem;
+  color: var(--sl-color-gray-2);
+}
+
+/* Feature Walkthrough Step Cards */
+.walkthrough-step {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: var(--sl-color-black);
+  border: 1px solid var(--sl-color-gray-5);
+  box-shadow: var(--ipes-shadow-sm);
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.walkthrough-step:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ipes-shadow-md);
+}
+
+.walkthrough-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent);
+  shrink: 0;
+}
