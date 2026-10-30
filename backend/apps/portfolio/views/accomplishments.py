@@ -12,6 +12,8 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Count
 
 from apps.audit.utils import log_action, AuditActions
+from apps.organizations.access import active_organization
+from apps.organizations.models import Organization
 
 from ..models import Accomplishment
 from ..serializers import (
@@ -105,23 +107,18 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
         return queryset.select_related('user_id', 'verified_by').order_by('-date_completed', '-id')
 
+    def create(self, request, *args, **kwargs):
+        active_organization(request)
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
-        """Auto-set user_id and organization_id from request, then log creation"""
-        org_id = self._get_org_id_from_request()
-        if not org_id:
-            from rest_framework.exceptions import ValidationError
-            raise ValidationError({
-                'organization_id': 'An active organization must be selected to submit an accomplishment.'
-            })
+        """Auto-set user_id and organization_id from request, then log."""
+        org_id = active_organization(self.request)
+        organization = Organization.objects.get(pk=org_id)
 
-        from apps.organizations.models import Organization
-        try:
-            organization = Organization.objects.get(pk=org_id)
-        except Organization.DoesNotExist:
-            from rest_framework.exceptions import ValidationError
-            raise ValidationError({'organization_id': 'Organization not found.'})
-
-        accomplishment = serializer.save(user_id=self.request.user, organization_id=organization)
+        accomplishment = serializer.save(
+            user_id=self.request.user, organization_id=organization
+        )
         log_action(
             self.request.user,
             AuditActions.ACCOMPLISHMENT_CREATED,
