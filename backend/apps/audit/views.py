@@ -19,12 +19,7 @@ from .utils import sanitize_csv_cell
 
 
 def parse_audit_date_bound(raw_value, field_name, is_end_bound=False):
-    """
-    Parse a date or datetime string for audit filtering.
-    For an end bound given as date-only (e.g. YYYY-MM-DD), returns the start
-    of the next day with an exclusive upper-bound lookup ('__lt') so the entire
-    selected day is included.
-    """
+    """Parse a date or datetime bound; date-only end bounds include the day."""
     if not isinstance(raw_value, str) or not raw_value.strip():
         raise serializers.ValidationError({
             field_name: 'Enter a valid date or datetime.'
@@ -32,30 +27,27 @@ def parse_audit_date_bound(raw_value, field_name, is_end_bound=False):
 
     val = raw_value.strip()
     has_time = 'T' in val or (' ' in val and ':' in val)
-
-    if not has_time:
-        d = parse_date(val)
-        if d is not None:
-            if is_end_bound:
-                next_day = d + timedelta(days=1)
-                bound_dt = timezone.make_aware(
-                    datetime.combine(next_day, time.min),
-                    timezone.get_current_timezone()
+    try:
+        if not has_time:
+            day = parse_date(val)
+            if day is not None:
+                if is_end_bound:
+                    day += timedelta(days=1)
+                bound = timezone.make_aware(
+                    datetime.combine(day, time.min),
+                    timezone.get_current_timezone(),
                 )
-                return bound_dt, '__lt'
-            else:
-                bound_dt = timezone.make_aware(
-                    datetime.combine(d, time.min),
-                    timezone.get_current_timezone()
-                )
-                return bound_dt, '__gte'
+                return bound, '__lt' if is_end_bound else '__gte'
 
-    dt = parse_datetime(val)
-    if dt is not None:
-        if timezone.is_naive(dt):
-            dt = timezone.make_aware(dt, timezone.get_current_timezone())
-        lookup = '__lte' if is_end_bound else '__gte'
-        return dt, lookup
+        dt = parse_datetime(val)
+        if dt is not None:
+            if timezone.is_naive(dt):
+                dt = timezone.make_aware(dt, timezone.get_current_timezone())
+            return dt, '__lte' if is_end_bound else '__gte'
+    except (ValueError, OverflowError) as exc:
+        raise serializers.ValidationError({
+            field_name: f'Enter a valid date or datetime for {field_name}.'
+        }) from exc
 
     raise serializers.ValidationError({
         field_name: f'Enter a valid date or datetime for {field_name}.'
@@ -144,7 +136,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
         if start_dt and end_dt:
-            if start_dt > end_dt:
+            if start_dt > end_dt or (start_dt == end_dt and end_lookup == '__lt'):
                 raise serializers.ValidationError({
                     'end_date': 'end_date must be on or after start_date.'
                 })
