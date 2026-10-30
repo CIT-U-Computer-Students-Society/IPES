@@ -128,6 +128,7 @@ class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
             request.user,
             AuditActions.ORG_JOIN_APPROVED,
             request,
+            organization_id=join_request.organization_id,
             target_user_email=join_request.user.email,
             org_name=join_request.organization.name
         )
@@ -147,6 +148,7 @@ class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
             request.user,
             AuditActions.ORG_JOIN_REJECTED,
             request,
+            organization_id=join_request.organization_id,
             target_user_email=join_request.user.email,
             org_name=join_request.organization.name
         )

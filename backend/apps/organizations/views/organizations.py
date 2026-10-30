@@ -5,7 +5,9 @@ Organization ViewSet — CRUD, join-by-code, member management, analytics.
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import MethodNotAllowed, PermissionDenied
+from rest_framework.exceptions import (
+    MethodNotAllowed, PermissionDenied, ValidationError,
+)
 from django.db.models import Count, Avg, Q
 from django.utils import timezone
 
@@ -82,6 +84,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             self.request.user,
             AuditActions.ORG_CREATED,
             self.request,
+            organization_id=org.id,
             org_name=org.name,
             org_id=str(org.id)
         )
@@ -120,6 +123,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.ORG_JOIN_REQUESTED,
             request,
+            organization_id=org.id,
             org_name=org.name
         )
 
@@ -132,6 +136,13 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         Deactivates the OrganizationRole and all active Memberships for the user.
         """
         org = self.get_object()
+        header_org = request.headers.get('X-Organization-Id')
+        if header_org and str(header_org) != str(org.id):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header does not match target organization.'
+                )
+            })
         user_id = request.data.get('user_id')
 
         if not user_id:
@@ -169,6 +180,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.USER_DEACTIVATED,
             request,
+            organization_id=org.id,
             org_name=org.name,
             target_user_email=target_user.email if target_user else f"User ID: {user_id}"
         )
@@ -182,6 +194,13 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         Only Admins can call this.
         """
         org = self.get_object()
+        header_org = request.headers.get('X-Organization-Id')
+        if header_org and str(header_org) != str(org.id):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header does not match target organization.'
+                )
+            })
         user_id = request.data.get('user_id')
         new_role = request.data.get('role')
 
@@ -221,6 +240,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.USER_UPDATED,
             request,
+            organization_id=org.id,
             target_user_email=target_user.email if target_user else f'User ID: {user_id}',
             detail=f'Role changed to {new_role} in {org.name}'
         )
@@ -234,6 +254,13 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         Requires the Head Administrator's password and the correct organization code.
         """
         org = self.get_object()
+        header_org = request.headers.get('X-Organization-Id')
+        if header_org and str(header_org) != str(org.id):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header does not match target organization.'
+                )
+            })
         code = request.data.get('code')
         password = request.data.get('password')
 
@@ -302,6 +329,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
             request.user,
             AuditActions.ORG_UPDATED,
             request,
+            organization_id=org.id,
             detail="Organization formally deleted (soft-deactivated) by Head Admin",
             org_name=org.name,
             org_id=str(org.id)
