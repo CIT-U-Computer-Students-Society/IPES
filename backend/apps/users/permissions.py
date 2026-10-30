@@ -14,3 +14,10 @@ class IsAdmin(permissions.BasePermission):
             
         # Check if the user has an 'Admin' role in ANY active organization
         return request.user.organization_roles.filter(is_active=True, role__iexact='admin').exists()
+
+
+class IsPlatformAdministrator(permissions.BasePermission):
+    """Global account changes require a platform superuser."""
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
