@@ -81,6 +81,7 @@ class MembershipSerializer(ValidatedModelSerializer):
             'date_end', 'is_active'
         ]
         read_only_fields = ['id', 'date_start', 'date_end']
+        validators = []
 
     def validate(self, data):
         """Ensure uniqueness: a user cannot have the exact same unit+position entry twice."""
@@ -94,11 +95,15 @@ class MembershipSerializer(ValidatedModelSerializer):
         position = data.get('position_id') or (self.instance.position_id if self.instance else None)
 
         if user and unit and position:
-            qs = Membership.objects.filter(user_id=user, unit_id=unit, position_id=position)
+            qs = Membership.objects.filter(
+                user_id=user, unit_id=unit, position_id=position, is_active=True
+            )
             if self.instance:
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
-                raise serializers.ValidationError('This membership (user + unit + position) already exists.')
+                raise serializers.ValidationError(
+                    'This membership (user + unit + position) already exists.'
+                )
 
         return data
 
