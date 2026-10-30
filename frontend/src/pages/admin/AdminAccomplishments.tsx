@@ -337,6 +337,15 @@ const AdminAccomplishments = () => {
                 </>
               )}
 
+              {selectedAccomplishment.status === "Verified" && selectedAccomplishment.comments && (
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <Label className="text-green-700">Verification Notes</Label>
+                  <p className="text-sm text-green-600 break-words whitespace-pre-wrap max-h-40 overflow-auto">
+                    {selectedAccomplishment.comments}
+                  </p>
+                </div>
+              )}
+
               {selectedAccomplishment.status === "Rejected" && selectedAccomplishment.comments && (
                 <div className="p-3 bg-red-50 rounded-lg">
                   <Label className="text-red-700">Rejection Reason</Label>
