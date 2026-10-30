@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
-from apps.organizations.access import is_organization_admin
+from apps.organizations.access import is_organization_admin, require_organization_admin
 from apps.validation import positive_id
 
 from ..models import (
@@ -55,12 +55,8 @@ class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
         """Admin action to approve a join request and assign user to a unit and position."""
+        require_organization_admin(request)
         join_request = self.get_object()
-
-        if not OrganizationRole.objects.filter(
-            user=request.user, organization=join_request.organization, role='Admin'
-        ).exists():
-            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
 
         if join_request.status != 'Pending':
             return Response({'error': 'Request is not pending'}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,12 +135,8 @@ class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
     @action(detail=True, methods=['post'])
     def reject(self, request, pk=None):
         """Admin action to reject a pending join request"""
+        require_organization_admin(request)
         join_request = self.get_object()
-
-        if not OrganizationRole.objects.filter(
-            user=request.user, organization=join_request.organization, role='Admin'
-        ).exists():
-            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
 
         join_request.status = 'Rejected'
         join_request.save()
