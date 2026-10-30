@@ -104,14 +104,22 @@ def save_answers(request, assignment_id, payload, *, submit=False, replace=True)
 def member_ids(form, unit_id=None, position_id=None):
     qs = Membership.objects.filter(
         unit_id__organization_id_id=form.organization_id_id,
-        unit_id__is_active=True, position_id__is_active=True,
-        user_id__is_active=True, is_active=True,
+        unit_id__is_active=True,
+        position_id__is_active=True,
+        user_id__is_active=True,
+        is_active=True,
+        user_id__organization_roles__organization_id=form.organization_id_id,
+        user_id__organization_roles__is_active=True,
     ).exclude(unit_id__type_id__name='System')
     if unit_id is not None:
         qs = qs.filter(unit_id_id=unit_id)
     if position_id is not None:
         qs = qs.filter(position_id_id=position_id)
-    return list(qs.order_by('user_id_id').values_list('user_id_id', flat=True).distinct())
+    return list(
+        qs.order_by('user_id_id')
+        .values_list('user_id_id', flat=True)
+        .distinct()
+    )
 
 
 @transaction.atomic
