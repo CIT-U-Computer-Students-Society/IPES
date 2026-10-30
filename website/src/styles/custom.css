@@ -70,6 +70,23 @@
   --ipes-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
+/* Smooth Light/Dark Mode Color Transitions */
+html,
+body,
+header,
+main,
+section,
+footer,
+article,
+div[class*="bg-"],
+div[class*="border-"],
+nav,
+aside {
+  transition-property: color, background-color, border-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 400ms;
+}
+
 /* Typography Headings in Montserrat */
 h1, h2, h3, h4, h5, h6, .hero h1 {
   font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif !important;
