@@ -5,6 +5,7 @@ Organization ViewSet — CRUD, join-by-code, member management, analytics.
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed
 from django.db.models import Count, Avg, Q
 from django.utils import timezone
 
@@ -22,6 +23,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.filter(is_active=True)
     serializer_class = OrganizationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        """Organization removal must use the confirmed soft-deactivation flow."""
+        raise MethodNotAllowed('DELETE', detail='Use the delete-organization action to deactivate an organization.')
 
     def create(self, request, *args, **kwargs):
         """Override create to provide specific validation errors for duplicate codes."""
