@@ -84,11 +84,13 @@ class JoinRequestViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, views
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Re-activate user account if deactivated
+        # Organization administrators cannot reactivate a global account.
         rejoining_user = join_request.user
         if not rejoining_user.is_active:
-            rejoining_user.is_active = True
-            rejoining_user.save(update_fields=['is_active'])
+            return Response(
+                {'error': 'The account is inactive. Contact a platform administrator.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Re-activate prior deactivated membership or create new one
         existing_membership = Membership.objects.filter(
