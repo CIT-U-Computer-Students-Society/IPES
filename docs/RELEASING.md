@@ -20,7 +20,7 @@ without Python package version metadata. No npm or Python package is published.
 1. Enable GitHub Actions and allow it to create pull requests in repository
    **Settings → Actions → General → Workflow permissions**.
 2. Add an Actions secret named `RELEASE_PLEASE_TOKEN` using a fine-grained PAT
-   with access to this repository and **Contents**, **Issues**, and **Pull requests**
+   with access to this repository and **Contents**, **Issues**, **Pull requests**, and **Workflows**
    read/write permissions. This lets bot-created PRs trigger normal validation.
    The workflow falls back to `GITHUB_TOKEN`, but GitHub suppresses workflows
    triggered by that token; CI on those PRs must then be triggered manually.
@@ -28,10 +28,8 @@ without Python package version metadata. No npm or Python package is published.
    usual reviewed PR. The workflows become available on their respective branches.
 
 The workflow's `issues: write` permission is used for release lifecycle labels.
-Production publication uses the job's `GITHUB_TOKEN`, with `contents: write`,
-`issues: write`, and `pull-requests: write`, to create releases and update labels
-on release PRs. The optional `RELEASE_PLEASE_TOKEN` is used only to prepare PRs into
-`main`; its permissions do not control production publication.
+Production publication uses the configured release token (falling back to `GITHUB_TOKEN`)
+to create releases, tag commits, and update labels on release PRs.
 These permissions do not grant automatic approval or merging. Required CI checks and both local
 application suites must pass before a merge.
 
