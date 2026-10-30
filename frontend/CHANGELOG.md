@@ -1,5 +1,39 @@
 # Changelog
 
+## [3.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.0.0...web-v3.0.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **audit:** scope audit read endpoints and hooks by active organization ([ed078d6](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ed078d6c8a19c5ddd81e7f9ce4da94f7ca48c58c)), closes [#268](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/268)
+* **dashboard:** count completed evaluation assignments using backend status ([6436bb2](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/6436bb2f79f164d917afb90b58139129a0c4a448)), closes [#240](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/240)
+* **evaluations:** record distinct audit action on results release ([7dd9b2a](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/7dd9b2a2a18399f942f26564dccd18d57838881f)), closes [#263](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/263)
+
+
+### Build and Dependencies
+
+* **deps-dev:** bump postcss from 8.5.31 to 8.5.32 in /frontend ([1930f62](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/1930f62dfd7180ac0c0aa60f03456feb77098140))
+* **deps-dev:** bump postcss from 8.5.31 to 8.5.32 in /frontend ([392f38d](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/392f38d80d172da25a65a49d74b92160633f81e9))
+* **deps-dev:** bump typescript from 6.0.3 to 7.0.2 in /frontend ([91fb385](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/91fb38557fed3f5449a850a23a4ffc994c0ba29e))
+* **deps-dev:** bump typescript from 6.0.3 to 7.0.2 in /frontend ([c82240e](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/c82240e5539edebd061ed24e21bc73a6abdfc729))
+* **deps:** bump @lottiefiles/dotlottie-react from 0.17.14 to 0.20.0 in /frontend ([a12aa4e](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/a12aa4e7efa009970060a31af3bbcd591b26f0ba))
+* **deps:** bump @lottiefiles/dotlottie-react in /frontend ([8fa7542](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/8fa75428ed4451aebf72d3324aa87dcddd211408))
+* **deps:** bump react from 19.3.0 to 19.3.1 in /frontend ([ed46fbf](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ed46fbf97266e5bc2b819c77946304995e606b7e))
+* **deps:** bump react from 19.3.0 to 19.3.1 in /frontend ([c46d222](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/c46d222f3b588406dbabe93d9119b2ab277c8ba7))
+* **deps:** bump react-hook-form from 7.86.0 to 7.91.0 in /frontend ([3c2fc09](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/3c2fc093f8b3340de8df348ae2f57564ae3abb9c))
+* **deps:** bump react-hook-form from 7.86.0 to 7.91.0 in /frontend ([deaa302](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/deaa302ab3e42876c62bcb2d25c5952a19938398))
+* **frontend:** restore compatible dependency versions ([85c31ec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/85c31ec519ec69cb7bf0093209abb54d4e03e7e1))
+
+
+### Tests
+
+* **frontend:** add Playwright requirements and evidence pipeline ([9b5e6ec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/9b5e6ecc1f6fd9acf666adecbca83bd85fc10261))
+
+
+### CI
+
+* **testing:** provision isolated PostgreSQL test environments ([f00ac86](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f00ac860b4a8a83c905a7272287cf984fcd0067d))
+
 ## [3.0.0](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v2.0.0...web-v3.0.0) (2026-10-29)
 
 

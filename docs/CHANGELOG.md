@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.6](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.5...docs-v1.0.6) (2026-10-30)
+
+
+### Documentation
+
+* **release:** describe direct release pull requests into main ([f06872e](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f06872ec6bf0f5004f0749f33745c86ffef5f0a5))
+* **release:** include stack follow-up review ([07c8c15](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/07c8c15a80645904a1648a8a3307a8af3a02e555))
+* **release:** record dev to main review ([d8a61b6](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/d8a61b63e63fe2a510219927c1f2b3429d6e0d55))
+* **testing:** define concise requirements traceability matrix ([cc8b5d1](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/cc8b5d1455edf4a70f5e5da458d16d7011d0c46f))
+* **testing:** plan PostgreSQL and Playwright testing rollout ([e81f20e](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/e81f20eb99ff38eb6ff8e9d4eb7fcb7e610fc9ce))
+
+
+### Tests
+
+* **frontend:** add Playwright requirements and evidence pipeline ([9b5e6ec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/9b5e6ecc1f6fd9acf666adecbca83bd85fc10261))
+
+
+### CI
+
+* **testing:** provision isolated PostgreSQL test environments ([f00ac86](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f00ac860b4a8a83c905a7272287cf984fcd0067d))
+
 ## [1.0.5](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.4...docs-v1.0.5) (2026-10-29)
 
 
