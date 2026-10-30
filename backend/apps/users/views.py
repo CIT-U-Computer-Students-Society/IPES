@@ -14,13 +14,14 @@ from apps.audit.utils import log_action, AuditActions
 from .models import User
 from .serializers import (
     UserSerializer,
+    TenantUserSerializer,
     UserCreateSerializer,
     LoginSerializer,
     PasswordResetSerializer,
     UserProfileUpdateSerializer
 )
 
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsPlatformAdministrator
 
 @method_decorator([csrf_protect, never_cache], name='dispatch')
 class AuthViewSet(viewsets.ViewSet):
@@ -129,10 +130,15 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
     
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy', 'set_password'):
+            return [IsAuthenticated(), IsPlatformAdministrator()]
+        return super().get_permissions()
+
     def get_serializer_class(self):
         if self.action == 'create':
             return UserCreateSerializer
-        return UserSerializer
+        return TenantUserSerializer
     
     def get_queryset(self):
         """Scope user details and signed avatars to the active organization."""

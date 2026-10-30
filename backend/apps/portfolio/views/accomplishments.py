@@ -8,8 +8,8 @@ so that each action stays concise and readable.
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.db.models import Count
-from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
 
@@ -58,10 +58,15 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         is_global_admin = user.is_staff or user.is_superuser
-        org_id = (
-            self.request.query_params.get('organization_id')
-            or self._get_org_id_from_request()
-        )
+        header_org = self._get_org_id_from_request()
+        query_org = self.request.query_params.get('organization_id')
+        if header_org and query_org and str(header_org) != str(query_org):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header and parameter must match.'
+                )
+            })
+        org_id = query_org or header_org
 
         if not org_id and not is_global_admin:
             return (
@@ -121,6 +126,7 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
             self.request.user,
             AuditActions.ACCOMPLISHMENT_CREATED,
             self.request,
+            organization_id=organization.id,
             accomplishment_id=str(accomplishment.id),
             title=accomplishment.title
         )
@@ -140,6 +146,7 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
             self.request.user,
             AuditActions.ACCOMPLISHMENT_UPDATED,
             self.request,
+            organization_id=accomplishment.organization_id_id,
             accomplishment_id=str(accomplishment.id),
             title=accomplishment.title,
             status=accomplishment.status
@@ -262,11 +269,20 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
         user = request.user
         is_global_admin = user.is_staff or user.is_superuser
-        org_id = (
-            request.query_params.get('organization_id')
-            or request.data.get('organization_id')
-            or self._get_org_id_from_request()
-        )
+        header_org = self._get_org_id_from_request()
+        query_org = request.query_params.get('organization_id')
+        body_org = request.data.get('organization_id')
+        selectors = [
+            s for s in (header_org, query_org, body_org)
+            if s is not None and str(s).strip() != ''
+        ]
+        if len(set(str(s) for s in selectors)) > 1:
+            raise ValidationError({
+                'organization_id': (
+                    'Conflicting organization selectors provided.'
+                )
+            })
+        org_id = str(selectors[0]) if selectors else None
 
         if not is_global_admin:
             if not org_id:
@@ -306,6 +322,7 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
             request.user,
             audit_action,
             request,
+            organization_id=accomplishment.organization_id_id,
             accomplishment_id=str(accomplishment.id),
             title=accomplishment.title,
             status=accomplishment.status
@@ -324,10 +341,15 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         for use by evaluators filling out a peer evaluation form.
         """
         evaluatee_id = request.query_params.get('user_id')
-        org_id = (
-            request.query_params.get('organization_id')
-            or self._get_org_id_from_request()
-        )
+        header_org = self._get_org_id_from_request()
+        query_org = request.query_params.get('organization_id')
+        if header_org and query_org and str(header_org) != str(query_org):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header and parameter must match.'
+                )
+            })
+        org_id = query_org or header_org
 
         if not evaluatee_id or not org_id:
             return Response(

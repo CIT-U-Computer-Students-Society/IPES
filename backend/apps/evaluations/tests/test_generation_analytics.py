@@ -125,6 +125,7 @@ class GenerationAnalyticsTests(EvaluationFixtures, APITestCase):
         self.make_members()
         for i in range(22):
             user = User.objects.create_user(username=f'm{i}', email=f'm{i}@example.test')
+            OrganizationRole.objects.create(user=user, organization=self.org, role='Member')
             Membership.objects.create(user_id=user, unit_id=self.units[0], position_id=self.positions[0], date_start=self.form.start_date)
         EvaluationAssignment.objects.filter(form_id=self.form).delete()
         rule = AssignmentRule.objects.create(form_id=self.form)

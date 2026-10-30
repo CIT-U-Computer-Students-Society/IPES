@@ -1,0 +1,995 @@
+{
+  "schemaVersion": 1,
+  "source": "docs/testing/requirements_traceability_matrix.md",
+  "sourceHash": "1288f3024f6acdf42525a9d8d44ae2075c9b088d274265db664067aa384a6626",
+  "requirements": [
+    {
+      "id": "F01-FR01",
+      "text": "Validate registration and create a session",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F01-FR02",
+      "text": "Sign in, read profile, and invalidate logout sessions",
+      "lifecycle": "proposed",
+      "coverage": "complete",
+      "scenarios": [
+        "S01"
+      ],
+      "criteria": [
+        {
+          "id": "F01-FR02-S01",
+          "scenario": "S01",
+          "expected": "Sign in through the UI, read the current profile, select the expected organization, then sign out. The old session must receive 401/403 and the organization snapshot must contain zero active sessions."
+        }
+      ]
+    },
+    {
+      "id": "F01-FR03",
+      "text": "Update own profile and validate avatar changes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F01-FR04",
+      "text": "Limit account administration to authorized scope",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F01-NFR01",
+      "text": "Enforce configured password policies",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F01-NFR02",
+      "text": "Protect mutations with CSRF and secure session cookies",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S01",
+        "S06"
+      ],
+      "criteria": [
+        {
+          "id": "F01-NFR02-S01",
+          "scenario": "S01",
+          "expected": "Sign in through the UI, read the current profile, select the expected organization, then sign out. The old session must receive 401/403 and the organization snapshot must contain zero active sessions."
+        },
+        {
+          "id": "F01-NFR02-S06",
+          "scenario": "S06",
+          "expected": "Organization switching must remove the other organization form from the screen. A member attempting a mutation in an unauthorized organization must receive 403/404 and leave that organization snapshot unchanged."
+        }
+      ]
+    },
+    {
+      "id": "F01-NFR03",
+      "text": "Prevent cross-organization account takeover or deactivation",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-FR01",
+      "text": "Create organizations with unique codes and creator administration",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-FR02",
+      "text": "Persist authorized organization selection and role routing",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S01",
+        "S06"
+      ],
+      "criteria": [
+        {
+          "id": "F02-FR02-S01",
+          "scenario": "S01",
+          "expected": "Sign in through the UI, read the current profile, select the expected organization, then sign out. The old session must receive 401/403 and the organization snapshot must contain zero active sessions."
+        },
+        {
+          "id": "F02-FR02-S06",
+          "scenario": "S06",
+          "expected": "Organization switching must remove the other organization form from the screen. A member attempting a mutation in an unauthorized organization must receive 403/404 and leave that organization snapshot unchanged."
+        }
+      ]
+    },
+    {
+      "id": "F02-FR03",
+      "text": "Save current organization settings",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-FR04",
+      "text": "Deactivate organizations while retaining history",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-NFR01",
+      "text": "Authorize every organization mutation",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-NFR02",
+      "text": "Refresh membership and settings after changes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F02-NFR03",
+      "text": "Retain history and attribute events to the correct organization",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-FR01",
+      "text": "Validate join codes and reject duplicate applications",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S07"
+      ],
+      "criteria": [
+        {
+          "id": "F03-FR01-S07",
+          "scenario": "S07",
+          "expected": "An outsider submits a valid join code through the UI. Exactly one Pending join request for that user must be committed under the target organization."
+        }
+      ]
+    },
+    {
+      "id": "F03-FR02",
+      "text": "Approve or reject requests with valid membership details",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-FR03",
+      "text": "Restore access when removed members rejoin",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-FR04",
+      "text": "Restrict join-request visibility and controlled fields",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-NFR01",
+      "text": "Revoke inactive administrators' decision authority",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-NFR02",
+      "text": "Keep failed and concurrent decisions atomic",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F03-NFR03",
+      "text": "Audit decisions under the target organization",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-FR01",
+      "text": "Manage organization units, types, and ranked positions",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-FR02",
+      "text": "Search complete member and structure directories",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-FR03",
+      "text": "Add, remove, and restore positional memberships",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-FR04",
+      "text": "Change organization roles without altering global identity",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-FR05",
+      "text": "Refresh directories, counts, and open editors",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-NFR01",
+      "text": "Require valid active organization enrollment",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-NFR02",
+      "text": "Keep tenant directories confidential",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F04-NFR03",
+      "text": "Audit organization, structure, and membership changes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F05-FR01",
+      "text": "Create and edit form details and dates",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S02"
+      ],
+      "criteria": [
+        {
+          "id": "F05-FR01-S02",
+          "scenario": "S02",
+          "expected": "Create one form and rating question through the UI, activate it and generate exactly six unique non-self evaluator pairs for three members. Repeating generation must retain the same six pairs."
+        }
+      ]
+    },
+    {
+      "id": "F05-FR02",
+      "text": "Configure and reorder validated, weighted questions",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S02"
+      ],
+      "criteria": [
+        {
+          "id": "F05-FR02-S02",
+          "scenario": "S02",
+          "expected": "Create one form and rating question through the UI, activate it and generate exactly six unique non-self evaluator pairs for three members. Repeating generation must retain the same six pairs."
+        }
+      ]
+    },
+    {
+      "id": "F05-FR03",
+      "text": "Duplicate forms into unreleased drafts",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F05-FR04",
+      "text": "Control activation, deactivation, release, and soft deletion",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S02",
+        "S04",
+        "S09"
+      ],
+      "criteria": [
+        {
+          "id": "F05-FR04-S02",
+          "scenario": "S02",
+          "expected": "Create one form and rating question through the UI, activate it and generate exactly six unique non-self evaluator pairs for three members. Repeating generation must retain the same six pairs."
+        },
+        {
+          "id": "F05-FR04-S04",
+          "scenario": "S04",
+          "expected": "The evaluatee aggregate must be absent before release. An admin releases through the UI; PostgreSQL must record released/inactive flags, preserve score 3.5 and audit history, and the evaluatee UI must then show 3.5."
+        },
+        {
+          "id": "F05-FR04-S09",
+          "scenario": "S09",
+          "expected": "UI deletion must hide the form while PostgreSQL retains its deleted/inactive row, questions, assignments and an additional audit event."
+        }
+      ]
+    },
+    {
+      "id": "F05-FR05",
+      "text": "Invalidate stale completions after required-question changes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F05-NFR01",
+      "text": "Commit successful creation despite audit failures",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F05-NFR02",
+      "text": "Persist valid form metadata within PostgreSQL limits",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F05-NFR03",
+      "text": "Audit form updates with correct tenant context",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-FR01",
+      "text": "Configure assignment filters, wildcards, and self-exclusion",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-FR02",
+      "text": "Generate unique assignments while preserving completed work",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S02"
+      ],
+      "criteria": [
+        {
+          "id": "F06-FR02-S02",
+          "scenario": "S02",
+          "expected": "Create one form and rating question through the UI, activate it and generate exactly six unique non-self evaluator pairs for three members. Repeating generation must retain the same six pairs."
+        }
+      ]
+    },
+    {
+      "id": "F06-FR03",
+      "text": "Generate eligible assignments on membership activation",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-FR04",
+      "text": "Expose complete assignments and accurate totals",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-NFR01",
+      "text": "Require active participants and response-ready forms",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-NFR02",
+      "text": "Handle multi-rule generation failures consistently",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F06-NFR03",
+      "text": "Bound generation queries, duplicates, and batch sizes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F07-FR01",
+      "text": "Offer actions only for response-ready assignments",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F07-FR02",
+      "text": "Save, resume, replace, and clear draft answers",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S03"
+      ],
+      "criteria": [
+        {
+          "id": "F07-FR02-S03",
+          "scenario": "S03",
+          "expected": "Save ratings 2 and 4 as a draft, reload and retain them, then submit. Exactly two response rows, Completed status, a submission timestamp and weighted score 3.5 must be committed; the UI must become read-only."
+        }
+      ]
+    },
+    {
+      "id": "F07-FR03",
+      "text": "Validate required answers and calculate weighted scores",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S03"
+      ],
+      "criteria": [
+        {
+          "id": "F07-FR03-S03",
+          "scenario": "S03",
+          "expected": "Save ratings 2 and 4 as a draft, reload and retain them, then submit. Exactly two response rows, Completed status, a submission timestamp and weighted score 3.5 must be committed; the UI must become read-only."
+        }
+      ]
+    },
+    {
+      "id": "F07-FR04",
+      "text": "Restrict responses by evaluator and submission state",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S03"
+      ],
+      "criteria": [
+        {
+          "id": "F07-FR04-S03",
+          "scenario": "S03",
+          "expected": "Save ratings 2 and 4 as a draft, reload and retain them, then submit. Exactly two response rows, Completed status, a submission timestamp and weighted score 3.5 must be committed; the UI must become read-only."
+        }
+      ]
+    },
+    {
+      "id": "F07-NFR01",
+      "text": "Commit answers, completion state, and final score together",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S03"
+      ],
+      "criteria": [
+        {
+          "id": "F07-NFR01-S03",
+          "scenario": "S03",
+          "expected": "Save ratings 2 and 4 as a draft, reload and retain them, then submit. Exactly two response rows, Completed status, a submission timestamp and weighted score 3.5 must be committed; the UI must become read-only."
+        }
+      ]
+    },
+    {
+      "id": "F07-NFR02",
+      "text": "Prevent concurrent overwrites and duplicate responses",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F07-NFR03",
+      "text": "Keep completion status consistent with current questions",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F08-FR01",
+      "text": "Release results and stop further responses",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S04"
+      ],
+      "criteria": [
+        {
+          "id": "F08-FR01-S04",
+          "scenario": "S04",
+          "expected": "The evaluatee aggregate must be absent before release. An admin releases through the UI; PostgreSQL must record released/inactive flags, preserve score 3.5 and audit history, and the evaluatee UI must then show 3.5."
+        }
+      ]
+    },
+    {
+      "id": "F08-FR02",
+      "text": "Show released aggregates, breakdowns, and evaluator counts",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S04"
+      ],
+      "criteria": [
+        {
+          "id": "F08-FR02-S04",
+          "scenario": "S04",
+          "expected": "The evaluatee aggregate must be absent before release. An admin releases through the UI; PostgreSQL must record released/inactive flags, preserve score 3.5 and audit history, and the evaluatee UI must then show 3.5."
+        }
+      ]
+    },
+    {
+      "id": "F08-FR03",
+      "text": "Keep evaluator identities anonymous in feedback",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F08-FR04",
+      "text": "Select released periods and performance history",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F08-NFR01",
+      "text": "Enforce release gating and anonymity on every endpoint",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S04"
+      ],
+      "criteria": [
+        {
+          "id": "F08-NFR01-S04",
+          "scenario": "S04",
+          "expected": "The evaluatee aggregate must be absent before release. An admin releases through the UI; PostgreSQL must record released/inactive flags, preserve score 3.5 and audit history, and the evaluatee UI must then show 3.5."
+        }
+      ]
+    },
+    {
+      "id": "F08-NFR02",
+      "text": "Aggregate only valid, complete evaluations",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F08-NFR03",
+      "text": "Distinguish activation and release audit events",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-FR01",
+      "text": "Calculate completion using canonical statuses",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-FR02",
+      "text": "Show accurate organization and unit participation",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-FR03",
+      "text": "Show form, question, performer, and unit summaries",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-FR04",
+      "text": "Export requested analytics safely and on demand",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-NFR01",
+      "text": "Isolate analytics queries and caches by organization",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-NFR02",
+      "text": "Keep complete dashboard totals current",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F09-NFR03",
+      "text": "Measure peak latency, errors, and enrollment capacity",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-FR01",
+      "text": "Submit complete accomplishments to the intended organization",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S05"
+      ],
+      "criteria": [
+        {
+          "id": "F10-FR01-S05",
+          "scenario": "S05",
+          "expected": "A member creates an accomplishment in the UI with Pending state. An admin rejects it with feedback; PostgreSQL must retain the reviewer, Rejected status and exact feedback, and the member must find it in the Rejected tab."
+        }
+      ]
+    },
+    {
+      "id": "F10-FR02",
+      "text": "Filter the member's own accomplishments",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-FR03",
+      "text": "Edit eligible evidence and control resubmission",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-FR04",
+      "text": "Render validated HTTP(S) proof links safely",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-NFR01",
+      "text": "Require active membership for portfolio submissions",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-NFR02",
+      "text": "Reject malformed organization selectors without persistence",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F10-NFR03",
+      "text": "Distinguish failed portfolio requests from empty results",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S11"
+      ],
+      "criteria": [
+        {
+          "id": "F10-NFR03-S11",
+          "scenario": "S11",
+          "expected": "Abort the real portfolio read deliberately. The UI must show a load error instead of an empty-state success, and persisted accomplishments must remain unchanged."
+        }
+      ]
+    },
+    {
+      "id": "F11-FR01",
+      "text": "Expose every pending accomplishment to reviewers",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F11-FR02",
+      "text": "Retain review decisions and reviewer feedback",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S05"
+      ],
+      "criteria": [
+        {
+          "id": "F11-FR02-S05",
+          "scenario": "S05",
+          "expected": "A member creates an accomplishment in the UI with Pending state. An admin rejects it with feedback; PostgreSQL must retain the reviewer, Rejected status and exact feedback, and the member must find it in the Rejected tab."
+        }
+      ]
+    },
+    {
+      "id": "F11-FR03",
+      "text": "Keep review drafts attached to the correct record",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F11-FR04",
+      "text": "Show verified evidence and evaluatee context",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F11-NFR01",
+      "text": "Prevent competing edits from undoing review decisions",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F11-NFR02",
+      "text": "Retain verified evidence and audit authorized changes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F11-NFR03",
+      "text": "Attribute review audit events to the evidence organization",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S05"
+      ],
+      "criteria": [
+        {
+          "id": "F11-NFR03-S05",
+          "scenario": "S05",
+          "expected": "A member creates an accomplishment in the UI with Pending state. An admin rejects it with feedback; PostgreSQL must retain the reviewer, Rejected status and exact feedback, and the member must find it in the Rejected tab."
+        }
+      ]
+    },
+    {
+      "id": "F12-FR01",
+      "text": "Audit critical actions with actor and tenant context",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-FR02",
+      "text": "Honor organization headers across audit endpoints",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-FR03",
+      "text": "Search complete history with inclusive date boundaries",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-FR04",
+      "text": "Display identifiable records and distinct event types",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-FR05",
+      "text": "Export authorized, filtered audit history",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-NFR01",
+      "text": "Retain audit history through organization deactivation",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-NFR02",
+      "text": "Keep audit failures from rolling back successful writes",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-NFR03",
+      "text": "Validate audit filters and expose recoverable errors",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "F12-NFR04",
+      "text": "Escape spreadsheet formulas in CSV exports",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR01",
+      "text": "Define and monitor availability targets and ownership",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR02",
+      "text": "Measure representative load against agreed capacity targets",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR03",
+      "text": "Verify backup retention, recovery objectives, and restoration",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR04",
+      "text": "Verify PostgreSQL constraints, rollback, and concurrency",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR05",
+      "text": "Verify deployed HTTPS, CSP, migrations, and storage",
+      "lifecycle": "proposed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "X-NFR06",
+      "text": "Verify keyboard, accessibility, errors, and responsive layouts",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S10"
+      ],
+      "criteria": [
+        {
+          "id": "X-NFR06-S10",
+          "scenario": "S10",
+          "expected": "Tab from the email input must focus the password input. The login screen must have zero violations in the selected automated WCAG 2.1 AA axe checks; this does not establish manual accessibility."
+        }
+      ]
+    },
+    {
+      "id": "X-NFR07",
+      "text": "Cover tenant abuse, pagination, failures, and concurrency",
+      "lifecycle": "proposed",
+      "coverage": "partial",
+      "scenarios": [
+        "S06",
+        "S08",
+        "S11"
+      ],
+      "criteria": [
+        {
+          "id": "X-NFR07-S06",
+          "scenario": "S06",
+          "expected": "Organization switching must remove the other organization form from the screen. A member attempting a mutation in an unauthorized organization must receive 403/404 and leave that organization snapshot unchanged."
+        },
+        {
+          "id": "X-NFR07-S08",
+          "scenario": "S08",
+          "expected": "With 21 persisted forms, UI search must locate the oldest form beyond the first API page."
+        },
+        {
+          "id": "X-NFR07-S11",
+          "scenario": "S11",
+          "expected": "Abort the real portfolio read deliberately. The UI must show a load error instead of an empty-state success, and persisted accomplishments must remain unchanged."
+        }
+      ]
+    },
+    {
+      "id": "A-FR01",
+      "text": "Persist organization reminder preferences",
+      "lifecycle": "advertised-unconfirmed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "A-FR02",
+      "text": "Send scheduled reminders to eligible evaluators",
+      "lifecycle": "advertised-unconfirmed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    },
+    {
+      "id": "A-NFR01",
+      "text": "Prevent duplicate reminders and enforce tenant eligibility",
+      "lifecycle": "advertised-unconfirmed",
+      "coverage": "unmapped",
+      "scenarios": [],
+      "criteria": []
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+import { test, expect } from '../fixtures/test';
+import { login, signOut } from '../helpers/workflows';
+
+test('S05 submit an accomplishment and retain rejection feedback @core', async ({ page, fixture, evidence }) => {
+  await login(page, fixture);
+  await page.goto('/member/accomplishments');
+  expect((await evidence('before-accomplishment')).accomplishments).toHaveLength(0);
+  await page.getByRole('button', { name: /Add Accomplishment/ }).click();
+  const dialog = page.getByRole('dialog');
+  const title = 'Research contribution ' + fixture.title.split(' ').at(-1);
+  await dialog.getByLabel('Title', { exact: true }).fill(title);
+  await dialog.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Project', exact: true }).click();
+  await dialog.getByLabel('Description', { exact: true }).fill('Synthetic research project evidence.');
+  await dialog.getByRole('button', { name: 'Submit', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  const pending = await evidence('pending-review', { status: 'Pending' });
+  expect(pending.accomplishments).toHaveLength(1);
+  expect(pending.accomplishments[0].status).toBe('Pending');
+  await signOut(page);
+  await login(page, fixture, 'admin');
+  await page.goto('/admin/accomplishments');
+  await page.getByRole('row').filter({ hasText: title }).getByRole('button').click();
+  await page.getByPlaceholder('Add any notes about this accomplishment...').fill('Please attach the final research report.');
+  await page.getByRole('button', { name: 'Reject', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  const reviewed = await evidence('reviewed', { status: 'Rejected', comments: 'Please attach the final research report.' });
+  expect(reviewed.accomplishments[0].status).toBe('Rejected');
+  expect(reviewed.accomplishments[0].comments).toBe('Please attach the final research report.');
+  expect(reviewed.accomplishments[0].verified_by_id).toBe(fixture.users.admin.id);
+  expect(reviewed.audit.some(row => row.user_id_id === fixture.users.admin.id)).toBe(true);
+  await signOut(page);
+  await login(page, fixture);
+  await page.goto('/member/accomplishments');
+  await page.getByRole('tab', { name: /Rejected/ }).click();
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
+  await evidence('member-feedback', { status: 'Rejected' });
+});

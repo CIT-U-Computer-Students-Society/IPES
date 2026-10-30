@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import User
 from apps.organizations.models import OrganizationRole
 from django.db import transaction
@@ -19,16 +21,18 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'date_joined', 'display_picture']
         
+    def membership_roles(self, obj):
+        return obj.organization_roles.filter(
+            is_active=True, organization__is_active=True,
+        ).select_related('organization')
+
     def get_memberships(self, obj):
         """
         Returns the organizations this user belongs to, determined by OrganizationRole.
         Membership rows are supplementary — they provide position/unit data only.
         """
         try:
-            active_org_roles = obj.organization_roles.filter(
-                is_active=True,
-                organization__is_active=True
-            ).select_related('organization')
+            active_org_roles = self.membership_roles(obj)
         except Exception:
             return []
 
@@ -77,6 +81,17 @@ class UserSerializer(serializers.ModelSerializer):
         return result
 
 
+class TenantUserSerializer(UserSerializer):
+    """Limit managed-user memberships to the selected organization."""
+
+    def membership_roles(self, obj):
+        request = self.context.get('request')
+        org_id = request.headers.get('X-Organization-Id', '') if request else ''
+        if not str(org_id).isascii() or not str(org_id).isdigit():
+            return obj.organization_roles.none()
+        return super().membership_roles(obj).filter(organization_id=int(org_id))
+
+
 class UserCreateSerializer(serializers.ModelSerializer):
     """Serializer for admin to create new users"""
     password = serializers.CharField(write_only=True, min_length=8)
@@ -94,6 +109,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
     
+    def validate_password(self, value):
+        user = self.instance
+        if user is None:
+            user = User(
+                username=self.initial_data.get('username') or '',
+                email=self.initial_data.get('email') or '',
+                first_name=self.initial_data.get('first_name') or '',
+                last_name=self.initial_data.get('last_name') or '',
+            )
+        try:
+            validate_password(value, user=user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
+
     def create(self, validated_data):
         import uuid
         password = validated_data.pop('password')
@@ -133,6 +163,13 @@ class LoginSerializer(serializers.Serializer):
 class PasswordResetSerializer(serializers.Serializer):
     """Serializer for password resets by Admins"""
     password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_password(self, value):
+        try:
+            validate_password(value, user=self.instance)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
     
     def update(self, instance, validated_data):
         instance.set_password(validated_data['password'])

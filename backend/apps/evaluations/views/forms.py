@@ -151,7 +151,7 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
 
         log_action(
             request.user,
-            AuditActions.FORM_PUBLISHED,
+            AuditActions.FORM_RESULTS_RELEASED,
             request,
             organization_id=form.organization_id_id,
             form_title=form.title,

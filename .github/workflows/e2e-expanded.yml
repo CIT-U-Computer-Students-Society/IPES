@@ -1,0 +1,20 @@
+name: Expanded browser tests
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: e2e-expanded-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browsers:
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit, mobile-chromium]
+    uses: ./.github/workflows/e2e.yml
+    with:
+      project: ${{ matrix.project }}
+      expanded: true

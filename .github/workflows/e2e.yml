@@ -1,0 +1,72 @@
+name: End-to-end tests
+on:
+  workflow_call:
+    inputs:
+      project:
+        type: string
+        default: chromium
+        required: false
+      expanded:
+        type: boolean
+        default: false
+        required: false
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_USER: ipes_test_bootstrap
+          POSTGRES_PASSWORD: ipes_test_bootstrap_local
+          POSTGRES_DB: ipes_test_control
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ipes_test_bootstrap -d ipes_test_control"
+          --health-interval 2s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.14.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend test dependencies
+        run: pip install -r backend/requirements-dev.txt
+      - name: Initialize restricted PostgreSQL test role and instance marker
+        working-directory: backend
+        env:
+          IPES_TEST_BOOTSTRAP_PASSWORD: ipes_test_bootstrap_local
+        run: python scripts/test_database.py bootstrap
+      - name: Install frontend dependencies and browser
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps ${{ inputs.project == 'mobile-chromium' && 'chromium' || inputs.project }}
+      - name: Validate requirements and test types
+        working-directory: frontend
+        run: |
+          npm run test:requirements
+          npm run test:e2e:types
+          npm run test:harness
+      - name: Run real browser and PostgreSQL scenarios
+        working-directory: frontend
+        env:
+          IPES_E2E_EXPANDED: ${{ inputs.expanded && '1' || '0' }}
+        run: npm run test:e2e -- --project=${{ inputs.project }}
+      - name: Upload evidence, coverage and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ inputs.project }}-${{ github.run_attempt }}
+          path: frontend/e2e-artifacts/
+          retention-days: 14
+          if-no-files-found: error

@@ -71,7 +71,7 @@ IPES/
 | Framework | Django 6.0 + Django REST Framework |
 | Language | Python 3.13+ |
 | Database (prod) | PostgreSQL on Supabase |
-| Database (test) | SQLite (auto-switched during `manage.py test`) |
+| Database (test) | Isolated PostgreSQL service; separate disposable databases for Django and Playwright |
 | Auth | Session-based (CSRF-protected cookies) |
 | Linting | flake8 |
 | Production server | Gunicorn |
@@ -110,7 +110,9 @@ python manage.py migrate
 # Start the development server (http://127.0.0.1:8000)
 python manage.py runserver
 
-# Run all tests (uses SQLite automatically)
+# Start the disposable test service from the repository root first:
+# docker compose --env-file backend/test.env.example -f compose.test.yml up -d --wait
+# Run all tests (uses isolated PostgreSQL automatically)
 python manage.py test
 
 # Run tests for specific apps
@@ -159,7 +161,7 @@ npm run build
 
 6. **Audit Logging**: Use `apps.audit.utils.log_action()` to log any critical actions (form creation, result releases, member role changes, etc.). This helper is resilient — it silently catches exceptions so it never breaks the main flow.
 
-7. **Test Database**: The test runner auto-switches to SQLite. Do **not** override this unless explicitly testing Postgres-specific features.
+7. **Test Database**: Every database-backed test uses the dedicated PostgreSQL test service. `manage.py test` selects `IPES.settings_test` and creates a separate run-specific database. Playwright provisions its own database. Never use the development/production database or silently fall back to SQLite. See `docs/TESTING.md` for service setup and isolation checks.
 
 8. **App Structure**: Each Django app in `apps/` follows the pattern:
    - `models.py` — data models

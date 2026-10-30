@@ -31,14 +31,22 @@ export const useAuditLogs = (params?: {
   limit?: number;
   organization_id?: number;
 }) => {
-  const queryString = params
+  const { activeOrganizationId } = useOrganizationState();
+  const effectiveOrgId = params?.organization_id ?? (activeOrganizationId ?? undefined);
+  const mergedParams = {
+    ...params,
+    ...(effectiveOrgId !== undefined ? { organization_id: effectiveOrgId } : {}),
+  };
+  const queryString = Object.keys(mergedParams).length > 0
     ? '?' + new URLSearchParams(
-      Object.entries(params).filter(([, v]) => v !== undefined).reduce((acc, [k, v]) => ({ ...acc, [k]: String(v) }), {})
+      Object.entries(mergedParams)
+        .filter(([, v]) => v !== undefined)
+        .reduce((acc, [k, v]) => ({ ...acc, [k]: String(v) }), {})
     ).toString()
     : '';
 
   return useQuery({
-    queryKey: ['audit', 'logs', params],
+    queryKey: ['audit', 'logs', effectiveOrgId ?? null, mergedParams],
     queryFn: async () => {
       const response = await api.get(`/audit/${queryString}`);
       const data = await response.json() as { results: AuditLog[] } | AuditLog[];
@@ -51,11 +59,11 @@ export const useAuditLogs = (params?: {
 // Fetch recent audit logs (last 100)
 export const useRecentAuditLogs = (organizationId?: number) => {
   const { activeOrganizationId } = useOrganizationState();
-  const effectiveOrgId = organizationId || activeOrganizationId;
-  const queryString = effectiveOrgId ? `?organization_id=${effectiveOrgId}` : '';
+  const effectiveOrgId = organizationId ?? (activeOrganizationId ?? undefined);
+  const queryString = effectiveOrgId !== undefined ? `?organization_id=${effectiveOrgId}` : '';
 
   return useQuery({
-    queryKey: ['audit', 'recent', effectiveOrgId],
+    queryKey: ['audit', 'recent', effectiveOrgId ?? null],
     queryFn: async () => {
       const response = await api.get(`/audit/recent/${queryString}`);
       const data = await response.json() as { results: AuditLog[] } | AuditLog[];
@@ -66,11 +74,18 @@ export const useRecentAuditLogs = (organizationId?: number) => {
 };
 
 // Filter by user
-export const useAuditLogsByUser = (userId: number) => {
+export const useAuditLogsByUser = (userId: number, organizationId?: number) => {
+  const { activeOrganizationId } = useOrganizationState();
+  const effectiveOrgId = organizationId ?? (activeOrganizationId ?? undefined);
+  const searchParams = new URLSearchParams({ user_id: String(userId) });
+  if (effectiveOrgId !== undefined) {
+    searchParams.append('organization_id', String(effectiveOrgId));
+  }
+
   return useQuery({
-    queryKey: ['audit', 'by_user', userId],
+    queryKey: ['audit', 'by_user', effectiveOrgId ?? null, userId],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_user/?user_id=${userId}`);
+      const response = await api.get(`/audit/by_user/?${searchParams.toString()}`);
       const data = await response.json() as { results: AuditLog[] } | AuditLog[];
       return Array.isArray(data) ? data : data.results || [];
     },
@@ -79,11 +94,18 @@ export const useAuditLogsByUser = (userId: number) => {
 };
 
 // Filter by action type
-export const useAuditLogsByAction = (action: string) => {
+export const useAuditLogsByAction = (action: string, organizationId?: number) => {
+  const { activeOrganizationId } = useOrganizationState();
+  const effectiveOrgId = organizationId ?? (activeOrganizationId ?? undefined);
+  const searchParams = new URLSearchParams({ action });
+  if (effectiveOrgId !== undefined) {
+    searchParams.append('organization_id', String(effectiveOrgId));
+  }
+
   return useQuery({
-    queryKey: ['audit', 'by_action', action],
+    queryKey: ['audit', 'by_action', effectiveOrgId ?? null, action],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_action/?action=${action}`);
+      const response = await api.get(`/audit/by_action/?${searchParams.toString()}`);
       const data = await response.json() as { results: AuditLog[] } | AuditLog[];
       return Array.isArray(data) ? data : data.results || [];
     },
@@ -92,11 +114,18 @@ export const useAuditLogsByAction = (action: string) => {
 };
 
 // Filter by date range
-export const useAuditLogsByDate = (startDate: string, endDate: string) => {
+export const useAuditLogsByDate = (startDate: string, endDate: string, organizationId?: number) => {
+  const { activeOrganizationId } = useOrganizationState();
+  const effectiveOrgId = organizationId ?? (activeOrganizationId ?? undefined);
+  const searchParams = new URLSearchParams({ start_date: startDate, end_date: endDate });
+  if (effectiveOrgId !== undefined) {
+    searchParams.append('organization_id', String(effectiveOrgId));
+  }
+
   return useQuery({
-    queryKey: ['audit', 'by_date', startDate, endDate],
+    queryKey: ['audit', 'by_date', effectiveOrgId ?? null, startDate, endDate],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_date/?start_date=${startDate}&end_date=${endDate}`);
+      const response = await api.get(`/audit/by_date/?${searchParams.toString()}`);
       const data = await response.json() as { results: AuditLog[] } | AuditLog[];
       return Array.isArray(data) ? data : data.results || [];
     },
@@ -105,11 +134,15 @@ export const useAuditLogsByDate = (startDate: string, endDate: string) => {
 };
 
 // Single audit log
-export const useAuditLog = (id: number) => {
+export const useAuditLog = (id: number, organizationId?: number) => {
+  const { activeOrganizationId } = useOrganizationState();
+  const effectiveOrgId = organizationId ?? (activeOrganizationId ?? undefined);
+  const queryString = effectiveOrgId !== undefined ? `?organization_id=${effectiveOrgId}` : '';
+
   return useQuery({
-    queryKey: ['audit', id],
+    queryKey: ['audit', effectiveOrgId ?? null, id],
     queryFn: async () => {
-      const response = await api.get(`/audit/${id}/`);
+      const response = await api.get(`/audit/${id}/${queryString}`);
       return response.json() as Promise<AuditLog>;
     },
     enabled: !!id,
@@ -125,6 +158,7 @@ export const AUDIT_ACTIONS = {
   USER_DELETED: 'user.deleted',
   FORM_CREATED: 'form.created',
   FORM_PUBLISHED: 'form.published',
+  FORM_RESULTS_RELEASED: 'evaluation.results_released',
   FORM_UPDATED: 'form.updated',
   FORM_DELETED: 'form.deleted',
   EVALUATION_SUBMITTED: 'evaluation.submitted',
