@@ -1,0 +1,68 @@
+---
+// ThreeDLogo.astro — 3D GPU-Accelerated Rotating IPES Logo
+interface Props {
+  size?: number;
+}
+const { size = 260 } = Astro.props;
+---
+
+<div class="logo-3d-container" style={`max-width: ${size + 80}px;`}>
+  <div class="logo-3d-stage" style={`width: ${size}px; height: ${size}px;`}>
+    <!-- Ambient Radial Glow -->
+    <div class="logo-3d-glow"></div>
+    
+    <!-- Orbital Pulsing Ring -->
+    <div class="logo-3d-ring"></div>
+
+    <!-- 3D Rotator Coin/Emblem -->
+    <div class="logo-3d-rotator" id="ipes-3d-rotator" title="Click or hover to inspect IPES 3D Emblem">
+      <!-- Back Face (CIT-U SSG Committee on Research / Seal) -->
+      <div class="logo-3d-face logo-3d-back">
+        <img 
+          src="/ssg-logo.svg" 
+          alt="CIT-U SSG Committee on Research Logo" 
+          width={size * 0.7} 
+          height={size * 0.7}
+          style="object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));"
+        />
+      </div>
+
+      <!-- Extruded 3D Layers -->
+      <div class="logo-3d-layer logo-3d-layer-1"></div>
+      <div class="logo-3d-layer logo-3d-layer-2"></div>
+      <div class="logo-3d-layer logo-3d-layer-3"></div>
+
+      <!-- Front Face (Official IPES Colored Emblem) -->
+      <div class="logo-3d-face logo-3d-front">
+        <img 
+          src="/ipes-logo-colored.svg" 
+          alt="Official IPES 3D Emblem" 
+          width={size * 0.75} 
+          height={size * 0.75}
+          style="object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(41,63,85,0.2));"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Interactive Parallax Mouse Tilt
+  const rotator = document.getElementById('ipes-3d-rotator');
+  const stage = rotator?.parentElement;
+
+  if (stage && rotator) {
+    stage.addEventListener('mousemove', (e) => {
+      const rect = stage.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const tiltX = -(y / rect.height) * 30;
+      const tiltY = (x / rect.width) * 30;
+      rotator.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)`;
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      rotator.style.transform = '';
+    });
+  }
+</script>

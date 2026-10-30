@@ -1,0 +1,749 @@
+---
+// index.astro — Official IPES Landing Page & Visual Documentation Portal
+import ThreeDLogo from '../components/ThreeDLogo.astro';
+import '../styles/custom.css';
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IPES — Individual Performance Evaluation System | CIT-U SSG</title>
+  <meta name="description" content="Modern, automated peer evaluations and accomplishment portfolios for student organizations at Cebu Institute of Technology - University." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+  
+  <script is:inline>
+    // Theme initialization matching main IPES app
+    const storedTheme = typeof localStorage !== 'undefined' && (localStorage.getItem('starlight-theme') || localStorage.getItem('theme'));
+    const isDark = storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  </script>
+</head>
+
+<body class="bg-[#f8fafc] dark:bg-[#0b0f19] text-[#0f172a] dark:text-[#f8fafc] font-['Inter',system-ui,sans-serif] antialiased transition-colors duration-200">
+
+  <!-- =========================================================================
+       Navigation Header
+       ========================================================================= -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-white/85 dark:bg-[#0f172a]/85 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/ipes-logo-colored.svg" alt="IPES Logo" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold tracking-tight text-[#293f55] dark:text-white font-['Montserrat',sans-serif]">IPES</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">CIT-U SSG</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600 dark:text-slate-300">
+        <a href="#overview" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">Overview</a>
+        <a href="#comparison" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">Comparison</a>
+        <a href="#features" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">Capabilities</a>
+        <a href="#guides" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">User Guides</a>
+        <a href="#faq" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">FAQ</a>
+        <a href="/overview/" class="hover:text-[#293f55] dark:hover:text-[#f59e0b] transition-colors">Documentation &rarr;</a>
+      </nav>
+
+      <!-- Right Action Triggers -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle -->
+        <button 
+          id="theme-toggle-btn"
+          type="button" 
+          aria-label="Toggle theme" 
+          class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg id="sun-icon" class="w-5 h-5 hidden dark:block text-[#f59e0b]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg id="moon-icon" class="w-5 h-5 block dark:hidden text-[#293f55]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+
+        <!-- Launch Portal CTA -->
+        <a 
+          href="http://localhost:5173/login" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#293f55] hover:bg-[#1b2a4a] text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow transition-all"
+        >
+          <span>Launch App</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       Hero Section (Two-Column Layout with 3D Rotating Logo)
+       ========================================================================= -->
+  <section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+    <!-- Ambient Radial Glows -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-[#f59e0b]/10 via-[#293f55]/5 to-transparent blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Left Column: Copy & Actions -->
+        <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+          <!-- Announcement Pill -->
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-xs font-semibold text-[#293f55] dark:text-[#f59e0b]">
+            <span class="flex h-2 w-2 rounded-full bg-[#f59e0b] animate-ping"></span>
+            <span>CIT-U Supreme Student Government · Committee on Research</span>
+          </div>
+
+          <!-- Main Headline -->
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0f172a] dark:text-white font-['Montserrat',sans-serif] leading-[1.12]">
+            Transform Peer Evaluations Into <span class="text-[#293f55] dark:text-[#f59e0b] underline decoration-[#f59e0b] decoration-wavy decoration-2">Actionable Growth</span>
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
+            A dedicated, purpose-built platform replacing fragmented Google Forms with dynamic assignment rules, verified accomplishment portfolios, and real-time performance analytics for CIT-University student organizations.
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <a 
+              href="#guides" 
+              class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#293f55] hover:bg-[#1b2a4a] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5"
+            >
+              <span>Explore User Guides</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+
+            <a 
+              href="http://localhost:5173/login" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#f59e0b] text-slate-800 dark:text-slate-200 font-semibold text-sm shadow-sm hover:shadow transition-all flex items-center justify-center gap-2"
+            >
+              <span>Sign In to IPES</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+
+          <!-- Trust Signals & Key Metrics -->
+          <div class="pt-6 grid grid-cols-3 gap-4 border-t border-slate-200 dark:border-slate-800 text-left">
+            <div>
+              <p class="text-2xl font-black text-[#293f55] dark:text-[#f59e0b] font-['Montserrat',sans-serif]">100%</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Automated Assignment Rules</p>
+            </div>
+            <div>
+              <p class="text-2xl font-black text-[#293f55] dark:text-[#f59e0b] font-['Montserrat',sans-serif]">0</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Spreadsheets Required</p>
+            </div>
+            <div>
+              <p class="text-2xl font-black text-[#293f55] dark:text-[#f59e0b] font-['Montserrat',sans-serif]">Strict</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Database Anonymity</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive 3D Rotating Logo -->
+        <div class="lg:col-span-5 flex justify-center items-center">
+          <div class="relative p-6 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 shadow-xl backdrop-blur-sm">
+            <ThreeDLogo size={260} />
+            <div class="text-center mt-3">
+              <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.5 2-10 10"/><path d="m15.5 2 6 6-10 10H5v-6.5z"/></svg>
+                Hover or drag to inspect 3D emblem
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Institutional Partners / Trust Bar
+       ========================================================================= -->
+  <section class="border-y border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-around gap-8 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+        <div class="flex items-center gap-3">
+          <img src="/ssg-logo.svg" alt="CIT-U SSG Logo" class="w-9 h-9 object-contain" />
+          <span>CIT-U Supreme Student Government</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <img src="/ipes-logo-colored.svg" alt="Committee on Research" class="w-9 h-9 object-contain" />
+          <span>SSG Committee on Research</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <img src="/css-logo.svg" alt="Computer Students Society" class="w-9 h-9 object-contain" />
+          <span>Computer Students Society (CSS)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       The Paradigm Shift: Before vs. After Comparison
+       ========================================================================= -->
+  <section id="comparison" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-[#f59e0b] mb-2 font-['Montserrat',sans-serif]">The Paradigm Shift</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">
+        Why Student Organizations Choose IPES
+      </h3>
+      <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+        Manual evaluations through Google Forms and spreadsheets create administrative bottlenecks, calculation errors, and privacy concerns.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- The Legacy Way -->
+      <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/40 shadow-sm relative overflow-hidden">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 font-bold text-xs mb-6">
+          <span>❌ The Legacy Way (Google Forms &amp; Sheets)</span>
+        </div>
+        <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+          <li class="flex items-start gap-3">
+            <span class="text-red-500 font-bold text-base leading-none">✕</span>
+            <span><strong>Manual Distribution:</strong> Duplicating forms for every single committee, with a high risk of misrouting links to wrong members.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-500 font-bold text-base leading-none">✕</span>
+            <span><strong>Scattered Proof:</strong> Unstructured accomplishment files sent over chats, making systematic validation impossible.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-500 font-bold text-base leading-none">✕</span>
+            <span><strong>Spreadsheet Calculation Delay:</strong> Weeks of manual formula maintenance, cross-referencing, and potential tally errors.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-500 font-bold text-base leading-none">✕</span>
+            <span><strong>Exposed Identities:</strong> Evaluator email addresses visible to form owners, discouraging honest, constructive feedback.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-500 font-bold text-base leading-none">✕</span>
+            <span><strong>Zero Audit Trail:</strong> No immutable proof of when entries were modified, submitted, or released.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- The IPES Platform -->
+      <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border-2 border-[#293f55] dark:border-[#f59e0b] shadow-lg relative overflow-hidden">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#293f55]/10 dark:bg-[#f59e0b]/20 text-[#293f55] dark:text-[#f59e0b] font-bold text-xs mb-6">
+          <span>✨ The IPES Platform (Modern &amp; Automated)</span>
+        </div>
+        <ul class="space-y-4 text-sm text-slate-700 dark:text-slate-200">
+          <li class="flex items-start gap-3">
+            <span class="text-[#10b981] font-bold text-base leading-none">✓</span>
+            <span><strong>Automated Rule Engine:</strong> Declarative assignment rules (Peer-to-Peer, All-to-Head) generate exact evaluator-evaluatee pairs automatically.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#10b981] font-bold text-base leading-none">✓</span>
+            <span><strong>Verified Portfolios:</strong> Officers log achievements with verifiable Google Drive proof links, reviewed before scores close.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#10b981] font-bold text-base leading-none">✓</span>
+            <span><strong>Instant Multi-Axis Analytics:</strong> Real-time radar charts, competency category averages, and statistical percentiles published in one click.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#10b981] font-bold text-base leading-none">✓</span>
+            <span><strong>True Confidentiality:</strong> Database-level anonymization decouples evaluator identities from scores and remarks.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-[#10b981] font-bold text-base leading-none">✓</span>
+            <span><strong>Immutable Audit Trail:</strong> Append-only security logging records every form edit, role change, and result release with IP attribution.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Core Capabilities Grid
+       ========================================================================= -->
+  <section id="features" class="py-20 bg-slate-50/50 dark:bg-slate-900/20 border-t border-slate-200/80 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-[#f59e0b] mb-2 font-['Montserrat',sans-serif]">Platform Features</h2>
+        <h3 class="text-3xl sm:text-4xl font-extrabold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">
+          Everything Student Leadership Requires
+        </h3>
+        <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+          Engineered for organizational scale, fairness, and accountability.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Feature 1: Rules Engine -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-[#eef4f9] dark:bg-[#1b2a4a] text-[#293f55] dark:text-[#f59e0b] flex items-center justify-center mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+          </div>
+          <h4 class="text-base font-bold text-[#0f172a] dark:text-white mb-2 font-['Montserrat',sans-serif]">Dynamic Assignment Rules</h4>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Configure declarative filters (Peer-to-Peer within unit, All-to-Head, Head-to-All) that generate individualized queues instantly.
+          </p>
+        </div>
+
+        <!-- Feature 2: Portfolio -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-[#fff7ed] dark:bg-[#291800] text-[#f59e0b] flex items-center justify-center mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          </div>
+          <h4 class="text-base font-bold text-[#0f172a] dark:text-white mb-2 font-['Montserrat',sans-serif]">Accomplishment Portfolio</h4>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Officers log achievements with verifiable Google Drive proof links, audited by admins before scorecards are released.
+          </p>
+        </div>
+
+        <!-- Feature 3: Analytics -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-[#eef4f9] dark:bg-[#1b2a4a] text-[#293f55] dark:text-[#f59e0b] flex items-center justify-center mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+          </div>
+          <h4 class="text-base font-bold text-[#0f172a] dark:text-white mb-2 font-['Montserrat',sans-serif]">Radar Chart Analytics</h4>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Gain multi-axis insights across Leadership, Execution, and Communication with statistical percentile ranking.
+          </p>
+        </div>
+
+        <!-- Feature 4: Anonymity & Audit -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-[#ecfdf5] dark:bg-[#064e3b] text-[#10b981] flex items-center justify-center mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h4 class="text-base font-bold text-[#0f172a] dark:text-white mb-2 font-['Montserrat',sans-serif]">Confidentiality &amp; Audit</h4>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Database-level anonymization protects evaluator honesty, paired with an append-only audit trail logging every admin action.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       How It Works: 3 Steps
+       ========================================================================= -->
+  <section id="workflow" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-[#f59e0b] mb-2 font-['Montserrat',sans-serif]">Evaluation Lifecycle</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">
+        How IPES Works in 3 Simple Steps
+      </h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+      <!-- Step 1 -->
+      <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative">
+        <div class="w-10 h-10 rounded-full bg-[#f59e0b] text-white font-bold flex items-center justify-center text-sm mb-6">1</div>
+        <h4 class="text-lg font-bold text-[#0f172a] dark:text-white mb-3 font-['Montserrat',sans-serif]">Configure &amp; Assign</h4>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Admins define committee units, positions, competency rubrics, and Likert questions. Declarative assignment rules dynamically map evaluators to evaluatees.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative">
+        <div class="w-10 h-10 rounded-full bg-[#293f55] text-white font-bold flex items-center justify-center text-sm mb-6">2</div>
+        <h4 class="text-lg font-bold text-[#0f172a] dark:text-white mb-3 font-['Montserrat',sans-serif]">Evaluate &amp; Verify</h4>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Officers answer evaluations on an intuitive 1-5 Likert scale with qualitative remarks, and submit portfolio achievements with Google Drive proof links.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative">
+        <div class="w-10 h-10 rounded-full bg-[#10b981] text-white font-bold flex items-center justify-center text-sm mb-6">3</div>
+        <h4 class="text-lg font-bold text-[#0f172a] dark:text-white mb-3 font-['Montserrat',sans-serif]">Analyze &amp; Grow</h4>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Admins release the cycle. Officers immediately receive individualized scorecards, multi-axis radar charts, and anonymous peer feedback to foster leadership growth.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Visual User Guide Showcase (With Annotated Light Mode Screenshots)
+       ========================================================================= -->
+  <section id="guides" class="py-20 bg-slate-50/70 dark:bg-slate-900/40 border-t border-slate-200/80 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-[#f59e0b] mb-2 font-['Montserrat',sans-serif]">Interactive Visual Manuals</h2>
+        <h3 class="text-3xl sm:text-4xl font-extrabold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">
+          Annotated User Instructions
+        </h3>
+        <p class="mt-4 text-base text-slate-600 dark:text-slate-300">
+          Step-by-step instructions annotated with directional arrows and numbered action badges matching tldraw visual standards.
+        </p>
+      </div>
+
+      <!-- Guide Track Selector Tabs -->
+      <div class="flex justify-center mb-10">
+        <div class="inline-flex p-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+          <button id="tab-officer" class="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#293f55] text-white transition-all">
+            Student Officer &amp; Member Track
+          </button>
+          <button id="tab-admin" class="px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-[#293f55] transition-all">
+            Organization Administrator Track
+          </button>
+        </div>
+      </div>
+
+      <!-- Officer Track Content Panel -->
+      <div id="panel-officer" class="space-y-12">
+        <!-- Step 1: Getting Started -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#8b5cf6]/15 text-[#8b5cf6]">OFFICER STEP 1</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Sign In &amp; Select Active Organization</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Log in with your institutional CIT-U email. If you belong to multiple student bodies, choose your active governance organization to scope all evaluation forms and portfolios.
+            </p>
+            <div class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <p><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#8b5cf6] text-white font-bold text-[10px] mr-2">1</span> Enter email and password credentials.</p>
+              <p><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#8b5cf6] text-white font-bold text-[10px] mr-2">2</span> Click Sign In to initiate secure session.</p>
+              <p><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#f59e0b] text-white font-bold text-[10px] mr-2">3</span> Select active organization card (e.g. CIT-U SSG).</p>
+            </div>
+            <a href="/officer/getting-started/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Chapter 1 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/officer/login-and-select-org.svg" alt="Sign In and Organization Selection Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Step 2: Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#8b5cf6]/15 text-[#8b5cf6]">OFFICER STEP 2</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Monitor Task Queue on Officer Dashboard</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Track pending evaluation counts, verified accomplishment items, and cycle submission deadlines at a glance. Click "Start Form" to begin evaluating assigned peers.
+            </p>
+            <a href="/officer/dashboard/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Chapter 2 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/officer/dashboard-overview.svg" alt="Officer Dashboard Overview Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Step 3: Accomplishments -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#8b5cf6]/15 text-[#8b5cf6]">OFFICER STEP 3</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Log Accomplishments with Verifiable Proof</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Submit leadership milestones, events organized, or deliverables produced with public Google Drive proof links for administrative verification.
+            </p>
+            <a href="/officer/accomplishments/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Chapter 3 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/officer/accomplishment-form.svg" alt="Accomplishment Submission Modal Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Step 4: Completing Evaluations -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#8b5cf6]/15 text-[#8b5cf6]">OFFICER STEP 4</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Answer Likert Rubrics &amp; Constructive Remarks</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Rate peers across objective competency dimensions on a 5-point Likert scale (1 to 5). Provide candid qualitative feedback aggregated anonymously upon cycle release.
+            </p>
+            <a href="/officer/evaluations/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Chapter 4 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/officer/evaluation-rubric.svg" alt="Evaluation Rubric Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Step 5: Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#8b5cf6]/15 text-[#8b5cf6]">OFFICER STEP 5</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Inspect Radar Scorecards &amp; Feedback</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              When released, view your overall performance index, radar competency vectors, statistical percentile ranking, and anonymized peer feedback comments.
+            </p>
+            <a href="/officer/results/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Chapter 5 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/officer/results-scorecard.svg" alt="Performance Scorecard Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Administrator Track Content Panel (Hidden by default) -->
+      <div id="panel-admin" class="space-y-12 hidden">
+        <!-- Admin Step 1: Units & Positions -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">ADMIN STEP 1</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Structure Committees &amp; Rank Hierarchy</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Configure organizational units and define positions with hierarchical ranks (Rank 1 = Unit Head). This structure forms the foundation of automated evaluation routing.
+            </p>
+            <a href="/admin/organization-setup/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Admin Chapter 1 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/admin/units-and-positions.svg" alt="Admin Units and Positions Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Admin Step 2: Form Builder -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">ADMIN STEP 2</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Build Evaluation Cycles &amp; Rubrics</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Author question categories (e.g. Leadership, Execution), 5-point Likert rating criteria, and qualitative prompts with intuitive drag-and-drop reordering.
+            </p>
+            <a href="/admin/form-builder/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Admin Chapter 3 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/admin/form-builder.svg" alt="Form Builder Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Admin Step 3: Assignment Rules -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">ADMIN STEP 3</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Configure Assignment Rules Engine</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Define declarative rules (Peer-to-Peer within unit, All-to-Head). Preview the complete generated assignment matrix (pairs count) before cycle activation.
+            </p>
+            <a href="/admin/assignment-rules/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Admin Chapter 4 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/admin/assignment-rules.svg" alt="Assignment Rules Engine Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Admin Step 4: Verification -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">ADMIN STEP 4</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Audit Accomplishment Proof Links</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Inspect submitted portfolios from the admin review drawer. Open external Google Drive proof links and approve or reject submissions with feedback notes.
+            </p>
+            <a href="/admin/accomplishment-verification/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Admin Chapter 5 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/admin/accomplishment-review.svg" alt="Admin Verification Drawer Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+
+        <!-- Admin Step 5: Cycle Management & Release -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-[#f59e0b]/15 text-[#b45309] dark:text-[#f59e0b]">ADMIN STEP 5</span>
+            <h4 class="text-2xl font-bold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">Track Live Rates &amp; Release Results</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Monitor real-time submission progress bars across committees. Close the form when the deadline arrives, compute weighted percentiles, and release results to members.
+            </p>
+            <a href="/admin/cycle-management/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#293f55] dark:text-[#f59e0b] hover:underline pt-2">
+              Read Admin Chapter 6 Instructions &rarr;
+            </a>
+          </div>
+          <div class="lg:col-span-7">
+            <img src="/images/annotated/admin/cycle-release.svg" alt="Cycle Management Annotated Diagram" class="w-full h-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-md" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       FAQ Section
+       ========================================================================= -->
+  <section id="faq" class="py-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-[#f59e0b] mb-2 font-['Montserrat',sans-serif]">Got Questions?</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#0f172a] dark:text-white font-['Montserrat',sans-serif]">
+        Frequently Asked Questions
+      </h3>
+    </div>
+
+    <div class="space-y-4">
+      <!-- FAQ 1 -->
+      <details class="p-6 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm group">
+        <summary class="font-bold text-[#0f172a] dark:text-white cursor-pointer list-none flex items-center justify-between">
+          <span>How does IPES guarantee evaluator confidentiality?</span>
+          <span class="text-slate-400 group-open:rotate-180 transition-transform">&darr;</span>
+        </summary>
+        <p class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Evaluator identities are decoupled at the database level. When scorecards are generated, numerical scores are mathematically averaged by category, and qualitative comments are compiled into a randomized list stripped of all author identifiers, timestamps, and IP addresses.
+        </p>
+      </details>
+
+      <!-- FAQ 2 -->
+      <details class="p-6 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm group">
+        <summary class="font-bold text-[#0f172a] dark:text-white cursor-pointer list-none flex items-center justify-between">
+          <span>Can I access IPES on my mobile smartphone or tablet?</span>
+          <span class="text-slate-400 group-open:rotate-180 transition-transform">&darr;</span>
+        </summary>
+        <p class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Yes! IPES is fully mobile-responsive. You can fill out evaluation rubrics, upload proof links, inspect your radar scorecards, and monitor progress smoothly on any modern mobile device.
+        </p>
+      </details>
+
+      <!-- FAQ 3 -->
+      <details class="p-6 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm group">
+        <summary class="font-bold text-[#0f172a] dark:text-white cursor-pointer list-none flex items-center justify-between">
+          <span>What happens if my accomplishment proof link is rejected?</span>
+          <span class="text-slate-400 group-open:rotate-180 transition-transform">&darr;</span>
+        </summary>
+        <p class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          If an administrator rejects an accomplishment submission, they are required to leave decision feedback notes explaining what documentation is missing. You can simply click the rejected item in your portfolio, update the Google Drive URL or details, and resubmit for review.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Final Bottom Call to Action
+       ========================================================================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="relative overflow-hidden rounded-3xl bg-[#293f55] text-white p-10 sm:p-16 text-center shadow-xl">
+      <div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#f59e0b]/20 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#1b2a4a]/80 blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl mx-auto space-y-6">
+        <h3 class="text-3xl sm:text-4xl font-extrabold font-['Montserrat',sans-serif]">
+          Ready to Experience Fair, Automated Evaluations?
+        </h3>
+        <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+          Empower your student organization with transparent rubrics, verifiable accomplishment portfolios, and instant performance scorecards.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <a 
+            href="http://localhost:5173/login" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="px-8 py-3.5 rounded-xl bg-[#f59e0b] hover:bg-[#d97706] text-slate-900 font-bold text-sm shadow-lg hover:shadow-xl transition-all"
+          >
+            Launch IPES Application &rarr;
+          </a>
+          <a 
+            href="/overview/" 
+            class="px-8 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm transition-all"
+          >
+            Explore Full Documentation
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Footer
+       ========================================================================= -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-12 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <!-- Col 1: Brand -->
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-2.5">
+            <img src="/ipes-logo-colored.svg" alt="IPES Logo" class="w-7 h-7 object-contain" />
+            <span class="font-bold text-base text-[#293f55] dark:text-white font-['Montserrat',sans-serif]">IPES</span>
+          </div>
+          <p class="text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+            Individual Performance Evaluation System — Developed by the Committee on Research of the CIT-U Supreme Student Government (SSG).
+          </p>
+          <p class="text-[11px] text-slate-400">Cebu Institute of Technology - University · N. Bacalso Ave, Cebu City</p>
+        </div>
+
+        <!-- Col 2: Documentation -->
+        <div class="space-y-2">
+          <p class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">User Guides</p>
+          <ul class="space-y-1.5">
+            <li><a href="/officer/getting-started/" class="hover:underline">Officer Quickstart</a></li>
+            <li><a href="/officer/accomplishments/" class="hover:underline">Accomplishment Portfolio</a></li>
+            <li><a href="/officer/evaluations/" class="hover:underline">Answering Evaluations</a></li>
+            <li><a href="/officer/results/" class="hover:underline">Interpreting Results</a></li>
+            <li><a href="/admin/organization-setup/" class="hover:underline">Administrator Setup</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Institutional Links -->
+        <div class="space-y-2">
+          <p class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">Governance</p>
+          <ul class="space-y-1.5">
+            <li><a href="/policies/anonymity/" class="hover:underline">Confidentiality Policy</a></li>
+            <li><a href="/faq/" class="hover:underline">FAQ &amp; Help</a></li>
+            <li><a href="https://github.com/CIT-U-Computer-Students-Society/IPES" target="_blank" rel="noopener noreferrer" class="hover:underline">GitHub Repository</a></li>
+            <li><a href="http://localhost:5173/login" target="_blank" rel="noopener noreferrer" class="hover:underline">Portal Sign In</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 dark:border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <p>&copy; 2026 CIT-U Supreme Student Government Committee on Research. All rights reserved.</p>
+        <p>Built for Cebu Institute of Technology - University Student Leadership Governance.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       Interactive Scripts: Tab Switcher & Theme Toggle
+       ========================================================================= -->
+  <script is:inline>
+    // Theme Toggle Handler
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    toggleBtn?.addEventListener('click', () => {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      const nextDark = !isCurrentlyDark;
+      document.documentElement.classList.toggle('dark', nextDark);
+      document.documentElement.dataset.theme = nextDark ? 'dark' : 'light';
+      localStorage.setItem('starlight-theme', nextDark ? 'dark' : 'light');
+      localStorage.setItem('theme', nextDark ? 'dark' : 'light');
+    });
+
+    // Guide Tab Switcher
+    const tabOfficer = document.getElementById('tab-officer');
+    const tabAdmin = document.getElementById('tab-admin');
+    const panelOfficer = document.getElementById('panel-officer');
+    const panelAdmin = document.getElementById('panel-admin');
+
+    tabOfficer?.addEventListener('click', () => {
+      panelOfficer?.classList.remove('hidden');
+      panelAdmin?.classList.add('hidden');
+      tabOfficer.className = 'px-6 py-2.5 rounded-lg text-sm font-bold bg-[#293f55] text-white transition-all';
+      tabAdmin.className = 'px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-[#293f55] transition-all';
+    });
+
+    tabAdmin?.addEventListener('click', () => {
+      panelAdmin?.classList.remove('hidden');
+      panelOfficer?.classList.add('hidden');
+      tabAdmin.className = 'px-6 py-2.5 rounded-lg text-sm font-bold bg-[#293f55] text-white transition-all';
+      tabOfficer.className = 'px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-[#293f55] transition-all';
+    });
+  </script>
+
+</body>
+</html>

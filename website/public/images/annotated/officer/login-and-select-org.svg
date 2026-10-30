@@ -1,0 +1,79 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-violet-lm1" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+    <marker id="arrow-amber-lm1" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-navy-lm1" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#293f55" />
+    </marker>
+  </defs>
+
+  <!-- Browser Frame in Light Mode -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cit.edu/login</text>
+
+  <!-- Left Card: Sign In Form -->
+  <rect x="50" y="80" width="360" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="75" y="125" font-size="19" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Sign In to IPES</text>
+  <text x="75" y="148" font-size="12" fill="#64748b">Enter your CIT-U credentials</text>
+
+  <!-- Input 1: Email -->
+  <text x="75" y="185" font-size="12" font-weight="600" fill="#334155">Email Address</text>
+  <rect id="input-email" x="75" y="195" width="310" height="38" rx="6" fill="#f8fafc" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="90" y="219" font-size="13" fill="#0f172a">student.officer@cit.edu</text>
+
+  <!-- Input 2: Password -->
+  <text x="75" y="260" font-size="12" font-weight="600" fill="#334155">Password</text>
+  <rect id="input-pwd" x="75" y="270" width="310" height="38" rx="6" fill="#f8fafc" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="90" y="295" font-size="15" fill="#0f172a">••••••••••••••••</text>
+
+  <!-- Button: Sign In -->
+  <rect id="btn-signin" x="75" y="335" width="310" height="42" rx="6" fill="#293f55"/>
+  <text x="180" y="361" font-size="14" font-weight="700" fill="#ffffff">Sign In →</text>
+
+  <!-- Right Card: Organization Picker -->
+  <rect x="440" y="80" width="390" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="465" y="125" font-size="19" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Select Organization</text>
+  <text x="465" y="148" font-size="12" fill="#64748b">Choose your active governance term</text>
+
+  <!-- Org Option 1 (Selected) -->
+  <rect id="org-card" x="465" y="175" width="340" height="95" rx="8" fill="#f8fafc" stroke="#293f55" stroke-width="2"/>
+  <rect x="480" y="190" width="38" height="38" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="487" y="214" font-size="15" font-weight="900" fill="#b45309">SSG</text>
+  <text x="530" y="205" font-size="14" font-weight="700" fill="#293f55">CIT-U Supreme Student Gov.</text>
+  <text x="530" y="224" font-size="12" fill="#0284c7" font-weight="600">Role: Officer · Committee on Research</text>
+  <text x="530" y="248" font-size="11" fill="#64748b">Term: AY 2026-2027 · Active Cycle</text>
+
+  <!-- Org Option 2 -->
+  <rect x="465" y="285" width="340" height="80" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="480" y="300" width="38" height="38" rx="6" fill="#f1f5f9"/>
+  <text x="487" y="324" font-size="15" font-weight="900" fill="#475569">CSS</text>
+  <text x="530" y="315" font-size="14" font-weight="600" fill="#334155">Computer Students Society</text>
+  <text x="530" y="334" font-size="12" fill="#64748b">Role: Member · AY 2026-2027</text>
+
+  <!-- ================= tldraw-Style Annotations ================= -->
+  <!-- Callout 1: Email & Password Input -->
+  <circle cx="395" cy="205" r="14" fill="#8b5cf6"/>
+  <text x="390" y="210" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 450 205 L 415 205" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm1)"/>
+
+  <!-- Callout 2: Sign In Trigger -->
+  <circle cx="395" cy="355" r="14" fill="#8b5cf6"/>
+  <text x="390" y="360" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 425 355 L 412 355" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm1)"/>
+
+  <!-- Callout 3: Organization Card Selection -->
+  <circle cx="815" cy="220" r="14" fill="#f59e0b"/>
+  <text x="810" y="225" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 845 220 L 832 220" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm1)"/>
+  <rect x="670" y="110" width="135" height="26" rx="13" fill="#293f55"/>
+  <text x="682" y="127" font-size="11" font-weight="700" fill="#ffffff">Select Active Org</text>
+</svg>

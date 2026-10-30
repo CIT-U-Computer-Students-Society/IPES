@@ -1,0 +1,75 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-amber-adm2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-violet-adm2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+  </defs>
+
+  <!-- Frame -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cit.edu/admin/forms/builder/12</text>
+
+  <!-- Header -->
+  <text x="50" y="85" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Form Builder: AY 2026-2027 Midterm Evaluation</text>
+  <text x="50" y="105" font-size="12" fill="#64748b">Configure categories, Likert rating criteria, and reorder prompts</text>
+
+  <!-- Add Category Button -->
+  <rect id="btn-add-cat" x="690" y="70" width="140" height="36" rx="6" fill="#f59e0b"/>
+  <text x="708" y="93" font-size="13" font-weight="700" fill="#ffffff">+ Add Category</text>
+
+  <!-- Category Block (Expanded) -->
+  <rect x="50" y="125" width="780" height="230" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+  
+  <!-- Category Header Bar -->
+  <rect x="50" y="125" width="780" height="40" rx="8" fill="#f5f3ff"/>
+  <text x="70" y="150" font-size="14" font-weight="700" fill="#7c3aed">▼ 1. Leadership &amp; Strategic Vision (Weight: 35%)</text>
+  <rect x="670" y="132" width="145" height="26" rx="4" fill="#8b5cf6"/>
+  <text x="682" y="149" font-size="11" font-weight="700" fill="#ffffff">+ Add Question</text>
+
+  <!-- Question 1 in Category -->
+  <rect x="70" y="180" width="740" height="60" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Drag Handle Icon -->
+  <text x="85" y="215" font-size="18" font-weight="900" fill="#7c3aed">::</text>
+  <text x="115" y="205" font-size="13" font-weight="600" fill="#0f172a">Articulates committee objectives and keeps team members aligned.</text>
+  <text x="115" y="225" font-size="11" fill="#b45309">Type: 5-Point Likert Scale (1 = Unsatisfactory ... 5 = Outstanding)</text>
+  <text x="720" y="215" font-size="12" fill="#64748b">[Edit] [Delete]</text>
+
+  <!-- Question 2 in Category -->
+  <rect x="70" y="250" width="740" height="60" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Drag Handle Icon -->
+  <text x="85" y="285" font-size="18" font-weight="900" fill="#7c3aed">::</text>
+  <text x="115" y="275" font-size="13" font-weight="600" fill="#0f172a">Proactively mentors peers and resolves inter-committee bottlenecks.</text>
+  <text x="115" y="295" font-size="11" fill="#b45309">Type: 5-Point Likert Scale</text>
+  <text x="720" y="285" font-size="12" fill="#64748b">[Edit] [Delete]</text>
+
+  <!-- Footer Actions -->
+  <rect x="50" y="375" width="280" height="85" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="405" font-size="12" font-weight="600" fill="#64748b">Evaluation Status: DRAFT</text>
+  <rect x="70" y="415" width="240" height="34" rx="6" fill="#293f55"/>
+  <text x="100" y="437" font-size="13" font-weight="700" fill="#ffffff">Activate Evaluation Form →</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1 -->
+  <circle cx="670" cy="88" r="14" fill="#f59e0b"/>
+  <text x="665" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 640 88 L 676 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm2)"/>
+
+  <!-- Callout 2 -->
+  <circle cx="820" cy="210" r="14" fill="#8b5cf6"/>
+  <text x="815" y="215" font-size="14" font-weight="800" fill="#ffffff">2</text>
+
+  <!-- Callout 3 -->
+  <circle cx="85" cy="245" r="14" fill="#8b5cf6"/>
+  <text x="80" y="250" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 85 240 L 85 220" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm2)"/>
+  <rect x="110" y="235" width="130" height="22" rx="11" fill="#8b5cf6"/>
+  <text x="120" y="250" font-size="10" font-weight="700" fill="#ffffff">Drag &amp; Drop to Reorder</text>
+</svg>

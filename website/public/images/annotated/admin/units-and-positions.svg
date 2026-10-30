@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-amber-adm1" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-violet-adm1" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+  </defs>
+
+  <!-- Frame -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cit.edu/admin/organization</text>
+
+  <!-- Page Header & Action -->
+  <text x="50" y="85" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Organization Structure: Units &amp; Positions</text>
+  <text x="50" y="105" font-size="12" fill="#64748b">Configure committee subdivisions and ranked position hierarchies</text>
+
+  <!-- Add Unit Button Highlighted -->
+  <rect id="btn-add-unit" x="710" y="70" width="120" height="36" rx="6" fill="#f59e0b"/>
+  <text x="732" y="93" font-size="13" font-weight="700" fill="#ffffff">+ Add Unit</text>
+
+  <!-- Left: Units Table -->
+  <rect x="50" y="125" width="400" height="335" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="50" y="125" width="400" height="35" rx="8" fill="#f1f5f9"/>
+  <text x="65" y="147" font-size="12" font-weight="700" fill="#293f55">COMMITTEES &amp; UNITS (4)</text>
+
+  <!-- Unit Row 1 Selected -->
+  <rect x="50" y="160" width="400" height="60" fill="#f8fafc" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="70" y="185" font-size="14" font-weight="700" fill="#293f55">Committee on Research</text>
+  <text x="70" y="205" font-size="11" fill="#7c3aed">8 active members · 3 positions defined</text>
+
+  <!-- Unit Row 2 -->
+  <rect x="50" y="220" width="400" height="60" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.5"/>
+  <text x="70" y="245" font-size="14" font-weight="600" fill="#334155">Committee on Ways and Means</text>
+  <text x="70" y="265" font-size="11" fill="#64748b">6 active members · 2 positions defined</text>
+
+  <!-- Unit Row 3 -->
+  <rect x="50" y="280" width="400" height="60" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.5"/>
+  <text x="70" y="305" font-size="14" font-weight="600" fill="#334155">Public Relations Office</text>
+  <text x="70" y="325" font-size="11" fill="#64748b">5 active members · 2 positions defined</text>
+
+  <!-- Right: Positions Table -->
+  <rect x="470" y="125" width="360" height="335" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <rect x="470" y="125" width="360" height="35" rx="8" fill="#f5f3ff"/>
+  <text x="485" y="147" font-size="12" font-weight="700" fill="#7c3aed">POSITIONS: COMMITTEE ON RESEARCH</text>
+
+  <!-- Position 1 (Rank 1 Head) -->
+  <rect x="485" y="175" width="330" height="60" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="495" y="188" width="55" height="22" rx="4" fill="#fef3c7"/>
+  <text x="502" y="203" font-size="10" font-weight="800" fill="#b45309">RANK 1</text>
+  <text x="560" y="198" font-size="13" font-weight="700" fill="#293f55">Committee Chair</text>
+  <text x="560" y="215" font-size="11" fill="#b45309">Unit Head (Evaluated by All)</text>
+
+  <!-- Position 2 -->
+  <rect x="485" y="245" width="330" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="495" y="258" width="55" height="22" rx="4" fill="#e2e8f0"/>
+  <text x="502" y="273" font-size="10" font-weight="700" fill="#475569">RANK 2</text>
+  <text x="560" y="274" font-size="13" font-weight="600" fill="#334155">Senior Research Associate</text>
+
+  <!-- Position 3 -->
+  <rect x="485" y="305" width="330" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="495" y="318" width="55" height="22" rx="4" fill="#e2e8f0"/>
+  <text x="502" y="333" font-size="10" font-weight="700" fill="#475569">RANK 3</text>
+  <text x="560" y="334" font-size="13" font-weight="600" fill="#334155">Junior Officer</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1 -->
+  <circle cx="690" cy="88" r="14" fill="#f59e0b"/>
+  <text x="685" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 660 88 L 696 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm1)"/>
+
+  <!-- Callout 2 -->
+  <circle cx="800" cy="180" r="14" fill="#8b5cf6"/>
+  <text x="795" y="185" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 830 180 L 818 180" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm1)"/>
+  <rect x="690" y="225" width="125" height="24" rx="12" fill="#8b5cf6"/>
+  <text x="700" y="241" font-size="10" font-weight="700" fill="#ffffff">Designates Unit Head</text>
+</svg>
