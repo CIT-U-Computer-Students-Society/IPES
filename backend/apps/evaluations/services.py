@@ -125,7 +125,7 @@ def member_ids(form, unit_id=None, position_id=None):
 @transaction.atomic
 def generate_rule_assignments(rule, form, *, evaluator_id=None, evaluatee_id=None):
     form = EvaluationForm.objects.select_for_update().get(pk=form.pk)
-    if not form.is_active or form.is_deleted or form.results_released:
+    if not form.is_active or form.is_deleted or form.results_released or not form.questions.exists():
         return 0
     rule.clean()
     evaluators = member_ids(form, rule.evaluator_unit_id, rule.evaluator_position_id)
