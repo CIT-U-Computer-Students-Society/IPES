@@ -127,6 +127,14 @@ const EvaluationForm = () => {
   }
 
   const isCompleted = assignment.status === 'Completed';
+  const isClosed = Boolean(
+    assignment.is_closed ?? (
+      assignment.form_is_active === false ||
+      assignment.form_results_released === true ||
+      (form && (!form.is_active || form.results_released || form.is_deleted))
+    )
+  );
+  const isReadOnly = isCompleted || isClosed;
 
   const sections = [
     { name: "Evaluatee Info", questions: [] as Question[] },
@@ -139,12 +147,12 @@ const EvaluationForm = () => {
   const progressPercentage = totalQuestions === 0 ? 0 : Math.min(100, (answeredCount / totalQuestions) * 100);
 
   const handleRatingChange = (questionId: number, value: string) => {
-    if (isCompleted) return;
+    if (isReadOnly) return;
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
   const handleTextChange = (questionId: number, value: string) => {
-    if (isCompleted) return;
+    if (isReadOnly) return;
     setTextAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
@@ -461,7 +469,7 @@ const EvaluationForm = () => {
         </Button>
 
         <div className="flex gap-2">
-          {!isCompleted && (
+          {!isReadOnly && (
             <Button variant="outline" onClick={handleSaveDraft} disabled={draftMutation.isPending}>
               <Save className="w-4 h-4 mr-2" />
               {draftMutation.isPending ? "Saving..." : "Save Draft"}
@@ -469,7 +477,7 @@ const EvaluationForm = () => {
           )}
 
           {currentSection === sections.length - 1 ? (
-            !isCompleted && (
+            !isReadOnly && (
               <Button onClick={() => setShowSubmitDialog(true)} disabled={submitMutation.isPending}>
                 <Send className="w-4 h-4 mr-2" />
                 Submit

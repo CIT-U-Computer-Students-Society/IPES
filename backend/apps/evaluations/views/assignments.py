@@ -64,7 +64,10 @@ class EvaluationAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
         """Get pending and in-progress evaluations for current user"""
         assignments = self.get_queryset().filter(
             evaluator_id=request.user,
-            status__in=['Pending', 'In Progress']
+            status__in=['Pending', 'In Progress'],
+            form_id__is_active=True,
+            form_id__results_released=False,
+            form_id__is_deleted=False,
         )
         serializer = EvaluationAssignmentSerializer(assignments, many=True)
         return DRFResponse(serializer.data)

@@ -131,16 +131,27 @@ class EvaluationAssignmentSerializer(serializers.ModelSerializer):
     evaluatee_email = serializers.CharField(source='evaluatee_id.email', read_only=True)
     evaluatee_name = serializers.SerializerMethodField()
     form_title = serializers.CharField(source='form_id.title', read_only=True)
-    
+    form_is_active = serializers.BooleanField(
+        source='form_id.is_active', read_only=True
+    )
+    form_results_released = serializers.BooleanField(
+        source='form_id.results_released', read_only=True
+    )
+    is_closed = serializers.SerializerMethodField()
+
     class Meta:
         model = EvaluationAssignment
         fields = [
             'id', 'evaluator_id', 'evaluator_email', 'evaluator_name',
             'evaluatee_id', 'evaluatee_email', 'evaluatee_name',
-            'form_id', 'form_title', 'status',
+            'form_id', 'form_title', 'form_is_active', 'form_results_released',
+            'is_closed', 'status',
             'submitted_at', 'total_score'
         ]
-        read_only_fields = ['id', 'status', 'submitted_at', 'total_score']
+        read_only_fields = [
+            'id', 'status', 'submitted_at', 'total_score',
+            'form_is_active', 'form_results_released', 'is_closed',
+        ]
     
     def get_evaluator_name(self, obj):
         user = obj.evaluator_id
@@ -155,6 +166,14 @@ class EvaluationAssignmentSerializer(serializers.ModelSerializer):
             full_name = f"{user.first_name} {user.last_name}".strip()
             return full_name if full_name else user.email
         return None
+
+    def get_is_closed(self, obj):
+        form = getattr(obj, 'form_id', None)
+        if not form:
+            return True
+        return bool(
+            not form.is_active or form.results_released or form.is_deleted
+        )
 
 
 class ResponseSerializer(serializers.ModelSerializer):
