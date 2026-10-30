@@ -11,6 +11,23 @@ IPES was architected from the ground up by the **CIT-U SSG Committee on Research
 
 ## How IPES Enforces Anonymity
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Evaluator as Student Officer (Evaluator)
+    participant System as IPES Backend API
+    participant DB as Anonymized Database
+    actor Evaluatee as Peer / Head (Evaluatee)
+
+    Evaluator->>System: Submit Form (Likert Scores + Written Remarks)
+    Note over System: Strips Evaluator Identity, IP & Session
+    System->>DB: Store Mathematical Vectors & Shuffled Comments
+    Note over DB: Computes Category Means & Percentiles
+    DB-->>System: Aggregated Analytics Payload
+    System->>Evaluatee: Deliver Final Anonymized Scorecard
+    Note over Evaluatee: Identity of Evaluator Never Disclosed
+```
+
 ### 1. Database-Level Anonymization
 In released scorecards and analytics views, the system mathematically decouples the **Evaluator** from individual rating scores and qualitative remarks. 
 

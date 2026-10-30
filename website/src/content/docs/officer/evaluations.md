@@ -13,6 +13,17 @@ Navigate to **Evaluations** (`/member/evaluations`) or click **Start Form** from
 
 <img src="/images/annotated/officer/evaluation-rubric.svg" alt="Evaluation Rubric Annotated Interface" class="guide-screenshot" />
 
+### Evaluation Submission Flow
+
+```mermaid
+flowchart TD
+    Queue["Open Assigned Form<br/>from Dashboard Queue"] --> Criteria["Rate Competency Dimensions<br/>(1 to 5 Likert Rubrics)"]
+    Criteria --> Feedback["Write Qualitative Constructive Feedback"]
+    Feedback --> Decision{"Ready to finalize?"}
+    Decision -->|Need More Time| SaveDraft["Save Draft<br/>(Editable until cycle deadline)"]
+    Decision -->|Confirm & Lock| FinalSubmit["Submit Final Evaluation<br/>(Anonymized & Locked)"]
+```
+
 ### Rating Criteria
 
 1. <span class="step-badge-amber step-badge">1</span> **5-Point Likert Rating Scale**:

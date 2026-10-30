@@ -15,6 +15,20 @@ Units represent functional subdivisions within your student body (e.g., *"Execut
 
 <img src="/images/annotated/admin/units-and-positions.svg" alt="Admin Units and Positions Annotated Interface" class="guide-screenshot" />
 
+### Structural Hierarchy Model
+
+```mermaid
+flowchart TD
+    Org["Student Organization<br/>(e.g., Supreme Student Government)"]
+    Org --> U1["Executive Board"]
+    Org --> U2["Committee on Research"]
+    Org --> U3["Ways and Means"]
+
+    U2 --> P1["Rank 1: Committee Chair (Unit Head)"]
+    U2 --> P2["Rank 2: Senior Research Associate"]
+    U2 --> P3["Rank 3: Junior Officer"]
+```
+
 ### Key Setup Actions
 
 1. <span class="step-badge-amber step-badge">1</span> **Add Unit**: Click to open the committee creation drawer and specify the unit name and description.

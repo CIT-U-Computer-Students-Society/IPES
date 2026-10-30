@@ -52,6 +52,24 @@ async function inspect() {
   await page.waitForTimeout(600);
   await page.screenshot({ path: resolve(outputDir, 'homepage_dark.png'), fullPage: false });
 
+  // 6. Overview with Mermaid diagram
+  console.log('Capturing Overview Mermaid diagram...');
+  await page.goto('http://localhost:4321/overview/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: resolve(outputDir, 'overview_mermaid.png'), fullPage: false });
+
+  // 7. Cycle Management with State Diagram Mermaid
+  console.log('Capturing Cycle Management Mermaid diagram...');
+  await page.goto('http://localhost:4321/admin/cycle-management/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: resolve(outputDir, 'cycle_mermaid.png'), fullPage: false });
+
+  // 8. Anonymity Policy with Sequence Diagram Mermaid
+  console.log('Capturing Anonymity Policy Mermaid diagram...');
+  await page.goto('http://localhost:4321/policies/anonymity/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: resolve(outputDir, 'anonymity_mermaid.png'), fullPage: false });
+
   await browser.close();
   console.log('Inspection captures completed in:', outputDir);
 }

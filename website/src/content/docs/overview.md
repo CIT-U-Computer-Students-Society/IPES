@@ -19,18 +19,11 @@ IPES digitizes this entire process from end to end.
 
 IPES organizes performance assessment into distinct evaluation cycles. Each cycle progresses through four immutable state transitions:
 
-```
-  ┌─────────┐       Activate Cycle       ┌──────────┐
-  │  Draft  │ ─────────────────────────> │  Active  │
-  └─────────┘                            └──────────┘
-       │                                       │
-       │ Configure forms & rules               │ Officers submit evaluations
-       v                                       v
-  ┌───────────┐      Publish Scorecards   ┌──────────┐
-  │ Released  │ <──────────────────────── │  Closed  │
-  └───────────┘                           └──────────┘
-                                               │
-                                               │ Review completion & verify
+```mermaid
+flowchart LR
+    Draft["Draft<br/><i>Configure forms & rules</i>"] -->|Activate Cycle| Active["Active<br/><i>Officers submit evaluations</i>"]
+    Active -->|Close Submissions| Closed["Closed<br/><i>Review completion & verify</i>"]
+    Closed -->|Publish Scorecards| Released["Released<br/><i>Officers inspect results</i>"]
 ```
 
 1. **Draft State**: Administrators configure the evaluation cycle, author question categories and Likert rubrics, and define rule sets mapping which members evaluate each other.

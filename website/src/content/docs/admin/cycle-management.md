@@ -11,6 +11,17 @@ Once an evaluation cycle is active, administrators can track live completion pro
 
 <img src="/images/annotated/admin/cycle-release.svg" alt="Cycle Management and Results Release Annotated Interface" class="guide-screenshot" />
 
+### Cycle State Transitions
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft : Create Form Cycle
+    Draft --> Active : Activate Cycle (Generates Assignments)
+    Active --> Closed : Close Submissions at Deadline
+    Closed --> Released : Publish Verified Results to Officers
+    Released --> [*] : Permanent Historical Archive
+```
+
 ### Action Sequence
 
 1. <span class="step-badge-navy step-badge">1</span> **Live Participation Rate**:

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+import mermaid from 'astro-mermaid';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,8 +13,12 @@ export default defineConfig({
 	},
 	integrations: [
 		react(),
+		mermaid({
+			autoTheme: true,
+		}),
 		starlight({
 			title: 'IPES',
+			favicon: '/favicon.svg',
 			description: 'Individual Performance Evaluation System — Official Landing Page and User Manual for CIT-U Student Organizations',
 			logo: {
 				src: './src/assets/ipes-logo-colored.svg',

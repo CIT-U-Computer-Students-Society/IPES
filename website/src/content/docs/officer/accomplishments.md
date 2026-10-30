@@ -30,6 +30,15 @@ Ensure permissions on Google Drive or external proof links are set to *"Anyone w
 
 ## Understanding Verification Statuses
 
+```mermaid
+stateDiagram-v2
+    [*] --> Pending : Officer Submits Proof Link
+    Pending --> Verified : Admin Verifies Authentic Proof
+    Pending --> Rejected : Missing / Inaccessible Proof
+    Rejected --> Pending : Officer Updates Link & Resubmits
+    Verified --> [*] : Factored into Permanent Scorecard
+```
+
 Your submitted accomplishments are displayed in a clean tabular view with status badges:
 
 | Status Badge | Meaning | Action Required |

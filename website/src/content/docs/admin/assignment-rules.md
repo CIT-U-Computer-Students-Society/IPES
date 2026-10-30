@@ -13,6 +13,22 @@ When the evaluation cycle transitions to **Active**, IPES parses these rules aga
 
 <img src="/images/annotated/admin/assignment-rules.svg" alt="Assignment Rules Engine and Matrix Preview Annotated Interface" class="guide-screenshot" />
 
+### Assignment Rule Evaluation Flow
+
+```mermaid
+flowchart TD
+    Rule{"Rule Type Defined"}
+    Rule -->|Peer-to-Peer| P2P["Intra-Unit Peers<br/>(Officers evaluate fellow committee members)"]
+    Rule -->|All-to-Head| A2H["Subordinates to Head<br/>(All unit officers evaluate Rank 1 Chair)"]
+    Rule -->|Head-to-All| H2A["Head to Subordinates<br/>(Rank 1 Chair evaluates all committee officers)"]
+    Rule -->|Self-Evaluation| SELF["Self Assessment<br/>(Officer evaluates own performance)"]
+
+    P2P --> Matrix["Assignment Matrix Generated<br/>(Concrete Evaluator-Evaluatee Pairs)"]
+    A2H --> Matrix
+    H2A --> Matrix
+    SELF --> Matrix
+```
+
 ### Rule Archetypes
 
 1. <span class="step-badge-amber step-badge">1</span> **Rule Configuration**:
