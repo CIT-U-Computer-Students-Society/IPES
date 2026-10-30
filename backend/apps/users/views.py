@@ -14,6 +14,7 @@ from apps.audit.utils import log_action, AuditActions
 from .models import User
 from .serializers import (
     UserSerializer,
+    TenantUserSerializer,
     UserCreateSerializer,
     LoginSerializer,
     PasswordResetSerializer,
@@ -137,7 +138,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return UserCreateSerializer
-        return UserSerializer
+        return TenantUserSerializer
     
     def get_queryset(self):
         """Scope user details and signed avatars to the active organization."""

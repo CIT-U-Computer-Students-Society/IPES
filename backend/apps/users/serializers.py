@@ -19,16 +19,18 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'date_joined', 'display_picture']
         
+    def membership_roles(self, obj):
+        return obj.organization_roles.filter(
+            is_active=True, organization__is_active=True,
+        ).select_related('organization')
+
     def get_memberships(self, obj):
         """
         Returns the organizations this user belongs to, determined by OrganizationRole.
         Membership rows are supplementary — they provide position/unit data only.
         """
         try:
-            active_org_roles = obj.organization_roles.filter(
-                is_active=True,
-                organization__is_active=True
-            ).select_related('organization')
+            active_org_roles = self.membership_roles(obj)
         except Exception:
             return []
 
@@ -75,6 +77,17 @@ class UserSerializer(serializers.ModelSerializer):
                 })
 
         return result
+
+
+class TenantUserSerializer(UserSerializer):
+    """Limit managed-user memberships to the selected organization."""
+
+    def membership_roles(self, obj):
+        request = self.context.get('request')
+        org_id = request.headers.get('X-Organization-Id', '') if request else ''
+        if not str(org_id).isascii() or not str(org_id).isdigit():
+            return obj.organization_roles.none()
+        return super().membership_roles(obj).filter(organization_id=int(org_id))
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
