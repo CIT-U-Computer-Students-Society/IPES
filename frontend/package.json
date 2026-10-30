@@ -62,7 +62,7 @@
     "istanbul-lib-report": "3.0.1",
     "istanbul-reports": "3.2.0",
     "jsdom": "^29.0.1",
-    "postcss": "^8.5.26",
+    "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "~6.0.3",
