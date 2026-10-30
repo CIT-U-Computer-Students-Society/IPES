@@ -1,68 +1,316 @@
 ---
-// ThreeDLogo.astro — 3D GPU-Accelerated Rotating IPES Logo
+// ThreeDLogo.astro — High-Precision 3D Extruded Wireframe IPES Logo via Three.js
 interface Props {
   size?: number;
 }
-const { size = 260 } = Astro.props;
 ---
 
-<div class="logo-3d-container" style={`max-width: ${size + 80}px;`}>
-  <div class="logo-3d-stage" style={`width: ${size}px; height: ${size}px;`}>
-    <!-- Ambient Radial Glow -->
-    <div class="logo-3d-glow"></div>
-    
-    <!-- Orbital Pulsing Ring -->
-    <div class="logo-3d-ring"></div>
+<div id="ipes-3d-wrapper" class="relative w-full max-w-[520px] aspect-square flex items-center justify-center select-none">
+  <!-- Ambient Volumetric Glow behind the 3D Wireframe -->
+  <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-[#f59e0b]/20 via-[#293f55]/15 to-transparent blur-3xl pointer-events-none -z-10"></div>
 
-    <!-- 3D Rotator Coin/Emblem -->
-    <div class="logo-3d-rotator" id="ipes-3d-rotator" title="Click or hover to inspect IPES 3D Emblem">
-      <!-- Back Face (IPES Emblem) -->
-      <div class="logo-3d-face logo-3d-back">
-        <img 
-          src="/ipes-logo-colored.svg" 
-          alt="Official IPES 3D Emblem" 
-          width={size * 0.75} 
-          height={size * 0.75}
-          style="object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(41,63,85,0.2));"
-        />
-      </div>
+  <!-- Three.js Canvas -->
+  <canvas id="ipes-3d-canvas" class="w-full h-full cursor-grab active:cursor-grabbing relative z-10"></canvas>
 
-      <!-- Extruded 3D Layers -->
-      <div class="logo-3d-layer logo-3d-layer-1"></div>
-      <div class="logo-3d-layer logo-3d-layer-2"></div>
-      <div class="logo-3d-layer logo-3d-layer-3"></div>
-
-      <!-- Front Face (Official IPES Colored Emblem) -->
-      <div class="logo-3d-face logo-3d-front">
-        <img 
-          src="/ipes-logo-colored.svg" 
-          alt="Official IPES 3D Emblem" 
-          width={size * 0.75} 
-          height={size * 0.75}
-          style="object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(41,63,85,0.2));"
-        />
-      </div>
-    </div>
+  <!-- Interactive Control Hint -->
+  <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-center pointer-events-none z-20">
+    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-white/80 dark:bg-slate-900/80 px-3.5 py-1 rounded-full backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#f59e0b]"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      Drag to rotate in 3D
+    </span>
   </div>
 </div>
 
 <script>
-  // Interactive Parallax Mouse Tilt
-  const rotator = document.getElementById('ipes-3d-rotator');
-  const stage = rotator?.parentElement;
+  import * as THREE from 'three';
+  import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 
-  if (stage && rotator) {
-    stage.addEventListener('mousemove', (e) => {
-      const rect = stage.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      const tiltX = -(y / rect.height) * 30;
-      const tiltY = (x / rect.width) * 30;
-      rotator.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)`;
+  const container = document.getElementById('ipes-3d-wrapper');
+  const canvas = document.getElementById('ipes-3d-canvas') as HTMLCanvasElement | null;
+
+  if (container && canvas) {
+    const scene = new THREE.Scene();
+
+    const width = container.clientWidth || 480;
+    const height = container.clientHeight || 480;
+
+    const camera = new THREE.PerspectiveCamera(38, width / height, 1, 3000);
+    camera.position.set(0, 0, 780);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Lighting setup for depth and edge highlights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xf59e0b, 1.8);
+    dirLight1.position.set(250, 350, 400);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 1.4);
+    dirLight2.position.set(-250, -250, 350);
+    scene.add(dirLight2);
+
+    const pointLight = new THREE.PointLight(0xffffff, 1.0, 1200);
+    pointLight.position.set(0, 0, 500);
+    scene.add(pointLight);
+
+    // Root group for the 3D model
+    const logoGroup = new THREE.Group();
+    scene.add(logoGroup);
+
+    // Color definitions
+    const getIsDark = () => document.documentElement.classList.contains('dark') || document.documentElement.dataset.theme === 'dark';
+
+    const lightColors = {
+      amberSurface: 0xf59e0b,
+      amberEdge: 0xd97706,
+      amberGrid: 0xf59e0b,
+      navySurface: 0x293f55,
+      navyEdge: 0x1b2a4a,
+      navyGrid: 0x293f55,
+      checkSurface: 0x1e293b,
+      checkEdge: 0x0f172a,
+      checkGrid: 0x293f55,
+    };
+
+    const darkColors = {
+      amberSurface: 0xf59e0b,
+      amberEdge: 0xfbbf24,
+      amberGrid: 0xf59e0b,
+      navySurface: 0x0284c7,
+      navyEdge: 0x38bdf8,
+      navyGrid: 0x0284c7,
+      checkSurface: 0x0284c7,
+      checkEdge: 0x60a5fa,
+      checkGrid: 0x38bdf8,
+    };
+
+    // Keep track of materials for live theme switching
+    const dynamicMaterials: {
+      updateTheme: (isDark: boolean) => void;
+    }[] = [];
+
+    // Fetch and parse the official IPES SVG
+    fetch('/ipes-logo-colored.svg')
+      .then((res) => res.text())
+      .then((svgText) => {
+        const loader = new SVGLoader();
+        const svgData = loader.parse(svgText);
+
+        const tempGroup = new THREE.Group();
+
+        svgData.paths.forEach((path, pathIndex) => {
+          const shapes = SVGLoader.createShapes(path);
+
+          shapes.forEach((shape) => {
+            const isCheckmark = pathIndex === 2;
+            const isAmberGear = pathIndex === 0;
+
+            const extrudeSettings = {
+              depth: isCheckmark ? 65 : 50,
+              bevelEnabled: true,
+              bevelSegments: 3,
+              steps: 1,
+              bevelSize: isCheckmark ? 5 : 4,
+              bevelThickness: isCheckmark ? 6 : 5,
+            };
+
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+            // 1. Semi-transparent Holographic Surface (allows seeing through while preserving 3D depth)
+            const surfaceMat = new THREE.MeshStandardMaterial({
+              roughness: 0.25,
+              metalness: 0.75,
+              transparent: true,
+              opacity: isCheckmark ? 0.35 : 0.22,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+            });
+
+            // 2. Crisp Outer Contour Edges
+            const edgeGeo = new THREE.EdgesGeometry(geometry, 20);
+            const edgeMat = new THREE.LineBasicMaterial({
+              transparent: true,
+              opacity: 0.95,
+            });
+            const edgeLines = new THREE.LineSegments(edgeGeo, edgeMat);
+
+            // 3. Interior Structural Wireframe (Tessellation Triangulation Grid)
+            const wireGeo = new THREE.WireframeGeometry(geometry);
+            const wireMat = new THREE.LineBasicMaterial({
+              transparent: true,
+              opacity: isCheckmark ? 0.35 : 0.25,
+            });
+            const wireLines = new THREE.LineSegments(wireGeo, wireMat);
+
+            // Color updater function
+            const updateColors = (isDark: boolean) => {
+              const pal = isDark ? darkColors : lightColors;
+              if (isAmberGear) {
+                surfaceMat.color.setHex(pal.amberSurface);
+                edgeMat.color.setHex(pal.amberEdge);
+                wireMat.color.setHex(pal.amberGrid);
+              } else if (isCheckmark) {
+                surfaceMat.color.setHex(pal.checkSurface);
+                edgeMat.color.setHex(pal.checkEdge);
+                wireMat.color.setHex(pal.checkGrid);
+              } else {
+                surfaceMat.color.setHex(pal.navySurface);
+                edgeMat.color.setHex(pal.navyEdge);
+                wireMat.color.setHex(pal.navyGrid);
+              }
+            };
+
+            updateColors(getIsDark());
+            dynamicMaterials.push({ updateTheme: updateColors });
+
+            const mesh = new THREE.Mesh(geometry, surfaceMat);
+            const partGroup = new THREE.Group();
+            partGroup.add(mesh);
+            partGroup.add(edgeLines);
+            partGroup.add(wireLines);
+
+            // Z-Layering: Checkmark floats forward in front of the gear ring
+            if (isCheckmark) {
+              partGroup.position.z = 24;
+            }
+
+            tempGroup.add(partGroup);
+          });
+        });
+
+        // Compute Bounding Box to Center Logo around (0,0,0)
+        const box = new THREE.Box3().setFromObject(tempGroup);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+
+        tempGroup.position.x = -center.x;
+        tempGroup.position.y = -center.y;
+        tempGroup.position.z = -center.z;
+
+        logoGroup.add(tempGroup);
+
+        // Normalize scale to fit viewer nicely and invert Y (SVG coordinate flip)
+        const maxDim = Math.max(size.x, size.y);
+        const targetScale = 450 / maxDim;
+        logoGroup.scale.set(targetScale, -targetScale, targetScale);
+
+        // Slight initial aesthetic tilt
+        logoGroup.rotation.x = 0.15;
+        logoGroup.rotation.y = -0.3;
+      })
+      .catch((err) => {
+        console.warn('[3D Logo] SVG Load Error:', err);
+      });
+
+    // Theme mutation observer
+    const observer = new MutationObserver(() => {
+      const isDark = getIsDark();
+      dynamicMaterials.forEach((m) => m.updateTheme(isDark));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
     });
 
-    stage.addEventListener('mouseleave', () => {
-      rotator.style.transform = '';
+    // Drag, Parallax & Inertia Physics
+    let isDragging = false;
+    let previousPointerX = 0;
+    let previousPointerY = 0;
+    let velocityX = 0;
+    let velocityY = 0;
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      isDragging = true;
+      previousPointerX = e.clientX;
+      previousPointerY = e.clientY;
+      velocityX = 0;
+      velocityY = 0;
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      // Parallax calculation relative to canvas center
+      const rect = canvas.getBoundingClientRect();
+      const normX = (e.clientX - rect.left) / rect.width - 0.5;
+      const normY = (e.clientY - rect.top) / rect.height - 0.5;
+      targetTiltY = normX * 0.45;
+      targetTiltX = -normY * 0.35;
+
+      if (isDragging) {
+        const deltaX = e.clientX - previousPointerX;
+        const deltaY = e.clientY - previousPointerY;
+        velocityX = deltaX * 0.007;
+        velocityY = deltaY * 0.007;
+
+        logoGroup.rotation.y += velocityX;
+        logoGroup.rotation.x += velocityY;
+
+        previousPointerX = e.clientX;
+        previousPointerY = e.clientY;
+      }
+    };
+
+    const onPointerUp = () => {
+      isDragging = false;
+    };
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+
+    // Responsive Canvas Resizing
+    const resizeObserver = new ResizeObserver(() => {
+      if (!container || !canvas) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
     });
+    resizeObserver.observe(container);
+
+    // Render loop
+    let clock = new THREE.Clock();
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
+
+      if (!isDragging) {
+        // Continuous smooth auto-rotation
+        logoGroup.rotation.y += 0.007;
+
+        // Gentle organic breathing float
+        logoGroup.rotation.z = Math.sin(elapsed * 0.6) * 0.03;
+
+        // Inertia damping
+        velocityX *= 0.94;
+        velocityY *= 0.94;
+        logoGroup.rotation.y += velocityX;
+        logoGroup.rotation.x += velocityY;
+
+        // Subtle tilt interpolation toward pointer
+        logoGroup.rotation.x += (targetTiltX - logoGroup.rotation.x) * 0.03;
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
   }
 </script>

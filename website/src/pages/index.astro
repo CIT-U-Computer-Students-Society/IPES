@@ -92,7 +92,7 @@ import '../styles/custom.css';
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
         
         <!-- Left Column: Copy & Actions -->
-        <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+        <div class="lg:col-span-6 text-center lg:text-left space-y-6">
           <!-- Main Headline -->
           <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0f172a] dark:text-white font-['Montserrat',sans-serif] leading-[1.12]">
             Transform Peer Evaluations Into <span class="text-[#293f55] dark:text-[#f59e0b] underline decoration-[#f59e0b] decoration-wavy decoration-2">Actionable Growth</span>
@@ -125,17 +125,9 @@ import '../styles/custom.css';
           </div>
         </div>
 
-        <!-- Right Column: Interactive 3D Rotating Logo -->
-        <div class="lg:col-span-5 flex justify-center items-center">
-          <div class="relative p-6 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 shadow-xl backdrop-blur-sm">
-            <ThreeDLogo size={260} />
-            <div class="text-center mt-3">
-              <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.5 2-10 10"/><path d="m15.5 2 6 6-10 10H5v-6.5z"/></svg>
-                Hover or drag to inspect 3D emblem
-              </span>
-            </div>
-          </div>
+        <!-- Right Column: Interactive 3D Extruded Wireframe Logo -->
+        <div class="lg:col-span-6 flex justify-center items-center relative">
+          <ThreeDLogo />
         </div>
 
       </div>
