@@ -115,4 +115,4 @@ class JoinRequestSerializer(serializers.ModelSerializer):
             'id', 'user', 'user_email', 'user_first_name', 'user_last_name',
             'organization', 'organization_name', 'status', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'user']
+        read_only_fields = fields
