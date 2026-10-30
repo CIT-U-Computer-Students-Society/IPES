@@ -57,8 +57,6 @@
   <circle cx="745" cy="294" r="14" fill="#f59e0b"/>
   <text x="740" y="299" font-size="14" font-weight="800" fill="#ffffff">2</text>
   <path d="M 728 294 L 708 294" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm3)"/>
-  <rect x="735" y="255" width="115" height="24" rx="6" fill="#f59e0b"/>
-  <text x="743" y="271" font-size="10" font-weight="700" fill="#ffffff">Public View Link</text>
 
   <!-- Callout 3: Points to Submit Button -->
   <circle cx="745" cy="434" r="14" fill="#8b5cf6"/>

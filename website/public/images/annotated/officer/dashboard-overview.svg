@@ -72,21 +72,15 @@
   <text x="715" y="377" font-size="13" font-weight="600" fill="#334155">Continue →</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1: Points to Pending Forms Metric -->
-  <circle cx="140" cy="90" r="14" fill="#8b5cf6"/>
-  <text x="135" y="95" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 140 106 L 140 122" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm2)"/>
-  <rect x="55" y="65" width="135" height="22" rx="11" fill="#8b5cf6"/>
-  <text x="65" y="80" font-size="10" font-weight="700" fill="#ffffff">Pending Tasks Count</text>
+  <!-- Callout 1: Anchored on Pending Forms Metric Card -->
+  <circle cx="230" cy="125" r="14" fill="#8b5cf6"/>
+  <text x="225" y="130" font-size="14" font-weight="800" fill="#ffffff">1</text>
 
-  <!-- Callout 2: Points to Portfolio Accomplishments Metric -->
-  <circle cx="530" cy="90" r="14" fill="#f59e0b"/>
-  <text x="525" y="95" font-size="14" font-weight="800" fill="#ffffff">2</text>
-  <path d="M 530 106 L 530 122" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm2)"/>
-  <rect x="445" y="65" width="145" height="22" rx="11" fill="#f59e0b"/>
-  <text x="455" y="80" font-size="10" font-weight="700" fill="#ffffff">Verified Portfolio Items</text>
+  <!-- Callout 2: Anchored on Portfolio Metric Card -->
+  <circle cx="620" cy="125" r="14" fill="#f59e0b"/>
+  <text x="615" y="130" font-size="14" font-weight="800" fill="#ffffff">2</text>
 
-  <!-- Callout 3: Points to Start Form Button -->
+  <!-- Callout 3: Points to Start Form Button in Active Queue -->
   <circle cx="835" cy="297" r="14" fill="#8b5cf6"/>
   <text x="830" y="302" font-size="14" font-weight="800" fill="#ffffff">3</text>
   <path d="M 818 297 L 795 297" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm2)"/>

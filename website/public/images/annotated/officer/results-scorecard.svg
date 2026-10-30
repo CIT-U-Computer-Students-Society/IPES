@@ -72,18 +72,15 @@
   <text x="85" y="429" font-size="12" fill="#334155">“Very organized speaker in committee hearings; could share draft minutes a day earlier.”</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1: Points to Overall Performance Index -->
-  <circle cx="260" cy="90" r="14" fill="#f59e0b"/>
-  <text x="255" y="95" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 260 106 L 260 122" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm5)"/>
+  <!-- Callout 1: Anchored on Composite Score Card -->
+  <circle cx="290" cy="125" r="14" fill="#f59e0b"/>
+  <text x="285" y="130" font-size="14" font-weight="800" fill="#ffffff">1</text>
 
-  <!-- Callout 2: Points to Competency Breakdown -->
-  <circle cx="800" cy="90" r="14" fill="#293f55"/>
-  <text x="795" y="95" font-size="14" font-weight="800" fill="#ffffff">2</text>
-  <path d="M 800 106 L 800 122" fill="none" stroke="#293f55" stroke-width="2.5" marker-end="url(#arrow-navy-lm5)"/>
+  <!-- Callout 2: Anchored on Category Averages Card -->
+  <circle cx="830" cy="125" r="14" fill="#293f55"/>
+  <text x="825" y="130" font-size="14" font-weight="800" fill="#ffffff">2</text>
 
-  <!-- Callout 3: Points to Anonymized Peer Feedback -->
-  <circle cx="835" cy="355" r="14" fill="#8b5cf6"/>
-  <text x="830" y="360" font-size="14" font-weight="800" fill="#ffffff">3</text>
-  <path d="M 818 355 L 795 355" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm5)"/>
+  <!-- Callout 3: Anchored on Anonymized Peer Remarks -->
+  <circle cx="830" cy="315" r="14" fill="#8b5cf6"/>
+  <text x="825" y="320" font-size="14" font-weight="800" fill="#ffffff">3</text>
 </svg>

@@ -74,6 +74,4 @@
   <circle cx="830" cy="222" r="14" fill="#f59e0b"/>
   <text x="825" y="227" font-size="14" font-weight="800" fill="#ffffff">3</text>
   <path d="M 813 222 L 790 222" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm1)"/>
-  <rect x="670" y="110" width="135" height="26" rx="13" fill="#293f55"/>
-  <text x="682" y="127" font-size="11" font-weight="700" fill="#ffffff">Select Active Org</text>
 </svg>
