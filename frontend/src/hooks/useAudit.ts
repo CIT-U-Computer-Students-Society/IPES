@@ -166,4 +166,5 @@ export const AUDIT_ACTIONS = {
   ACCOMPLISHMENT_CREATED: 'accomplishment.created',
   ACCOMPLISHMENT_VERIFIED: 'accomplishment.verified',
   ACCOMPLISHMENT_REJECTED: 'accomplishment.rejected',
+  ACCOMPLISHMENT_DELETED: 'accomplishment.deleted',
 } as const;
