@@ -27,11 +27,27 @@ class ScopedEvaluationSerializer(ValidatedModelSerializer):
 class QuestionSerializer(ScopedEvaluationSerializer):
     """Serializer for Question model"""
     weight = FiniteFloatField(required=False, allow_null=True)
-    
+
     class Meta:
         model = Question
-        fields = ['id', 'form_id', 'text', 'input_type', 'order', 'weight', 'is_required', 'min_value', 'max_value']
+        fields = [
+            'id', 'form_id', 'text', 'input_type', 'order', 'weight',
+            'is_required', 'min_value', 'max_value'
+        ]
         read_only_fields = ['id']
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        form = attrs.get('form_id') or (
+            self.instance.form_id if self.instance else None
+        )
+        if form and form.results_released:
+            raise serializers.ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
+        return attrs
 
 
 class QuestionCreateSerializer(ValidatedModelSerializer):

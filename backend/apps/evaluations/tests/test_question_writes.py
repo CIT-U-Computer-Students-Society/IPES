@@ -57,3 +57,103 @@ class QuestionWriteTests(EvaluationFixtures, APITestCase):
                 with self.subTest(value=value, route=route):
                     response = self.client.post(reverse(route), {'form_id': value, 'questions': []}, format='json')
                     self.assertEqual(response.status_code, 400)
+
+    def test_single_question_create_resets_completed_assignments(self):
+        """Adding required question via POST /questions/ resets assignments."""
+        EvaluationAssignment.objects.filter(
+            pk=self.assignment.pk
+        ).update(status='Completed', total_score=4)
+
+        payload = {
+            **self.question_data(
+                text='New Required Question', order=2, is_required=True
+            ),
+            'form_id': self.form.pk,
+        }
+        response = self.client.post(
+            reverse('questions-list'), payload, format='json'
+        )
+        self.assertEqual(response.status_code, 201)
+
+        self.assignment.refresh_from_db()
+        self.assertEqual(self.assignment.status, 'In Progress')
+        self.assertIsNone(self.assignment.total_score)
+        self.assertIsNone(self.assignment.submitted_at)
+
+    def test_single_optional_question_resets_completed_assignments(self):
+        """Adding optional question via POST resets evaluations."""
+        EvaluationAssignment.objects.filter(
+            pk=self.assignment.pk
+        ).update(status='Completed', total_score=4)
+
+        payload = {
+            **self.question_data(
+                text='New Optional Question', order=2, is_required=False
+            ),
+            'form_id': self.form.pk,
+        }
+        response = self.client.post(
+            reverse('questions-list'), payload, format='json'
+        )
+        self.assertEqual(response.status_code, 201)
+
+        self.assignment.refresh_from_db()
+        self.assertEqual(self.assignment.status, 'In Progress')
+        self.assertIsNone(self.assignment.total_score)
+        self.assertIsNone(self.assignment.submitted_at)
+
+    def test_question_mutations_on_released_form_are_rejected(self):
+        """Questions on released forms cannot be created, edited, deleted."""
+        self.form.results_released = True
+        self.form.save(update_fields=['results_released'])
+
+        # 1. Single create
+        res_single = self.client.post(
+            reverse('questions-list'),
+            {**self.question_data(order=3), 'form_id': self.form.pk},
+            format='json',
+        )
+        self.assertEqual(res_single.status_code, 400)
+        self.assertIn('form_id', res_single.data)
+        self.assertIn('released results', str(res_single.data['form_id']))
+
+        # 2. Bulk create
+        res_bulk = self.client.post(
+            reverse('questions-bulk-create'),
+            {
+                'form_id': self.form.pk,
+                'questions': [self.question_data(order=3)],
+            },
+            format='json',
+        )
+        self.assertEqual(res_bulk.status_code, 400)
+        self.assertIn('form_id', res_bulk.data)
+        self.assertIn('released results', str(res_bulk.data['form_id']))
+
+        # 3. Update
+        res_update = self.client.patch(
+            reverse('questions-detail', args=[self.question.pk]),
+            {'text': 'Mutated Text'},
+            format='json',
+        )
+        self.assertEqual(res_update.status_code, 400)
+        self.assertIn('form_id', res_update.data)
+        self.assertIn('released results', str(res_update.data['form_id']))
+
+        # 4. Reorder
+        res_reorder = self.client.post(
+            reverse('questions-reorder', args=[self.question.pk]),
+            {'order': 5},
+            format='json',
+        )
+        self.assertEqual(res_reorder.status_code, 400)
+        self.assertIn('form_id', res_reorder.data)
+        self.assertIn('released results', str(res_reorder.data['form_id']))
+
+        # 5. Destroy
+        res_destroy = self.client.delete(
+            reverse('questions-detail', args=[self.question.pk])
+        )
+        self.assertEqual(res_destroy.status_code, 400)
+        self.assertIn('form_id', res_destroy.data)
+        self.assertIn('released results', str(res_destroy.data['form_id']))
