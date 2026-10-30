@@ -170,6 +170,48 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        """Allow only owners to delete pending or rejected accomplishments."""
+        accomplishment = self.get_object()
+
+        if accomplishment.user_id != request.user:
+            return Response(
+                {'error': 'You can only delete your own accomplishments'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if accomplishment.status not in ['Pending', 'Rejected']:
+            return Response(
+                {
+                    'error': (
+                        'You can only delete pending or rejected'
+                        ' accomplishments'
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return super().destroy(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        """Delete accomplishment and log the audit event."""
+        org_id = instance.organization_id_id
+        acc_id = str(instance.id)
+        title = instance.title
+        status_val = instance.status
+
+        super().perform_destroy(instance)
+
+        log_action(
+            self.request.user,
+            AuditActions.ACCOMPLISHMENT_DELETED,
+            self.request,
+            organization_id=org_id,
+            accomplishment_id=acc_id,
+            title=title,
+            status=status_val
+        )
+
     # ------------------------------------------------------------------
     # Actions
     # ------------------------------------------------------------------

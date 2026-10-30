@@ -129,6 +129,7 @@ class AuditActions:
     ACCOMPLISHMENT_UPDATED = 'accomplishment.updated'
     ACCOMPLISHMENT_VERIFIED = 'accomplishment.verified'
     ACCOMPLISHMENT_REJECTED = 'accomplishment.rejected'
+    ACCOMPLISHMENT_DELETED = 'accomplishment.deleted'
 
     # Admin actions
     ADMIN_SETTINGS_CHANGED = 'admin.settings_changed'
