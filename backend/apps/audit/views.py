@@ -165,7 +165,9 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 Q(action__icontains=keyword) |
                 Q(ip_address__icontains=keyword) |
-                Q(user_id__email__icontains=keyword)
+                Q(user_id__email__icontains=keyword) |
+                Q(user_id__first_name__icontains=keyword) |
+                Q(user_id__last_name__icontains=keyword)
             )
 
         return queryset.order_by('-datetime')
