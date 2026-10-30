@@ -305,7 +305,7 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         accomplishment.status = serializer.validated_data['status']
         accomplishment.verified_by = request.user
 
-        if accomplishment.status == 'Rejected' and 'comments' in serializer.validated_data:
+        if 'comments' in serializer.validated_data:
             accomplishment.comments = serializer.validated_data['comments']
 
         accomplishment.save()

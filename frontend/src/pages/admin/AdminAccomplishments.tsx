@@ -78,6 +78,20 @@ const AdminAccomplishments = () => {
     return matchesSearch && matchesTab;
   });
 
+  const handleOpenReview = (acc: Accomplishment) => {
+    setSelectedAccomplishment(acc);
+    setReviewNotes("");
+    setReviewDialogOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setReviewDialogOpen(open);
+    if (!open) {
+      setReviewNotes("");
+      setSelectedAccomplishment(null);
+    }
+  };
+
   const handleVerify = async (status: 'Verified' | 'Rejected') => {
     if (!selectedAccomplishment) return;
     try {
@@ -91,8 +105,7 @@ const AdminAccomplishments = () => {
       toast.success("Success", {
         description: `Accomplishment ${status.toLowerCase()} successfully.`,
       });
-      setReviewDialogOpen(false);
-      setReviewNotes("");
+      handleDialogChange(false);
     } catch (error) {
       toast.error("Error", {
         description: `Failed to update accomplishment status.`,
@@ -253,7 +266,7 @@ const AdminAccomplishments = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setSelectedAccomplishment(acc); setReviewDialogOpen(true); }}
+                          onClick={() => handleOpenReview(acc)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -268,7 +281,7 @@ const AdminAccomplishments = () => {
       </Card>
 
       {/* Review Dialog */}
-      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+      <Dialog open={reviewDialogOpen} onOpenChange={handleDialogChange}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Review Accomplishment</DialogTitle>
@@ -317,6 +330,13 @@ const AdminAccomplishments = () => {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      variant="outline"
+                      onClick={() => handleDialogChange(false)}
+                      disabled={verifyAccomplishment.isPending}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
                       className="flex-1"
                       onClick={() => handleVerify("Verified")}
                       disabled={verifyAccomplishment.isPending}
@@ -335,6 +355,15 @@ const AdminAccomplishments = () => {
                     </Button>
                   </div>
                 </>
+              )}
+
+              {selectedAccomplishment.status === "Verified" && selectedAccomplishment.comments && (
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <Label className="text-green-700">Verification Notes</Label>
+                  <p className="text-sm text-green-600 break-words whitespace-pre-wrap max-h-40 overflow-auto">
+                    {selectedAccomplishment.comments}
+                  </p>
+                </div>
               )}
 
               {selectedAccomplishment.status === "Rejected" && selectedAccomplishment.comments && (

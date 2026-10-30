@@ -447,6 +447,11 @@ const OfficerAccomplishments = () => {
                         Reason: {item.comments}
                       </p>
                     )}
+                    {item.status === 'Verified' && item.comments && (
+                      <p className="text-xs text-green-600 mt-2">
+                        Notes: {item.comments}
+                      </p>
+                    )}
                   </div>
                   {item.status === 'Pending' && (
                     <Button
