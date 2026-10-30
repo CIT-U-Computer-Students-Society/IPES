@@ -59,6 +59,34 @@ def log_action(user, action, request=None, organization_id=None, **extra_data):
 
 
 # Predefined action constants for consistency
+FORMULA_PREFIXES = ('=', '+', '-', '@')
+
+
+def sanitize_csv_cell(value) -> str:
+    """
+    Neutralize CSV / spreadsheet formula injection.
+
+    Spreadsheet applications (Excel, LibreOffice Calc, Google Sheets) evaluate
+    cells starting with '=', '+', '-', or '@' as formulas. Leading whitespace
+    or control characters (\\t, \\r, \\n) can also be ignored by spreadsheet
+    parsers before formula execution.
+
+    Prefixing such cells with a single quote (') forces spreadsheet software to
+    treat the contents as a plain text string literal while preserving
+    readability.
+    """
+    if value is None:
+        return ''
+    text = str(value)
+    stripped = text.lstrip(" \t\r\n")
+    if (
+        stripped.startswith(FORMULA_PREFIXES)
+        or text.startswith(('\t', '\r', '\n'))
+    ):
+        return f"'{text}"
+    return text
+
+
 class AuditActions:
     # User actions
     USER_LOGIN = 'user.login'
