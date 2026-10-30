@@ -97,6 +97,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 organization_id=org_id,
                 role='Admin',
                 is_active=True,
+                organization__is_active=True,
             ).exists()
             if not is_org_admin:
                 return AuditLog.objects.none()
@@ -158,6 +159,15 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 })
             queryset = queryset.filter(ip_address=ip_val)
 
+        # Search on the server before pagination, within the authorized tenant.
+        keyword = self.request.query_params.get('q')
+        if keyword:
+            queryset = queryset.filter(
+                Q(action__icontains=keyword) |
+                Q(ip_address__icontains=keyword) |
+                Q(user_id__email__icontains=keyword)
+            )
+
         return queryset.order_by('-datetime')
 
     def get_serializer_class(self):
@@ -169,7 +179,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def actions(self, request):
         """Get list of distinct actions in the audit log"""
-        actions = AuditLog.objects.values_list(
+        actions = self.get_queryset().values_list(
             'action', flat=True
         ).distinct().order_by('action')
         return Response(list(actions))
@@ -262,11 +272,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        logs = self.get_queryset().filter(
-            Q(action__icontains=keyword) |
-            Q(ip_address__icontains=keyword) |
-            Q(user_id__email__icontains=keyword)
-        )
+        logs = self.get_queryset()
 
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
