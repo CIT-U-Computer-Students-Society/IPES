@@ -1,4 +1,5 @@
 import logging
+from django.db import transaction
 from django.utils import timezone
 from .models import AuditLog
 
@@ -43,12 +44,15 @@ def log_action(user, action, request=None, organization_id=None, **extra_data):
         action_string = f"{action} ({extra_str})"
     
     try:
-        AuditLog.objects.create(
-            user_id=user,
-            organization_id_id=organization_id,
-            action=action_string,
-            ip_address=ip_address
-        )
+        # Roll back a failed audit insert to its own savepoint, preserving any
+        # surrounding business transaction before the error is suppressed.
+        with transaction.atomic():
+            AuditLog.objects.create(
+                user_id=user,
+                organization_id_id=organization_id,
+                action=action_string,
+                ip_address=ip_address
+            )
     except Exception as e:
         # Don't let logging failures break the main application
         logger.error(f"Failed to create audit log: {e}")
