@@ -10,6 +10,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outputDir = resolve(__dirname, '../public/inspection');
 mkdirSync(outputDir, { recursive: true });
 
+const target = process.argv[2] || 'hero';
+
 async function inspect() {
   const browser = await chromium.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -23,55 +25,31 @@ async function inspect() {
 
   const page = await context.newPage();
 
-  // 1. Homepage (Light Mode - Hero)
-  console.log('Capturing Homepage Hero...');
-  await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: resolve(outputDir, 'homepage_hero.png'), fullPage: false });
-
-  // 2. Homepage (Full Page)
-  console.log('Capturing Homepage Full Page...');
-  await page.screenshot({ path: resolve(outputDir, 'homepage_full.png'), fullPage: true });
-
-  // 3. Officer Getting Started Doc Page
-  console.log('Capturing Officer Guide...');
-  await page.goto('http://localhost:4321/officer/getting-started/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: resolve(outputDir, 'officer_guide.png'), fullPage: false });
-
-  // 4. Admin Organization Setup Doc Page
-  console.log('Capturing Admin Guide...');
-  await page.goto('http://localhost:4321/admin/organization-setup/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: resolve(outputDir, 'admin_guide.png'), fullPage: false });
-
-  // 5. Dark Mode Homepage
-  console.log('Capturing Homepage Dark Mode...');
-  await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
-  await page.click('#theme-toggle-btn');
-  await page.waitForTimeout(600);
-  await page.screenshot({ path: resolve(outputDir, 'homepage_dark.png'), fullPage: false });
-
-  // 6. Overview with Mermaid diagram
-  console.log('Capturing Overview Mermaid diagram...');
-  await page.goto('http://localhost:4321/overview/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: resolve(outputDir, 'overview_mermaid.png'), fullPage: false });
-
-  // 7. Cycle Management with State Diagram Mermaid
-  console.log('Capturing Cycle Management Mermaid diagram...');
-  await page.goto('http://localhost:4321/admin/cycle-management/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: resolve(outputDir, 'cycle_mermaid.png'), fullPage: false });
-
-  // 8. Anonymity Policy with Sequence Diagram Mermaid
-  console.log('Capturing Anonymity Policy Mermaid diagram...');
-  await page.goto('http://localhost:4321/policies/anonymity/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: resolve(outputDir, 'anonymity_mermaid.png'), fullPage: false });
+  if (target === 'hero') {
+    console.log('Targeted capture: Homepage Hero...');
+    await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: resolve(outputDir, 'homepage_hero.png'), fullPage: false });
+  } else if (target === 'dark') {
+    console.log('Targeted capture: Homepage Dark Mode...');
+    await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
+    await page.click('#theme-toggle-btn');
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: resolve(outputDir, 'homepage_dark.png'), fullPage: false });
+  } else if (target === 'all') {
+    console.log('Full suite capture...');
+    await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
+    await page.screenshot({ path: resolve(outputDir, 'homepage_hero.png'), fullPage: false });
+    await page.screenshot({ path: resolve(outputDir, 'homepage_full.png'), fullPage: true });
+  } else {
+    console.log(`Targeted capture for: ${target}...`);
+    await page.goto(`http://localhost:4321/${target.replace(/^\//, '')}`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: resolve(outputDir, `${target.replace(/[\/:]/g, '_')}.png`), fullPage: false });
+  }
 
   await browser.close();
-  console.log('Inspection captures completed in:', outputDir);
+  console.log('Inspection capture completed in:', outputDir);
 }
 
 inspect().catch(err => {
