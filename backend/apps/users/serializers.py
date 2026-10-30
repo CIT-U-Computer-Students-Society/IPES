@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import User
 from apps.organizations.models import OrganizationRole
 from django.db import transaction
@@ -107,6 +109,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
     
+    def validate_password(self, value):
+        user = self.instance
+        if user is None:
+            user = User(
+                username=self.initial_data.get('username') or '',
+                email=self.initial_data.get('email') or '',
+                first_name=self.initial_data.get('first_name') or '',
+                last_name=self.initial_data.get('last_name') or '',
+            )
+        try:
+            validate_password(value, user=user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
+
     def create(self, validated_data):
         import uuid
         password = validated_data.pop('password')
@@ -146,6 +163,13 @@ class LoginSerializer(serializers.Serializer):
 class PasswordResetSerializer(serializers.Serializer):
     """Serializer for password resets by Admins"""
     password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_password(self, value):
+        try:
+            validate_password(value, user=self.instance)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
     
     def update(self, instance, validated_data):
         instance.set_password(validated_data['password'])
