@@ -9,6 +9,7 @@ from apps.evaluations.models import (
     AssignmentRule,
     EvaluationAssignment,
     EvaluationForm,
+    Question,
 )
 from apps.organizations.models import (
     Membership,
@@ -223,6 +224,10 @@ class MembershipReactivationTests(TestCase):
             end_date=date(2026, 12, 31),
             is_active=True,
             results_released=False,
+        )
+        Question.objects.create(
+            form_id=form, text='Rate performance', input_type='rating',
+            order=1, is_required=True,
         )
         AssignmentRule.objects.create(
             form_id=form,

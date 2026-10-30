@@ -4,9 +4,11 @@ Membership ViewSet — CRUD with admin authorization checks.
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from django.db import transaction
 from django.utils import timezone
 
-from ..models import OrganizationUnit, Membership, OrganizationRole
+from ..models import Membership
 from ..serializers import MembershipSerializer
 from ..access import active_organization, EvaluationOrganizationPermission
 
@@ -41,61 +43,32 @@ class MembershipViewSet(viewsets.ModelViewSet):
             'user_id', 'unit_id', 'position_id'
         ).order_by('id')
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        """Create a new membership or reactivate an existing inactive assignment."""
-        unit_id = request.data.get('unit_id')
-        user_id = request.data.get('user_id')
-        position_id = request.data.get('position_id')
-
-        if not unit_id or not user_id:
-            return Response(
-                {'error': 'unit_id and user_id are required'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            unit = OrganizationUnit.objects.get(id=unit_id)
-            org = unit.organization_id
-        except OrganizationUnit.DoesNotExist:
-            return Response(
-                {'error': 'Invalid unit'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        is_admin = (
-            request.user.is_superuser or
-            OrganizationRole.objects.filter(
-                user=request.user,
-                organization=org,
-                role='Admin',
-                is_active=True,
-            ).exists()
-        )
-        if not is_admin:
-            return Response(
-                {'error': 'Not authorized to add memberships to this organization'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        # Check if an inactive assignment already exists for this user+unit+position
-        if position_id:
-            inactive_membership = Membership.objects.filter(
-                user_id=user_id,
-                unit_id=unit_id,
-                position_id=position_id,
-                is_active=False,
-            ).first()
-            if inactive_membership:
-                inactive_membership.is_active = True
-                inactive_membership.date_start = timezone.now().date()
-                inactive_membership.date_end = None
-                inactive_membership.save()
-                return Response(
-                    self.get_serializer(inactive_membership).data,
-                    status=status.HTTP_201_CREATED,
+        """Create or reactivate only after validating the same access rules."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        existing = Membership.objects.select_for_update().filter(
+            user_id=data['user_id'], unit_id=data['unit_id'],
+            position_id=data['position_id'],
+        ).first()
+        if existing:
+            if existing.is_active:
+                raise ValidationError(
+                    'This membership (user + unit + position) already exists.'
                 )
-
-        return super().create(request, *args, **kwargs)
+            serializer = self.get_serializer(
+                existing, data={'is_active': True}, partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+        else:
+            self.perform_create(serializer)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED,
+            headers=self.get_success_headers(serializer.data),
+        )
 
     def perform_create(self, serializer):
         """Automatically set start date when creating a membership"""
