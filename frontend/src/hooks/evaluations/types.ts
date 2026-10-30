@@ -51,7 +51,7 @@ export interface EvaluationAssignment {
   evaluatee_name?: string;
   form_id: number;
   form_title?: string;
-  status: 'Pending' | 'In Progress' | 'Submitted' | 'Reviewed' | 'Completed';
+  status: 'Pending' | 'In Progress' | 'Completed';
   submitted_at?: string;
   total_score?: number;
   responses?: Response[];

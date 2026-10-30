@@ -171,7 +171,7 @@ const AdminDashboard = () => {
   // Calculate stats
   const totalOfficers = users?.length || 0;
   const activeEvaluations = assignments?.filter(a => a.status === "Pending" || a.status === "In Progress").length || 0;
-  const completedEvaluations = assignments?.filter(a => a.status === "Submitted").length || 0;
+  const completedEvaluations = assignments?.filter(a => a.status === "Completed").length || 0;
   const completionRate = assignments?.length
     ? Math.round((completedEvaluations / assignments.length) * 100)
     : 0;
