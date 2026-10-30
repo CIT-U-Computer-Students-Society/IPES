@@ -1,5 +1,7 @@
 # Dev → main release review — 2026-10-30
 
+> This report is a snapshot of the dev revision named below. A [follow-up stack review](pr_stack_followup_review.md) records later fixes and verification; the hold remains relevant until the fixes reach the release branch and release checks are satisfied.
+
 **Decision: hold the release.** Twenty issues have supporting code and passing relevant regression tests. Three claimed fixes remain incomplete. The full backend suite fails and the release preflight is unmet.
 
 Reviewed `dev` / `origin/dev` at `c89460e65133daee8b422555115547476d791e1d` against `origin/main` at `3a698d68fe3082cb4565c33e0727797ec337f79d`. The promotion contains 56 commits and changes 102 files. All 21 corresponding PRs are merged; every PR head is an ancestor of dev and is absent from main. Their review-thread lists are empty.
