@@ -43,12 +43,10 @@ class EvaluationAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
         if org_id:
             queryset = queryset.filter(form_id__organization_id=org_id)
 
-        # Regular members can only see their own assignments
+        # Individual records belong to the evaluator's work queue. Evaluatees
+        # receive released, anonymized results through my_performance instead.
         if not is_admin:
-            from django.db.models import Q
-            queryset = queryset.filter(Q(evaluatee_id=user) | Q(evaluator_id=user))
-            if org_id:
-                queryset = queryset.filter(form_id__organization_id=org_id)
+            queryset = queryset.filter(evaluator_id=user)
 
         if form_id:
             queryset = queryset.filter(form_id=positive_id(form_id, 'form_id'))
