@@ -290,7 +290,7 @@ class AnswerIntegrityTests(EvaluationFixtures, APITestCase):
     def test_evaluatee_cannot_bypass_response_permissions_using_assignment_action(self):
         self.draft([self.answer(3)])
         self.client.force_authenticate(self.evaluatee)
-        self.assertEqual(self.client.get(reverse('assignments-responses', args=[self.assignment.pk])).status_code, 403)
+        self.assertEqual(self.client.get(reverse('assignments-responses', args=[self.assignment.pk])).status_code, 404)
 
     def test_large_weights_remain_finite_in_released_performance(self):
         Question.objects.filter(pk=self.question.pk).update(weight=1e308)
