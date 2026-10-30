@@ -8,8 +8,10 @@ from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from apps.organizations.models import OrganizationRole
 from apps.validation import positive_id
 from .models import AuditLog
 from .serializers import AuditLogListSerializer, AuditLogSerializer
@@ -72,36 +74,45 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         """Filter audit logs based on user role and parameters"""
         queryset = AuditLog.objects.all()
 
-        is_global_admin = (
-            self.request.user.is_staff or self.request.user.is_superuser
-        )
-        raw_org_id = self.request.query_params.get('organization_id')
-        org_id = (
-            positive_id(raw_org_id, 'organization_id')
-            if raw_org_id is not None
-            else None
-        )
+        user = self.request.user
+        is_global_admin = user.is_staff or user.is_superuser
+        header_org = self.request.headers.get('X-Organization-Id')
+        if header_org is not None and str(header_org).strip() == '':
+            header_org = None
+        query_org = self.request.query_params.get('organization_id')
+        if query_org is not None and str(query_org).strip() == '':
+            query_org = None
+
+        if header_org and query_org and str(header_org) != str(query_org):
+            raise ValidationError({
+                'organization_id': (
+                    'Organization header and parameter must match.'
+                )
+            })
+
+        raw_org = query_org or header_org
+        org_id = positive_id(raw_org, 'organization_id') if raw_org else None
 
         # Organization scoping & Authorization
         if not is_global_admin:
             if not org_id:
-                # Regular users MUST supply an organization_id to view logs,
+                # Regular users/org admins must specify or pass organization,
                 # otherwise return nothing to prevent cross-tenant data leakage
                 return AuditLog.objects.none()
 
-            from apps.organizations.models import OrganizationRole
             is_org_admin = OrganizationRole.objects.filter(
                 user=self.request.user,
                 organization_id=org_id,
                 role='Admin',
-                is_active=True
+                is_active=True,
             ).exists()
-
             if not is_org_admin:
                 return AuditLog.objects.none()
 
-        if org_id:
             queryset = queryset.filter(organization_id=org_id)
+        else:
+            if org_id:
+                queryset = queryset.filter(organization_id=org_id)
 
         # Filter by user
         raw_user_id = self.request.query_params.get('user_id')
@@ -143,36 +154,38 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         if end_dt:
             queryset = queryset.filter(**{f'datetime{end_lookup}': end_dt})
 
-        # Filter by IP
-        raw_ip = self.request.query_params.get('ip_address')
-        if raw_ip:
+        # Filter by IP address
+        ip_param = self.request.query_params.get('ip_address')
+        if ip_param:
+            ip_val = ip_param.strip()
             try:
-                ipaddress.ip_address(raw_ip.strip())
+                ipaddress.ip_address(ip_val)
             except ValueError:
                 raise serializers.ValidationError({
                     'ip_address': 'Enter a valid IPv4 or IPv6 address.'
                 })
-            queryset = queryset.filter(ip_address=raw_ip.strip())
+            queryset = queryset.filter(ip_address=ip_val)
 
-        # General search query
-        q = self.request.query_params.get('q')
-        if q:
-            queryset = queryset.filter(
-                Q(action__icontains=q) |
-                Q(ip_address__icontains=q) |
-                Q(user_id__email__icontains=q) |
-                Q(user_id__first_name__icontains=q) |
-                Q(user_id__last_name__icontains=q)
-            )
+        return queryset.order_by('-datetime')
 
-        return queryset.select_related(
-            'user_id', 'organization_id'
-        ).order_by('-datetime')
+    def get_serializer_class(self):
+        """Use lightweight serializer for list view"""
+        if self.action == 'list':
+            return AuditLogListSerializer
+        return AuditLogSerializer
+
+    @action(detail=False, methods=['get'])
+    def actions(self, request):
+        """Get list of distinct actions in the audit log"""
+        actions = AuditLog.objects.values_list(
+            'action', flat=True
+        ).distinct().order_by('action')
+        return Response(list(actions))
 
     @action(detail=False, methods=['get'])
     def recent(self, request):
-        """Get recent audit logs (last 100)"""
-        logs = self.get_queryset()[:100]
+        """Get recent audit logs (last 50)"""
+        logs = self.get_queryset()[:50]
         serializer = AuditLogListSerializer(logs, many=True)
         return Response(serializer.data)
 
