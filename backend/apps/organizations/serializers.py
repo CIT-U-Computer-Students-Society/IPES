@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Organization, UnitType, OrganizationUnit, PositionType, Membership, JoinRequest
+from .models import (
+    Organization, UnitType, OrganizationUnit, PositionType,
+    Membership, JoinRequest, OrganizationRole,
+)
 from apps.validation import ValidatedModelSerializer
 from .access import active_organization
 
@@ -84,15 +87,83 @@ class MembershipSerializer(ValidatedModelSerializer):
         validators = []
 
     def validate(self, data):
-        """Ensure uniqueness: a user cannot have the exact same unit+position entry twice."""
+        """Ensure active user access, organization match, and uniqueness."""
         data = super().validate(data)
-        unit = data.get('unit_id') or (self.instance.unit_id if self.instance else None)
-        if unit and self.context.get('request') and unit.organization_id_id != active_organization(self.context['request']):
-            raise serializers.ValidationError({'unit_id': 'Use a unit in the active organization.'})
-        # Only enforce on create (instance is None) or when unit/position/user are being changed
-        user = data.get('user_id') or (self.instance.user_id if self.instance else None)
-        unit = data.get('unit_id') or (self.instance.unit_id if self.instance else None)
-        position = data.get('position_id') or (self.instance.position_id if self.instance else None)
+        user = data.get('user_id') or (
+            self.instance.user_id if self.instance else None
+        )
+        unit = data.get('unit_id') or (
+            self.instance.unit_id if self.instance else None
+        )
+        position = data.get('position_id') or (
+            self.instance.position_id if self.instance else None
+        )
+
+        req = self.context.get('request')
+        if unit and req and unit.organization_id_id != active_organization(req):
+            raise serializers.ValidationError(
+                {'unit_id': 'Use a unit in the active organization.'}
+            )
+
+        if (
+            unit and position and
+            unit.organization_id_id != position.organization_id_id
+        ):
+            raise serializers.ValidationError({
+                'position_id': (
+                    'Position and unit must belong to the same organization.'
+                )
+            })
+
+        is_create = self.instance is None
+        if is_create:
+            is_changing_assignment = False
+        else:
+            changed_user = (
+                data.get('user_id') is not None and
+                data.get('user_id') != self.instance.user_id
+            )
+            changed_unit = (
+                data.get('unit_id') is not None and
+                data.get('unit_id') != self.instance.unit_id
+            )
+            changed_pos = (
+                data.get('position_id') is not None and
+                data.get('position_id') != self.instance.position_id
+            )
+            reactivated = (
+                data.get('is_active') is True and
+                not self.instance.is_active
+            )
+            is_changing_assignment = (
+                changed_user or changed_unit or changed_pos or reactivated
+            )
+
+        if is_create or is_changing_assignment:
+            if user and unit:
+                if not user.is_active:
+                    raise serializers.ValidationError({
+                        'user_id': 'Target user account is inactive.'
+                    })
+                if not OrganizationRole.objects.filter(
+                    user=user,
+                    organization_id=unit.organization_id_id,
+                    is_active=True,
+                ).exists():
+                    raise serializers.ValidationError({
+                        'user_id': (
+                            'User must have an active organization role '
+                            'in this organization.'
+                        )
+                    })
+            if unit and not unit.is_active:
+                raise serializers.ValidationError(
+                    {'unit_id': 'Unit is inactive.'}
+                )
+            if position and not position.is_active:
+                raise serializers.ValidationError(
+                    {'position_id': 'Position is inactive.'}
+                )
 
         if user and unit and position:
             qs = Membership.objects.filter(
@@ -106,6 +177,7 @@ class MembershipSerializer(ValidatedModelSerializer):
                 )
 
         return data
+
 
 class JoinRequestSerializer(serializers.ModelSerializer):
     """Serializer for JoinRequest model"""
