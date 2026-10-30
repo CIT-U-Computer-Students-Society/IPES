@@ -18,11 +18,11 @@ Verified accomplishments ensure that peer ratings and administrative reviews are
 1. <span class="step-badge-amber step-badge">1</span> **Inspect Proof Link**:
    - Click **Open Link &rarr;** to open and examine event photos, meeting minutes, shared spreadsheets, or certificates submitted by the officer.
 
-2. <span class="step-badge">2</span> **Decision Notes**:
+2. <span class="step-badge">2</span> **Reviewer Remarks / Decision Notes**:
    - For approvals: Optional praise or confirmation note.
    - For rejections: **Required**. Provide clear, actionable instructions explaining what additional evidence is needed (e.g., *"Please attach the attendance log or event permit"*).
 
-3. <span class="step-badge-emerald step-badge">2</span> **Approve or Reject**:
+3. <span class="step-badge-emerald step-badge">3</span> **Approve or Reject**:
    - **Approve & Verify**: Validates the achievement and permanently marks it as Verified.
    - **Reject with Notes**: Returns the item to the officer's portfolio with rejection feedback for resubmission.
 

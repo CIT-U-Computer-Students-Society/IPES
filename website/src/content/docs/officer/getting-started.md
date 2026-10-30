@@ -15,9 +15,8 @@ To access your evaluation assignments, navigate to the IPES application portal (
 
 ### Step-by-Step Instructions
 
-1. <span class="step-badge">1</span> **Enter your institutional email address**: Provide the university email address registered by your organization's administrator.
-2. <span class="step-badge">2</span> **Enter your password**: Enter your secure password.
-3. <span class="step-badge">3</span> **Click "Sign In"**: The system verifies your credentials and creates an encrypted, HttpOnly session.
+1. <span class="step-badge">1</span> **Enter your institutional email & password**: Provide your registered university email and secure credentials.
+2. <span class="step-badge">2</span> **Click "Sign In"**: The system verifies your credentials and creates an encrypted, HttpOnly session.
 
 :::note[Account Activation]
 If your student organization hasn't invited your account yet, or you need your password reset, contact your organization's IPES Administrator.

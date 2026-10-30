@@ -1,7 +1,10 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
   <defs>
     <marker id="arrow-amber-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-violet-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
     </marker>
     <marker id="arrow-emerald-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
@@ -42,13 +45,18 @@
   <text x="570" y="435" font-size="13" font-weight="700" fill="#ffffff">Approve &amp; Verify →</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1 -->
-  <circle cx="715" cy="258" r="14" fill="#f59e0b"/>
-  <text x="710" y="263" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 750 258 L 730 258" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm4)"/>
+  <!-- Callout 1: Points to Open Link Button -->
+  <circle cx="730" cy="258" r="14" fill="#f59e0b"/>
+  <text x="725" y="263" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 713 258 L 690 258" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm4)"/>
 
-  <!-- Callout 2 -->
-  <circle cx="715" cy="430" r="14" fill="#10b981"/>
-  <text x="710" y="435" font-size="14" font-weight="800" fill="#ffffff">2</text>
-  <path d="M 740 430 L 728 430" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-emerald-adm4)"/>
+  <!-- Callout 2: Points to Reviewer Remarks -->
+  <circle cx="730" cy="350" r="14" fill="#8b5cf6"/>
+  <text x="725" y="355" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 713 350 L 695 350" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm4)"/>
+
+  <!-- Callout 3: Points to Approve & Verify Button -->
+  <circle cx="730" cy="430" r="14" fill="#10b981"/>
+  <text x="725" y="435" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 713 430 L 695 430" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-emerald-adm4)"/>
 </svg>

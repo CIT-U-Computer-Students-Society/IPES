@@ -63,17 +63,18 @@
   <text x="675" y="449" font-size="13" font-weight="700" fill="#ffffff">Submit Final Evaluation</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1: Likert Selection -->
-  <circle cx="800" cy="212" r="14" fill="#f59e0b"/>
-  <text x="795" y="217" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 830 212 L 818 212" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm4)"/>
+  <!-- Callout 1: Points to Likert Selection -->
+  <circle cx="825" cy="212" r="14" fill="#f59e0b"/>
+  <text x="820" y="217" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 808 212 L 792 212" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-lm4)"/>
 
-  <!-- Callout 2: Qualitative Textarea -->
-  <circle cx="835" cy="376" r="14" fill="#8b5cf6"/>
-  <text x="830" y="381" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <!-- Callout 2: Points to Qualitative Textarea -->
+  <circle cx="840" cy="376" r="14" fill="#8b5cf6"/>
+  <text x="835" y="381" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 823 376 L 805 376" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm4)"/>
 
-  <!-- Callout 3: Submit Final Button -->
-  <circle cx="635" cy="444" r="14" fill="#8b5cf6"/>
-  <text x="630" y="449" font-size="14" font-weight="800" fill="#ffffff">3</text>
-  <path d="M 610 444 L 642 444" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm4)"/>
+  <!-- Callout 3: Points to Submit Final Button -->
+  <circle cx="625" cy="444" r="14" fill="#8b5cf6"/>
+  <text x="620" y="449" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 642 444 L 653 444" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-lm4)"/>
 </svg>

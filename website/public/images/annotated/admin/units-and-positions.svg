@@ -70,15 +70,15 @@
   <text x="560" y="334" font-size="13" font-weight="600" fill="#334155">Junior Officer</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1 -->
-  <circle cx="690" cy="88" r="14" fill="#f59e0b"/>
-  <text x="685" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 660 88 L 696 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm1)"/>
+  <!-- Callout 1: Points to Add Unit Button -->
+  <circle cx="665" cy="88" r="14" fill="#f59e0b"/>
+  <text x="660" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 682 88 L 704 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm1)"/>
 
-  <!-- Callout 2 -->
-  <circle cx="800" cy="180" r="14" fill="#8b5cf6"/>
-  <text x="795" y="185" font-size="14" font-weight="800" fill="#ffffff">2</text>
-  <path d="M 830 180 L 818 180" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm1)"/>
-  <rect x="690" y="225" width="125" height="24" rx="12" fill="#8b5cf6"/>
-  <text x="700" y="241" font-size="10" font-weight="700" fill="#ffffff">Designates Unit Head</text>
+  <!-- Callout 2: Points to Rank 1 Unit Head Position -->
+  <circle cx="835" cy="195" r="14" fill="#8b5cf6"/>
+  <text x="830" y="200" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 818 195 L 795 195" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm1)"/>
+  <rect x="710" y="225" width="125" height="24" rx="12" fill="#8b5cf6"/>
+  <text x="720" y="241" font-size="10" font-weight="700" fill="#ffffff">Designates Unit Head</text>
 </svg>

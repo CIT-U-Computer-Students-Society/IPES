@@ -17,10 +17,9 @@ To add an accomplishment to your portfolio, click the **+ Add Accomplishment** b
 
 ### Form Fields
 
-1. <span class="step-badge">1</span> **Title**: A clear, concise title summarizing the accomplishment (e.g., *"CIT-U Hackathon Event Lead"* or *"Drafted Constitutional Amendments"*).
-2. **Category & Date Range**: Select the competency area that best fits this achievement, and define when the work occurred.
-3. <span class="step-badge-amber step-badge">2</span> **Proof URL**: A direct hyperlink verifying your contribution (e.g. Google Drive shared folder, repository, meeting minutes).
-4. <span class="step-badge">3</span> **Submit Proof**: Saves the entry and places it into the administrator's review queue.
+1. <span class="step-badge">1</span> **Accomplishment Title**: A clear, concise title summarizing your contribution (e.g., *"CIT-U Research Colloquium Presentation"*). Specify the associated competency category and activity date range.
+2. <span class="step-badge-amber step-badge">2</span> **Verification Proof Link**: A direct hyperlink verifying your achievement (e.g. Google Drive shared folder, repository, meeting minutes). Ensure permissions are set so administrators can view the document.
+3. <span class="step-badge">3</span> **Submit Proof**: Saves the entry and places it into the administrator's review queue.
 
 :::caution[Public Link Permissions]
 Ensure permissions on Google Drive or external proof links are set to *"Anyone with the link can view"* so administrators can inspect your documentation without permission errors.

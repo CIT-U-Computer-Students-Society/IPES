@@ -1,4 +1,4 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
   <defs>
     <marker id="arrow-amber-adm2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
@@ -57,19 +57,20 @@
   <text x="100" y="437" font-size="13" font-weight="700" fill="#ffffff">Activate Evaluation Form →</text>
 
   <!-- ================= Annotations ================= -->
-  <!-- Callout 1 -->
-  <circle cx="670" cy="88" r="14" fill="#f59e0b"/>
-  <text x="665" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
-  <path d="M 640 88 L 676 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm2)"/>
+  <!-- Callout 1: Points to Add Category Button -->
+  <circle cx="645" cy="88" r="14" fill="#f59e0b"/>
+  <text x="640" y="93" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 662 88 L 684 88" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm2)"/>
 
-  <!-- Callout 2 -->
-  <circle cx="820" cy="210" r="14" fill="#8b5cf6"/>
-  <text x="815" y="215" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <!-- Callout 2: Points to Likert Question -->
+  <circle cx="835" cy="210" r="14" fill="#8b5cf6"/>
+  <text x="830" y="215" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 818 210 L 795 210" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm2)"/>
 
-  <!-- Callout 3 -->
-  <circle cx="85" cy="245" r="14" fill="#8b5cf6"/>
-  <text x="80" y="250" font-size="14" font-weight="800" fill="#ffffff">3</text>
-  <path d="M 85 240 L 85 220" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm2)"/>
-  <rect x="110" y="235" width="130" height="22" rx="11" fill="#8b5cf6"/>
-  <text x="120" y="250" font-size="10" font-weight="700" fill="#ffffff">Drag &amp; Drop to Reorder</text>
+  <!-- Callout 3: Points to Drag Handle -->
+  <circle cx="85" cy="260" r="14" fill="#8b5cf6"/>
+  <text x="80" y="265" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 85 243 L 85 222" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm2)"/>
+  <rect x="110" y="248" width="130" height="22" rx="11" fill="#8b5cf6"/>
+  <text x="120" y="263" font-size="10" font-weight="700" fill="#ffffff">Drag &amp; Drop to Reorder</text>
 </svg>

@@ -14,7 +14,7 @@ The **Officer Dashboard** (`/member/dashboard`) is your mission control center i
 ### Key Metrics Explained
 
 1. <span class="step-badge">1</span> **Pending Evaluations**: The number of peers assigned to you whose evaluation forms are either *Not Started* or currently *In Progress*.
-2. <span class="step-badge">2</span> **Completed Evaluations**: The count of evaluations you have finalized and submitted for the active cycle.
+2. **Completed Evaluations**: The count of evaluations you have finalized and submitted for the active cycle.
 3. <span class="step-badge-amber step-badge">2</span> **Verified Accomplishments**: The total number of accomplishments in your portfolio that have been reviewed and approved by an administrator.
 4. **Cycle Deadline**: The remaining days before the active evaluation window closes. Submissions lock automatically once the deadline expires.
 
