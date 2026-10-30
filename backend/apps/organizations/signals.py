@@ -23,6 +23,8 @@ def auto_assign_on_membership_activation(sender, instance, created, **kwargs):
     ).prefetch_related('assignment_rules__evaluator_unit', 'assignment_rules__evaluator_position', 'assignment_rules__evaluatee_unit', 'assignment_rules__evaluatee_position')
 
     for form in forms:
+        if not form.questions.exists():
+            continue
         rules = form.assignment_rules.all()
         for rule in rules:
             # Check if this member's unit/position matches the evaluator side
