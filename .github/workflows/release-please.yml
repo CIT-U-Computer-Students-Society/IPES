@@ -25,7 +25,7 @@ jobs:
       - name: Prepare combined component release PR
         uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN_IPES_CSS2627 || secrets.RELEASE_PLEASE_TOKEN || github.token }}
           target-branch: main
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
@@ -47,8 +47,8 @@ jobs:
       - name: Publish component releases merged into main
         uses: actions/github-script@v8
         with:
-          # Publication and PR labels use this job's explicit permissions.
-          github-token: ${{ github.token }}
+          # Uses configured release PAT (with workflow scope) or falls back to GITHUB_TOKEN.
+          github-token: ${{ secrets.RELEASE_PLEASE_TOKEN_IPES_CSS2627 || secrets.RELEASE_PLEASE_TOKEN || github.token }}
           script: |
             const publish = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/publish-releases.cjs`);
             await publish({ github, context, core });
