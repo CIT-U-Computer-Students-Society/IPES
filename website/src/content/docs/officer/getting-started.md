@@ -9,7 +9,7 @@ Welcome to IPES! As a student officer or committee member, you will use IPES to 
 
 ## Logging In to the Portal
 
-To access your evaluation assignments, navigate to the IPES application portal (e.g., `http://localhost:5173/login` or your organization's deployment URL).
+To access your evaluation assignments, navigate to the IPES application portal at [https://ipes.cc/login](https://ipes.cc/login).
 
 <img src="/images/annotated/officer/login-and-select-org.svg" alt="Sign In and Organization Selection Annotated Interface" class="guide-screenshot" />
 

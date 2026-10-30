@@ -18,7 +18,7 @@
   <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
   <circle cx="79" cy="39" r="5" fill="#10b981"/>
   <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
-  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cit.edu/login</text>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cc/login</text>
 
   <!-- Left Card: Sign In Form -->
   <rect x="50" y="80" width="360" height="360" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
