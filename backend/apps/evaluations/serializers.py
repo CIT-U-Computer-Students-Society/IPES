@@ -27,11 +27,27 @@ class ScopedEvaluationSerializer(ValidatedModelSerializer):
 class QuestionSerializer(ScopedEvaluationSerializer):
     """Serializer for Question model"""
     weight = FiniteFloatField(required=False, allow_null=True)
-    
+
     class Meta:
         model = Question
-        fields = ['id', 'form_id', 'text', 'input_type', 'order', 'weight', 'is_required', 'min_value', 'max_value']
+        fields = [
+            'id', 'form_id', 'text', 'input_type', 'order', 'weight',
+            'is_required', 'min_value', 'max_value'
+        ]
         read_only_fields = ['id']
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        form = attrs.get('form_id') or (
+            self.instance.form_id if self.instance else None
+        )
+        if form and form.results_released:
+            raise serializers.ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
+        return attrs
 
 
 class QuestionCreateSerializer(ValidatedModelSerializer):
@@ -56,16 +72,44 @@ class QuestionCreateSerializer(ValidatedModelSerializer):
 class EvaluationFormSerializer(ScopedEvaluationSerializer):
     """Serializer for EvaluationForm model"""
     questions = QuestionSerializer(many=True, read_only=True)
-    created_by_name = serializers.CharField(source='created_by.email', read_only=True)
-    
+    created_by_name = serializers.CharField(
+        source='created_by.email', read_only=True
+    )
+
     class Meta:
         model = EvaluationForm
         fields = [
-            'id', 'organization_id', 'title', 'description', 
+            'id', 'organization_id', 'title', 'description',
             'start_date', 'end_date', 'created_by', 'created_by_name',
-            'is_active', 'results_released', 'created_at', 'updated_at', 'questions'
+            'is_active', 'results_released', 'created_at', 'updated_at',
+            'questions'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self.instance:
+            if (
+                'is_active' in attrs
+                and attrs['is_active'] != self.instance.is_active
+            ):
+                raise serializers.ValidationError({
+                    'is_active': (
+                        'Form activation status must be changed through the '
+                        'dedicated lifecycle endpoints.'
+                    )
+                })
+            if (
+                'results_released' in attrs
+                and attrs['results_released'] != self.instance.results_released
+            ):
+                raise serializers.ValidationError({
+                    'results_released': (
+                        'Results release status must be changed through the '
+                        'dedicated lifecycle endpoint.'
+                    )
+                })
+        return attrs
 
 
 class EvaluationFormCreateSerializer(ScopedEvaluationSerializer):
@@ -131,16 +175,27 @@ class EvaluationAssignmentSerializer(serializers.ModelSerializer):
     evaluatee_email = serializers.CharField(source='evaluatee_id.email', read_only=True)
     evaluatee_name = serializers.SerializerMethodField()
     form_title = serializers.CharField(source='form_id.title', read_only=True)
-    
+    form_is_active = serializers.BooleanField(
+        source='form_id.is_active', read_only=True
+    )
+    form_results_released = serializers.BooleanField(
+        source='form_id.results_released', read_only=True
+    )
+    is_closed = serializers.SerializerMethodField()
+
     class Meta:
         model = EvaluationAssignment
         fields = [
             'id', 'evaluator_id', 'evaluator_email', 'evaluator_name',
             'evaluatee_id', 'evaluatee_email', 'evaluatee_name',
-            'form_id', 'form_title', 'status',
+            'form_id', 'form_title', 'form_is_active', 'form_results_released',
+            'is_closed', 'status',
             'submitted_at', 'total_score'
         ]
-        read_only_fields = ['id', 'status', 'submitted_at', 'total_score']
+        read_only_fields = [
+            'id', 'status', 'submitted_at', 'total_score',
+            'form_is_active', 'form_results_released', 'is_closed',
+        ]
     
     def get_evaluator_name(self, obj):
         user = obj.evaluator_id
@@ -155,6 +210,14 @@ class EvaluationAssignmentSerializer(serializers.ModelSerializer):
             full_name = f"{user.first_name} {user.last_name}".strip()
             return full_name if full_name else user.email
         return None
+
+    def get_is_closed(self, obj):
+        form = getattr(obj, 'form_id', None)
+        if not form:
+            return True
+        return bool(
+            not form.is_active or form.results_released or form.is_deleted
+        )
 
 
 class ResponseSerializer(serializers.ModelSerializer):

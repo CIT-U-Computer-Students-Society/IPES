@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { fetchAllPages } from '@/lib/pagination';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
 // Accomplishment types
@@ -59,11 +60,7 @@ export const useAccomplishments = (params?: { status?: string; type?: string; us
 
   return useQuery({
     queryKey: ['accomplishments', params],
-    queryFn: async () => {
-      const response = await api.get(`/accomplishments/${queryString}`);
-      const data = await response.json() as { results: Accomplishment[] } | Accomplishment[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<Accomplishment>(`/accomplishments/${queryString}`),
   });
 };
 
@@ -74,11 +71,7 @@ export const useMyAccomplishments = () => {
 
   return useQuery({
     queryKey: ['accomplishments', 'my', activeOrganizationId],
-    queryFn: async () => {
-      const response = await api.get(`/accomplishments/my/${queryString}`);
-      const data = await response.json() as { results: Accomplishment[] } | Accomplishment[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<Accomplishment>(`/accomplishments/my/${queryString}`),
   });
 };
 
@@ -90,11 +83,7 @@ export const usePendingAccomplishments = (organizationId?: number) => {
 
   return useQuery({
     queryKey: ['accomplishments', 'pending', effectiveOrgId],
-    queryFn: async () => {
-      const response = await api.get(`/accomplishments/pending/${queryString}`);
-      const data = await response.json() as { results: Accomplishment[] } | Accomplishment[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<Accomplishment>(`/accomplishments/pending/${queryString}`),
   });
 };
 
@@ -114,11 +103,7 @@ export const useAccomplishment = (id: number) => {
 export const useAccomplishmentsByType = (type: Accomplishment['type']) => {
   return useQuery({
     queryKey: ['accomplishments', 'by_type', type],
-    queryFn: async () => {
-      const response = await api.get(`/accomplishments/by_type/?type=${type}`);
-      const data = await response.json() as { results: Accomplishment[] } | Accomplishment[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<Accomplishment>(`/accomplishments/by_type/?type=${type}`),
     enabled: !!type,
   });
 };

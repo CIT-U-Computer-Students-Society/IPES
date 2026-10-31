@@ -9,8 +9,11 @@ import {
   ExternalLink,
   Eye,
   MessageSquare,
-  Loader2
+  Loader2,
+  AlertCircle,
+  RotateCcw
 } from "lucide-react";
+import { formatApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,7 +47,13 @@ const AdminAccomplishments = () => {
   const [reviewNotes, setReviewNotes] = useState("");
 
   const { activeOrganizationId } = useOrganizationState();
-  const { data: accomplishments = [], isLoading } = useAccomplishments({
+  const {
+    data: accomplishments = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useAccomplishments({
     organization_id: activeOrganizationId
   });
 
@@ -78,6 +87,20 @@ const AdminAccomplishments = () => {
     return matchesSearch && matchesTab;
   });
 
+  const handleOpenReview = (acc: Accomplishment) => {
+    setSelectedAccomplishment(acc);
+    setReviewNotes("");
+    setReviewDialogOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setReviewDialogOpen(open);
+    if (!open) {
+      setReviewNotes("");
+      setSelectedAccomplishment(null);
+    }
+  };
+
   const handleVerify = async (status: 'Verified' | 'Rejected') => {
     if (!selectedAccomplishment) return;
     try {
@@ -91,8 +114,7 @@ const AdminAccomplishments = () => {
       toast.success("Success", {
         description: `Accomplishment ${status.toLowerCase()} successfully.`,
       });
-      setReviewDialogOpen(false);
-      setReviewNotes("");
+      handleDialogChange(false);
     } catch (error) {
       toast.error("Error", {
         description: `Failed to update accomplishment status.`,
@@ -126,7 +148,7 @@ const AdminAccomplishments = () => {
                 <Clock className="w-5 h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stats.pending}</p>
+                <p className="text-2xl font-bold text-foreground">{isError && accomplishments.length === 0 ? '-' : stats.pending}</p>
                 <p className="text-sm text-muted-foreground">Pending</p>
               </div>
             </div>
@@ -139,7 +161,7 @@ const AdminAccomplishments = () => {
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stats.verified}</p>
+                <p className="text-2xl font-bold text-foreground">{isError && accomplishments.length === 0 ? '-' : stats.verified}</p>
                 <p className="text-sm text-muted-foreground">Verified</p>
               </div>
             </div>
@@ -152,7 +174,7 @@ const AdminAccomplishments = () => {
                 <XCircle className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stats.rejected}</p>
+                <p className="text-2xl font-bold text-foreground">{isError && accomplishments.length === 0 ? '-' : stats.rejected}</p>
                 <p className="text-sm text-muted-foreground">Rejected</p>
               </div>
             </div>
@@ -165,7 +187,7 @@ const AdminAccomplishments = () => {
                 <Trophy className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-2xl font-bold text-foreground">{isError && accomplishments.length === 0 ? '-' : stats.total}</p>
                 <p className="text-sm text-muted-foreground">Total</p>
               </div>
             </div>
@@ -198,6 +220,18 @@ const AdminAccomplishments = () => {
             </div>
           </div>
         </CardHeader>
+        {isError && accomplishments.length > 0 && (
+          <div className="mx-6 mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Failed to update accomplishments. Showing previously loaded records.</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="h-7 text-xs">
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Retry
+            </Button>
+          </div>
+        )}
         <CardContent>
           <Table>
             <TableHeader>
@@ -215,6 +249,24 @@ const AdminAccomplishments = () => {
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : isError && accomplishments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <AlertCircle className="w-8 h-8 text-destructive" />
+                      <div className="space-y-1">
+                        <p className="font-semibold text-foreground">Failed to load accomplishments</p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatApiError(error)}
+                        </p>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => refetch()}>
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Retry
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : filteredAccomplishments.length === 0 ? (
@@ -253,7 +305,7 @@ const AdminAccomplishments = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setSelectedAccomplishment(acc); setReviewDialogOpen(true); }}
+                          onClick={() => handleOpenReview(acc)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -268,7 +320,7 @@ const AdminAccomplishments = () => {
       </Card>
 
       {/* Review Dialog */}
-      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+      <Dialog open={reviewDialogOpen} onOpenChange={handleDialogChange}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Review Accomplishment</DialogTitle>
@@ -317,6 +369,13 @@ const AdminAccomplishments = () => {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      variant="outline"
+                      onClick={() => handleDialogChange(false)}
+                      disabled={verifyAccomplishment.isPending}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
                       className="flex-1"
                       onClick={() => handleVerify("Verified")}
                       disabled={verifyAccomplishment.isPending}
@@ -335,6 +394,15 @@ const AdminAccomplishments = () => {
                     </Button>
                   </div>
                 </>
+              )}
+
+              {selectedAccomplishment.status === "Verified" && selectedAccomplishment.comments && (
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <Label className="text-green-700">Verification Notes</Label>
+                  <p className="text-sm text-green-600 break-words whitespace-pre-wrap max-h-40 overflow-auto">
+                    {selectedAccomplishment.comments}
+                  </p>
+                </div>
               )}
 
               {selectedAccomplishment.status === "Rejected" && selectedAccomplishment.comments && (

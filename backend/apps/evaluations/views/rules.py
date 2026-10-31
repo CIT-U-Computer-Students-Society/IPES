@@ -5,6 +5,7 @@ AssignmentRule ViewSet and the ``_apply_rule`` helper.
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response as DRFResponse
+from django.db import transaction
 
 from apps.audit.utils import log_action, AuditActions
 
@@ -63,18 +64,26 @@ class AssignmentRuleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        total_created = 0
-        for rule in rules:
-            total_created += _apply_rule(rule, form)
+        with transaction.atomic():
+            form = EvaluationForm.objects.select_for_update().get(pk=form.pk)
+            if not form.is_active or form.results_released:
+                return DRFResponse(
+                    {'error': 'Assignments can only be generated for active forms.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        log_action(
-            request.user,
-            AuditActions.ASSIGNMENTS_GENERATED,
-            request,
-            organization_id=form.organization_id_id,
-            form_id=str(form.id),
-            assignments_created=str(total_created)
-        )
+            total_created = 0
+            for rule in rules:
+                total_created += _apply_rule(rule, form)
+
+            log_action(
+                request.user,
+                AuditActions.ASSIGNMENTS_GENERATED,
+                request,
+                organization_id=form.organization_id_id,
+                form_id=str(form.id),
+                assignments_created=str(total_created)
+            )
 
         return DRFResponse(
             {'message': f'{total_created} assignment(s) created.', 'created': total_created},

@@ -7,6 +7,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
+import { fetchAllPages } from '@/lib/pagination';
 
 // Audit log types
 export interface AuditLog {
@@ -18,6 +19,94 @@ export interface AuditLog {
   ip_address?: string;
   details?: Record<string, unknown>;
   datetime: string;
+}
+
+
+export function formatAuditAction(rawAction: string): string {
+  if (!rawAction) return '';
+
+  const parenMatch = rawAction.match(/^(.*?)(?:\s*\((.*)\)\s*)?$/);
+  const base = parenMatch?.[1]?.trim() || rawAction;
+  const parenContent = parenMatch?.[2]?.trim();
+
+  const formattedBase = base
+    .replace('.', ': ')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  if (!parenContent) {
+    return formattedBase;
+  }
+
+  const metadata: Record<string, string> = {};
+  const kvRegex = /(?:^|,\s*)([a-zA-Z0-9_]+)\s*=\s*(.*?)(?=(?:,\s*[a-zA-Z0-9_]+\s*=)|$)/g;
+  let match: RegExpExecArray | null;
+  let hasKeyValue = false;
+
+  while ((match = kvRegex.exec(parenContent)) !== null) {
+    hasKeyValue = true;
+    const key = match[1].toLowerCase();
+    const val = match[2].trim().replace(/^['"]|['"]$/g, '');
+    metadata[key] = val;
+  }
+
+  if (!hasKeyValue) {
+    const plain = parenContent.replace(/^['"]|['"]$/g, '').trim();
+    return plain ? `${formattedBase} (${plain})` : formattedBase;
+  }
+
+  const titleValues: string[] = [];
+  if (metadata.form_title) titleValues.push(metadata.form_title);
+  else if (metadata.title) titleValues.push(metadata.title);
+  else if (metadata.org_name) titleValues.push(metadata.org_name);
+  else if (metadata.name) titleValues.push(metadata.name);
+
+  if (metadata.unit_name && metadata.position_name) {
+    titleValues.push(`${metadata.unit_name} / ${metadata.position_name}`);
+  } else if (metadata.unit_name) {
+    titleValues.push(metadata.unit_name);
+  } else if (metadata.position_name) {
+    titleValues.push(metadata.position_name);
+  }
+
+  const userKey = ['target_user_email', 'user_email', 'target_user_name', 'target_user']
+    .find((k) => metadata[k]);
+  const detailKey = ['detail', 'reason', 'notes']
+    .find((k) => metadata[k]);
+
+  const detailParts: string[] = [];
+  if (titleValues.length > 0) {
+    detailParts.push(titleValues.join(' — '));
+  }
+  if (userKey) {
+    detailParts.push(metadata[userKey]);
+  } else if (metadata.target_user_id) {
+    detailParts.push(`target_user_id=${metadata.target_user_id}`);
+  } else if (metadata.membership_id) {
+    detailParts.push(`membership_id=${metadata.membership_id}`);
+  }
+  if (detailKey) {
+    detailParts.push(metadata[detailKey]);
+  }
+
+  const secondaryKeys = Object.keys(metadata).filter(
+    (k) =>
+      !k.endsWith('_id') &&
+      k !== 'id' &&
+      !['form_title', 'title', 'org_name', 'name', 'unit_name', 'position_name'].includes(k) &&
+      k !== userKey &&
+      k !== detailKey
+  );
+  for (const k of secondaryKeys) {
+    detailParts.push(`${k}: ${metadata[k]}`);
+  }
+
+  if (detailParts.length > 0) {
+    return `${formattedBase} (${detailParts.join(' — ')})`;
+  }
+
+  const idEntries = Object.entries(metadata).map(([k, v]) => `${k}=${v}`);
+  return idEntries.length > 0 ? `${formattedBase} (${idEntries.join(', ')})` : formattedBase;
 }
 
 // ===== Fetch Hooks =====
@@ -48,9 +137,7 @@ export const useAuditLogs = (params?: {
   return useQuery({
     queryKey: ['audit', 'logs', effectiveOrgId ?? null, mergedParams],
     queryFn: async () => {
-      const response = await api.get(`/audit/${queryString}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/${queryString}`);
     },
     staleTime: 30 * 1000, // 30 seconds for audit logs
   });
@@ -85,9 +172,7 @@ export const useAuditLogsByUser = (userId: number, organizationId?: number) => {
   return useQuery({
     queryKey: ['audit', 'by_user', effectiveOrgId ?? null, userId],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_user/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_user/?${searchParams.toString()}`);
     },
     enabled: !!userId,
   });
@@ -105,9 +190,7 @@ export const useAuditLogsByAction = (action: string, organizationId?: number) =>
   return useQuery({
     queryKey: ['audit', 'by_action', effectiveOrgId ?? null, action],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_action/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_action/?${searchParams.toString()}`);
     },
     enabled: !!action,
   });
@@ -125,9 +208,7 @@ export const useAuditLogsByDate = (startDate: string, endDate: string, organizat
   return useQuery({
     queryKey: ['audit', 'by_date', effectiveOrgId ?? null, startDate, endDate],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_date/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_date/?${searchParams.toString()}`);
     },
     enabled: !!startDate && !!endDate,
   });
@@ -166,4 +247,5 @@ export const AUDIT_ACTIONS = {
   ACCOMPLISHMENT_CREATED: 'accomplishment.created',
   ACCOMPLISHMENT_VERIFIED: 'accomplishment.verified',
   ACCOMPLISHMENT_REJECTED: 'accomplishment.rejected',
+  ACCOMPLISHMENT_DELETED: 'accomplishment.deleted',
 } as const;

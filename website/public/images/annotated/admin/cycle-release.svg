@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-amber-adm5" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-navy-adm5" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#293f55" />
+    </marker>
+  </defs>
+
+  <!-- Frame -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cc/admin/analytics/cycle/12</text>
+
+  <!-- Header -->
+  <text x="50" y="85" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Evaluation Cycle: AY 2026-2027 Midterm</text>
+  <text x="50" y="105" font-size="12" fill="#64748b">Track live submission rates, close cycle deadlines, and publish scorecards</text>
+
+  <!-- Overall Progress Bar Block -->
+  <rect x="50" y="125" width="780" height="110" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="75" y="155" font-size="13" font-weight="700" fill="#293f55">OVERALL CYCLE PARTICIPATION RATE</text>
+  <text x="750" y="155" font-size="14" font-weight="900" fill="#10b981">85% COMPLETE</text>
+
+  <!-- Progress Bar Track -->
+  <rect x="75" y="170" width="730" height="16" rx="8" fill="#f1f5f9"/>
+  <rect x="75" y="170" width="620" height="16" rx="8" fill="#10b981"/>
+
+  <text x="75" y="215" font-size="12" fill="#64748b">Total Assignments: 48 | Submitted: 41 | In Progress: 4 | Pending: 3</text>
+
+  <!-- Two Action Columns -->
+  <!-- Action 1: Close Cycle -->
+  <rect x="50" y="255" width="375" height="190" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="70" y="285" font-size="14" font-weight="700" fill="#293f55">Step 1: Close Evaluation Submissions</text>
+  <text x="70" y="310" font-size="12" fill="#64748b">Locks all member forms so no further edits or answers can be submitted after the deadline.</text>
+  
+  <rect x="70" y="380" width="335" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="145" y="406" font-size="13" font-weight="700" fill="#475569">Close Submissions (Locked)</text>
+
+  <!-- Action 2: Release Results (Highlighted) -->
+  <rect x="455" y="255" width="375" height="190" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="475" y="285" font-size="14" font-weight="700" fill="#b45309">Step 2: Publish &amp; Release Results</text>
+  <text x="475" y="310" font-size="12" fill="#64748b">Computes weighted averages, radar vectors, percentiles, and publishes scorecards to officers.</text>
+
+  <rect id="btn-release" x="475" y="380" width="335" height="42" rx="6" fill="#f59e0b"/>
+  <text x="560" y="406" font-size="14" font-weight="700" fill="#ffffff">Release Results to Members →</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1: Points to Overall Participation Rate -->
+  <circle cx="800" cy="155" r="14" fill="#293f55"/>
+  <text x="795" y="160" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 783 155 L 760 155" fill="none" stroke="#293f55" stroke-width="2.5" marker-end="url(#arrow-navy-adm5)"/>
+
+  <!-- Callout 2: Points to Release Results Button -->
+  <circle cx="840" cy="401" r="14" fill="#f59e0b"/>
+  <text x="835" y="406" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 823 401 L 800 401" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm5)"/>
+</svg>

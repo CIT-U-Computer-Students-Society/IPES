@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   ClipboardCheck,
-  Loader2
+  Loader2,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -126,7 +127,16 @@ const OfficerLayout = () => {
             <div className="flex-1" />
 
             {/* Bottom Actions */}
-            <div className="pt-4 mt-4 border-t border-border">
+            <div className="pt-4 mt-4 border-t border-border space-y-1">
+              <a
+                href="https://cit-u-computer-students-society.github.io/IPES/officer/getting-started/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <BookOpen className="w-5 h-5" />
+                User Guide
+              </a>
               <Link
                 to="/select-organization"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"

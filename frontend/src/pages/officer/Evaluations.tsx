@@ -10,7 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { useMyPendingEvaluations, useAssignments, type EvaluationAssignment } from "@/hooks/useEvaluations";
 import { useCurrentUser } from "@/hooks/useUsers";
 // Helper to format status
-const getStatusInfo = (status: string) => {
+const getStatusInfo = (status: string, isClosed: boolean = false) => {
+  if (isClosed && status.toLowerCase() !== "completed" && status.toLowerCase() !== "submitted") {
+    return { label: "Closed", className: "bg-gray-100 text-gray-800" };
+  }
   switch (status.toLowerCase()) {
     case "pending":
       return { label: "Not Started", className: "bg-yellow-100 text-yellow-800" };
@@ -43,7 +46,12 @@ const formatDate = (dateString: string) => {
 
 // Evaluation card component
 const EvaluationCard = ({ evaluation, basePath }: { evaluation: EvaluationAssignment, basePath: string }) => {
-  const statusInfo = getStatusInfo(evaluation.status);
+  const isClosed = Boolean(
+    evaluation.is_closed ?? (
+      evaluation.form_is_active === false || evaluation.form_results_released === true
+    )
+  );
+  const statusInfo = getStatusInfo(evaluation.status, isClosed);
   const urgent = evaluation.due_date ? isUrgent(evaluation.due_date) : false;
   const isSelfEvaluation = evaluation.evaluatee_id === evaluation.evaluator_id;
 
@@ -56,7 +64,7 @@ const EvaluationCard = ({ evaluation, basePath }: { evaluation: EvaluationAssign
               <h3 className="font-medium text-foreground truncate">
                 {evaluation.form_title || `Evaluation Form #${evaluation.form_id}`}
               </h3>
-              {urgent && (
+              {urgent && !isClosed && (
                 <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
               )}
             </div>
@@ -90,6 +98,10 @@ const EvaluationCard = ({ evaluation, basePath }: { evaluation: EvaluationAssign
               <Button variant="outline" size="sm" disabled>
                 <CheckCircle2 className="w-4 h-4 mr-1" />
                 Submitted
+              </Button>
+            ) : isClosed ? (
+              <Button variant="outline" size="sm" disabled>
+                Closed
               </Button>
             ) : (
               <Link to={`${basePath}evaluations/${evaluation.id}`}>

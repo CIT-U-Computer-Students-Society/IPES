@@ -10,6 +10,7 @@ import {
   useAuditLogsByAction,
   useAuditLogsByDate,
   useAuditLog,
+  formatAuditAction,
 } from '../useAudit';
 
 let mockActiveOrgId: number | null = 42;
@@ -132,5 +133,82 @@ describe('useAudit hooks tenant scoping and query keys', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/audit/recent/');
+  });
+
+  it('useAuditLogs fetches and aggregates all records beyond first page of 20 (#258)', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({
+        json: async () => ({
+          count: 25,
+          next: 'http://127.0.0.1:8000/api/audit/?organization_id=42&page=2',
+          results: Array.from({ length: 20 }, (_, i) => ({
+            id: i + 1,
+            user_id: 1,
+            action: `action_${i + 1}`,
+            datetime: '2026-10-31T00:00:00Z',
+          })),
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        json: async () => ({
+          count: 25,
+          next: null,
+          results: Array.from({ length: 5 }, (_, i) => ({
+            id: i + 21,
+            user_id: 1,
+            action: `action_${i + 21}`,
+            datetime: '2026-10-31T00:00:00Z',
+          })),
+        }),
+      } as Response);
+
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useAuditLogs({ organization_id: 42 }), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toHaveLength(25);
+    expect(result.current.data?.[0].id).toBe(1);
+    expect(result.current.data?.[24].id).toBe(25);
+  });
+
+});
+
+describe('formatAuditAction (#264)', () => {
+  it('preserves form_title and form identity from form_created action', () => {
+    expect(
+      formatAuditAction('evaluation.form_created (form_title=Annual Review, form_id=7)')
+    ).toBe('Evaluation: Form Created (Annual Review)');
+  });
+
+  it('preserves target_user_email and role-change detail from user.updated action', () => {
+    expect(
+      formatAuditAction(
+        'user.updated (target_user_email=target@example.test, detail=Role changed to Admin in A)'
+      )
+    ).toBe('User: Updated (target@example.test — Role changed to Admin in A)');
+  });
+
+  it('formats basic action without metadata', () => {
+    expect(formatAuditAction('user.login')).toBe('User: Login');
+  });
+
+  it('preserves plain parenthetical detail without key=value syntax', () => {
+    expect(formatAuditAction('user.login (Campus Wi-Fi)')).toBe(
+      'User: Login (Campus Wi-Fi)'
+    );
+  });
+
+  it('preserves commas inside backend-emitted form title', () => {
+    expect(
+      formatAuditAction('evaluation.form_created (form_title=Annual Review, Q1, form_id=7)')
+    ).toBe('Evaluation: Form Created (Annual Review, Q1)');
+  });
+
+  it('retains target identity of membership update with changed fields', () => {
+    const result = formatAuditAction(
+      'membership.updated (membership_id=12, target_user_id=17, unit_id=4, position_id=3, fields=position_id)'
+    );
+    expect(result).toContain('target_user_id=17');
+    expect(result).toContain('fields: position_id');
   });
 });

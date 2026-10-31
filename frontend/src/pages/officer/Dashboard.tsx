@@ -89,7 +89,12 @@ const StatCard = ({
 // Pending evaluation card
 const PendingEvaluationCard = ({ evaluation, basePath }: { evaluation: EvaluationAssignment, basePath: string }) => {
   const [now] = useState(Date.now);
-  const isUrgent = evaluation.due_date && new Date(evaluation.due_date) <= new Date(now + 3 * 24 * 60 * 60 * 1000);
+  const isClosed = Boolean(
+    evaluation.is_closed ?? (
+      evaluation.form_is_active === false || evaluation.form_results_released === true
+    )
+  );
+  const isUrgent = !isClosed && evaluation.due_date && new Date(evaluation.due_date) <= new Date(now + 3 * 24 * 60 * 60 * 1000);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -117,11 +122,17 @@ const PendingEvaluationCard = ({ evaluation, basePath }: { evaluation: Evaluatio
           )}
         </div>
       </div>
-      <Link to={`${basePath}evaluations/${evaluation.id}`}>
-        <Button size="sm">
-          {evaluation.status === "In Progress" ? "Continue" : "Start"}
+      {isClosed ? (
+        <Button size="sm" variant="outline" disabled>
+          Closed
         </Button>
-      </Link>
+      ) : (
+        <Link to={`${basePath}evaluations/${evaluation.id}`}>
+          <Button size="sm">
+            {evaluation.status === "In Progress" ? "Continue" : "Start"}
+          </Button>
+        </Link>
+      )}
 
     </div>
   );

@@ -63,7 +63,13 @@ const OfficerAccomplishments = () => {
   const [editingAccomplishment, setEditingAccomplishment] = useState<Accomplishment | null>(null);
   const [originalAccomplishment, setOriginalAccomplishment] = useState<Accomplishment | null>(null);
 
-  const { data: accomplishments = [], isLoading } = useMyAccomplishments();
+  const {
+    data: accomplishments = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useMyAccomplishments();
   const createAccomplishment = useCreateAccomplishment();
   const updateAccomplishment = useUpdateAccomplishment();
   const toast = ({ title, description, variant }: { title: string; description?: string; variant?: string }) => {
@@ -353,7 +359,7 @@ const OfficerAccomplishments = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {stats.verified}
+                {isError && accomplishments.length === 0 ? '-' : stats.verified}
               </p>
               <p className="text-sm text-muted-foreground">Verified</p>
             </div>
@@ -366,7 +372,7 @@ const OfficerAccomplishments = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {stats.pending}
+                {isError && accomplishments.length === 0 ? '-' : stats.pending}
               </p>
               <p className="text-sm text-muted-foreground">Pending</p>
             </div>
@@ -378,7 +384,7 @@ const OfficerAccomplishments = () => {
               <Trophy className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+              <p className="text-2xl font-bold text-foreground">{isError && accomplishments.length === 0 ? '-' : stats.total}</p>
               <p className="text-sm text-muted-foreground">Total</p>
             </div>
           </div>
@@ -406,10 +412,36 @@ const OfficerAccomplishments = () => {
             />
           </div>
         </div>
+        {isError && accomplishments.length > 0 && (
+          <div className="mx-4 my-3 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Failed to update accomplishments. Showing previously loaded records.</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="h-7 text-xs">
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Retry
+            </Button>
+          </div>
+        )}
         <div className="divide-y divide-border">
           {isLoading ? (
             <div className="p-8 flex justify-center text-muted-foreground">
               <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+          ) : isError && accomplishments.length === 0 ? (
+            <div className="p-8 text-center flex flex-col items-center justify-center space-y-3">
+              <AlertCircle className="w-8 h-8 text-destructive" />
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Failed to load accomplishments</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatApiError(error)}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Retry
+              </Button>
             </div>
           ) : accomplishments.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
@@ -445,6 +477,11 @@ const OfficerAccomplishments = () => {
                     {item.status === 'Rejected' && item.comments && (
                       <p className="text-xs text-destructive mt-2">
                         Reason: {item.comments}
+                      </p>
+                    )}
+                    {item.status === 'Verified' && item.comments && (
+                      <p className="text-xs text-green-600 mt-2">
+                        Notes: {item.comments}
                       </p>
                     )}
                   </div>

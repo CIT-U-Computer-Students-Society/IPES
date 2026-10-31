@@ -105,6 +105,25 @@ class AuditActions:
     ORG_JOIN_APPROVED = 'organization.join_approved'
     ORG_JOIN_REJECTED = 'organization.join_rejected'
 
+    # Structure actions
+    UNIT_TYPE_CREATED = 'unit_type.created'
+    UNIT_TYPE_UPDATED = 'unit_type.updated'
+    UNIT_TYPE_DEACTIVATED = 'unit_type.deactivated'
+
+    UNIT_CREATED = 'unit.created'
+    UNIT_UPDATED = 'unit.updated'
+    UNIT_DEACTIVATED = 'unit.deactivated'
+
+    POSITION_CREATED = 'position.created'
+    POSITION_UPDATED = 'position.updated'
+    POSITION_DEACTIVATED = 'position.deactivated'
+
+    # Membership actions
+    MEMBERSHIP_CREATED = 'membership.created'
+    MEMBERSHIP_UPDATED = 'membership.updated'
+    MEMBERSHIP_DEACTIVATED = 'membership.deactivated'
+    MEMBERSHIP_ACTIVATED = 'membership.activated'
+
     # Evaluation form actions
     FORM_CREATED = 'evaluation.form_created'
     FORM_UPDATED = 'evaluation.form_updated'
@@ -129,6 +148,7 @@ class AuditActions:
     ACCOMPLISHMENT_UPDATED = 'accomplishment.updated'
     ACCOMPLISHMENT_VERIFIED = 'accomplishment.verified'
     ACCOMPLISHMENT_REJECTED = 'accomplishment.rejected'
+    ACCOMPLISHMENT_DELETED = 'accomplishment.deleted'
 
     # Admin actions
     ADMIN_SETTINGS_CHANGED = 'admin.settings_changed'

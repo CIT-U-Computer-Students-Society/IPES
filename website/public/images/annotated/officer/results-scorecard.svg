@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-amber-lm5" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-navy-lm5" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#293f55" />
+    </marker>
+    <marker id="arrow-violet-lm5" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+  </defs>
+
+  <!-- Frame -->
+  <rect x="20" y="20" width="840" height="460" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="20" y="20" width="840" height="38" rx="10" fill="#f1f5f9"/>
+  <circle cx="45" cy="39" r="5" fill="#ef4444"/>
+  <circle cx="62" cy="39" r="5" fill="#f59e0b"/>
+  <circle cx="79" cy="39" r="5" fill="#10b981"/>
+  <rect x="110" y="29" width="380" height="20" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="125" y="43" font-size="11" fill="#64748b">https://ipes.cc/member/results</text>
+
+  <!-- Page Title -->
+  <text x="50" y="85" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Performance Scorecard: AY 2026-2027 Midterm</text>
+  <text x="50" y="105" font-size="12" fill="#64748b">Released by Administrator on October 31, 2026</text>
+
+  <!-- Left: Composite Score Card -->
+  <rect x="50" y="125" width="240" height="175" rx="8" fill="#f8fafc" stroke="#f59e0b" stroke-width="2"/>
+  <text x="70" y="155" font-size="11" font-weight="700" fill="#b45309">OVERALL PERFORMANCE INDEX</text>
+  <text x="70" y="210" font-size="44" font-weight="900" fill="#293f55">4.62</text>
+  <text x="175" y="195" font-size="16" fill="#64748b">/ 5.00</text>
+  <rect x="70" y="225" width="105" height="24" rx="12" fill="#10b981"/>
+  <text x="82" y="241" font-size="11" font-weight="700" fill="#ffffff">Outstanding</text>
+  <text x="70" y="275" font-size="12" fill="#0284c7" font-weight="600">Top 10% in Organization</text>
+
+  <!-- Middle: Competency Breakdown -->
+  <rect x="310" y="125" width="520" height="175" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="330" y="152" font-size="13" font-weight="700" fill="#293f55">Competency Category Averages</text>
+
+  <!-- Bar 1: Leadership -->
+  <text x="330" y="180" font-size="11" font-weight="600" fill="#334155">Leadership &amp; Vision</text>
+  <rect x="460" y="170" width="300" height="12" rx="6" fill="#f1f5f9"/>
+  <rect x="460" y="170" width="285" height="12" rx="6" fill="#293f55"/>
+  <text x="770" y="181" font-size="11" font-weight="700" fill="#293f55">4.75</text>
+
+  <!-- Bar 2: Execution -->
+  <text x="330" y="212" font-size="11" font-weight="600" fill="#334155">Execution &amp; Delivery</text>
+  <rect x="460" y="202" width="300" height="12" rx="6" fill="#f1f5f9"/>
+  <rect x="460" y="202" width="270" height="12" rx="6" fill="#293f55"/>
+  <text x="770" y="213" font-size="11" font-weight="700" fill="#293f55">4.50</text>
+
+  <!-- Bar 3: Teamwork -->
+  <text x="330" y="244" font-size="11" font-weight="600" fill="#334155">Communication</text>
+  <rect x="460" y="234" width="300" height="12" rx="6" fill="#f1f5f9"/>
+  <rect x="460" y="234" width="276" height="12" rx="6" fill="#293f55"/>
+  <text x="770" y="245" font-size="11" font-weight="700" fill="#293f55">4.60</text>
+
+  <!-- Bar 4: Initiative -->
+  <text x="330" y="276" font-size="11" font-weight="600" fill="#334155">Initiative &amp; Ethics</text>
+  <rect x="460" y="266" width="300" height="12" rx="6" fill="#f1f5f9"/>
+  <rect x="460" y="266" width="280" height="12" rx="6" fill="#293f55"/>
+  <text x="770" y="277" font-size="11" font-weight="700" fill="#293f55">4.65</text>
+
+  <!-- Bottom: Anonymized Peer Feedback -->
+  <rect x="50" y="315" width="780" height="145" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="70" y="340" font-size="13" font-weight="700" fill="#7c3aed">Anonymized Peer Remarks (Aggregated &amp; Randomized)</text>
+  
+  <rect x="70" y="355" width="740" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="85" y="379" font-size="12" fill="#334155">“Always dependable during crunch time; effectively rallied our research sub-team.”</text>
+
+  <rect x="70" y="405" width="740" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="85" y="429" font-size="12" fill="#334155">“Very organized speaker in committee hearings; could share draft minutes a day earlier.”</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1: Anchored on Composite Score Card -->
+  <circle cx="290" cy="125" r="14" fill="#f59e0b"/>
+  <text x="285" y="130" font-size="14" font-weight="800" fill="#ffffff">1</text>
+
+  <!-- Callout 2: Anchored on Category Averages Card -->
+  <circle cx="830" cy="125" r="14" fill="#293f55"/>
+  <text x="825" y="130" font-size="14" font-weight="800" fill="#ffffff">2</text>
+
+  <!-- Callout 3: Anchored on Anonymized Peer Remarks -->
+  <circle cx="830" cy="315" r="14" fill="#8b5cf6"/>
+  <text x="825" y="320" font-size="14" font-weight="800" fill="#ffffff">3</text>
+</svg>

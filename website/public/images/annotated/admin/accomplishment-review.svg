@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="880" height="500" style="background:#f8fafc; border-radius:12px; font-family:'Inter',system-ui,sans-serif;">
+  <defs>
+    <marker id="arrow-amber-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-violet-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+    </marker>
+    <marker id="arrow-emerald-adm4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Dimmed Backdrop -->
+  <rect x="0" y="0" width="880" height="500" fill="#0f172a" opacity="0.25"/>
+
+  <!-- Admin Verification Modal in Light Mode -->
+  <rect x="150" y="30" width="580" height="440" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="drop-shadow(0 20px 25px rgba(15,23,42,0.15))"/>
+  <text x="180" y="68" font-size="18" font-weight="700" fill="#293f55" font-family="'Montserrat', sans-serif">Verify Accomplishment Submission</text>
+  <text x="180" y="88" font-size="12" fill="#64748b">Submitted by Juan dela Cruz (Senior Research Associate)</text>
+
+  <!-- Title & Description Box -->
+  <rect x="180" y="115" width="520" height="105" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="195" y="140" font-size="13" font-weight="700" fill="#293f55">Research Paper Publication &amp; Presentation</text>
+  <text x="195" y="160" font-size="11" fill="#64748b">Date Range: 2026-09-01 to 2026-10-15 · Category: Technical Delivery</text>
+  <text x="195" y="185" font-size="12" fill="#334155">Led survey data cleaning and authored results chapter for committee presentation.</text>
+
+  <!-- Proof Link Box (Highlighted Amber) -->
+  <rect x="180" y="235" width="520" height="48" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="195" y="255" font-size="11" font-weight="700" fill="#b45309">VERIFIABLE PROOF LINK</text>
+  <text x="195" y="272" font-size="12" fill="#0284c7">https://drive.google.com/drive/folders/1xYzAbCdEfGh...</text>
+  <rect x="580" y="243" width="110" height="30" rx="4" fill="#f59e0b"/>
+  <text x="592" y="263" font-size="11" font-weight="700" fill="#ffffff">Open Link →</text>
+
+  <!-- Decision Remarks -->
+  <text x="180" y="310" font-size="12" font-weight="600" fill="#334155">Reviewer Remarks (Required if rejecting)</text>
+  <rect x="180" y="320" width="520" height="60" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="195" y="345" font-size="12" fill="#0f172a">Drive link verified. Full publication PDF and signed attendance log attached.</text>
+
+  <!-- Action Buttons -->
+  <rect x="360" y="410" width="160" height="40" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+  <text x="390" y="435" font-size="13" font-weight="700" fill="#dc2626">Reject with Notes</text>
+
+  <rect x="540" y="410" width="160" height="40" rx="6" fill="#10b981"/>
+  <text x="570" y="435" font-size="13" font-weight="700" fill="#ffffff">Approve &amp; Verify →</text>
+
+  <!-- ================= Annotations ================= -->
+  <!-- Callout 1: Points to Open Link Button -->
+  <circle cx="730" cy="258" r="14" fill="#f59e0b"/>
+  <text x="725" y="263" font-size="14" font-weight="800" fill="#ffffff">1</text>
+  <path d="M 713 258 L 690 258" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber-adm4)"/>
+
+  <!-- Callout 2: Points to Reviewer Remarks -->
+  <circle cx="730" cy="350" r="14" fill="#8b5cf6"/>
+  <text x="725" y="355" font-size="14" font-weight="800" fill="#ffffff">2</text>
+  <path d="M 713 350 L 695 350" fill="none" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow-violet-adm4)"/>
+
+  <!-- Callout 3: Points to Approve & Verify Button -->
+  <circle cx="730" cy="430" r="14" fill="#10b981"/>
+  <text x="725" y="435" font-size="14" font-weight="800" fill="#ffffff">3</text>
+  <path d="M 713 430 L 695 430" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-emerald-adm4)"/>
+</svg>

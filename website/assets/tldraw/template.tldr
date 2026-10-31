@@ -1,0 +1,34 @@
+{
+  "tldrawFileFormatVersion": 1,
+  "schema": {
+    "schemaVersion": 2,
+    "sequences": {
+      "com.tldraw.store": 4,
+      "com.tldraw.asset": 1,
+      "com.tldraw.camera": 1,
+      "com.tldraw.document": 2,
+      "com.tldraw.instance": 25,
+      "com.tldraw.instance_page_state": 5,
+      "com.tldraw.page": 1,
+      "com.tldraw.shape": 4,
+      "com.tldraw.shape.arrow": 5,
+      "com.tldraw.shape.geo": 9,
+      "com.tldraw.shape.text": 2
+    }
+  },
+  "records": [
+    {
+      "gridSize": 10,
+      "name": "IPES Guide Template",
+      "meta": {},
+      "id": "document:document",
+      "typeName": "document"
+    },
+    {
+      "id": "page:page",
+      "name": "Page 1",
+      "index": "a1",
+      "typeName": "page"
+    }
+  ]
+}

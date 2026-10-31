@@ -4,6 +4,7 @@ Question ViewSet — CRUD, bulk create, reorder, and content-change detection.
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response as DRFResponse
 from django.db import models
 from django.db import transaction
@@ -66,13 +67,36 @@ class QuestionViewSet(viewsets.ModelViewSet):
     # Overrides
     # ------------------------------------------------------------------
 
+    @transaction.atomic
+    def perform_create(self, serializer):
+        """Save question and reset completed assignments for the form"""
+        form = serializer.validated_data.get('form_id')
+        if form and form.results_released:
+            raise ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
+        question = serializer.save()
+        self._reset_completed_assignments(question.form_id_id)
+
     def update(self, request, *args, **kwargs):
         """Override update to only reset assignments if content changed"""
         instance = self.get_object()
+        if instance.form_id.results_released:
+            raise ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
 
-        content_changed = self._question_content_changed(instance, request.data)
+        content_changed = self._question_content_changed(
+            instance, request.data
+        )
 
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True
+        )
         serializer.is_valid(raise_exception=True)
         question = serializer.save()
 
@@ -83,6 +107,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         """Reset completed assignments and delete related responses when a question is deleted"""
+        if instance.form_id.results_released:
+            raise ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
         form_id = instance.form_id_id
         Response.objects.filter(question_id=instance).delete()
         instance.delete()
@@ -102,10 +132,20 @@ class QuestionViewSet(viewsets.ModelViewSet):
         questions_data = payload.validated_data['questions']
 
         form = get_object_or_404(
-            EvaluationForm, id=form_id, organization_id=active_organization(request), is_deleted=False,
+            EvaluationForm,
+            id=form_id,
+            organization_id=active_organization(request),
+            is_deleted=False,
         )
+        if form.results_released:
+            raise ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
         created_questions = Question.objects.bulk_create([
-            Question(form_id=form, **question_data) for question_data in questions_data
+            Question(form_id=form, **question_data)
+            for question_data in questions_data
         ])
 
         if created_questions:
@@ -119,6 +159,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def reorder(self, request, pk=None):
         """Update question order"""
         question = self.get_object()
+        if question.form_id.results_released:
+            raise ValidationError({
+                'form_id': (
+                    'Cannot modify questions on a form with released results.'
+                )
+            })
         new_order = request.data.get('order')
 
         if new_order is None:
