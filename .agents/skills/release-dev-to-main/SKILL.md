@@ -7,7 +7,7 @@ description: Skill for preparing a release pull request from dev into main. Cove
 
 Use this skill whenever you are asked to merge `dev` into `main`. This is a **release event** — not a regular feature PR. The title, description, and changelog must reflect the full scope of changes being promoted to production.
 
-Also apply [git-pr](../git-pr/SKILL.md) for descriptive titles, a Mermaid change diagram, and testing charts covering automated suites, regression scenarios, and other applicable checks. Use the release body structure below in place of the standard PR template, while retaining those shared evidence requirements.
+Also apply [git-pr](../git-pr/SKILL.md) for descriptive titles, a Mermaid change diagram, and testing charts covering automated suites, regression scenarios, and other applicable checks. Prefer Mermaid pie charts for measured test outcomes, following the [few-shot examples](../git-pr/references/chart-examples.md); keep failures/skips visible and regression subsets separate from parent-suite totals. Use the release body structure below in place of the standard PR template, while retaining those shared evidence requirements.
 
 > [!IMPORTANT]
 > CI permits ordinary promotion PRs into `main` only from `dev`. The same-repository `release-please--branches--main` branch is also allowed for automated component version and changelog PRs; see [the release guide](../../../docs/RELEASING.md). Other branches must go through `dev`.
@@ -141,7 +141,7 @@ Use this exact structure for the PR body. Fill in every section — do not leave
 
 ### Testing charts
 
-<Mermaid chart with Automated, Regression, and Other checks groups; show observed outcomes, including failures, skipped, blocked, unrun, or inapplicable checks>
+<Mermaid pie charts of measured suite outcomes, with Automated, Regression, and Other checks explained in captions/table; use a status chart for uncounted checks and explicitly show failures, skipped, blocked, unrun, or inapplicable checks>
 
 ## Type of change
 

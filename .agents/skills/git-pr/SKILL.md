@@ -70,14 +70,14 @@ Record evidence in a table with **Category**, **Suite or scenario**, **Command o
 | Regression | The bug reproduction or existing behavior protected, the relevant tests or manual steps, and the observed result |
 | Other checks | Checks actually applicable to the change, such as build, lint, type checking, manual UI, accessibility, or migration checks |
 
-Include a testing Mermaid chart with clearly labeled groups for **Automated**, **Regression**, and **Other checks**. Show the status of each reported suite or scenario. A single chart may cover all three groups; split it only when readability benefits. See [chart examples](references/chart-examples.md) when choosing the diagram structure.
+Prefer Mermaid **pie charts** for testing results when the runner reports counts. Use a separate pie per suite or a clearly labeled set of mutually exclusive test cases. Cover **Automated**, **Regression**, and **Other checks** in the evidence table and adjacent chart captions; use a small status flowchart for checks without meaningful counts. Read the [few-shot chart examples](references/chart-examples.md) when authoring testing charts: they cover passing suites, mixed outcomes, and regression subsets.
 
 - Derive every status, count, duration, and percentage from captured output or observed manual results. Never copy example results as evidence.
 - Use `PASS`, `FAIL`, `SKIPPED`, `BLOCKED`, `NOT RUN`, or `N/A` accurately. Explain `BLOCKED`, `NOT RUN`, and `N/A` in the evidence table; unexecuted checks are not passing checks.
 - For regressions, identify the scenario and test reference, and include before/after evidence if available. State when the original failure was not reproduced; do not claim a verified fix from an assumed baseline.
 - Include pass/fail/skipped counts when the runner reports them. Distinguish test cases from test files or suites. If counts are unavailable, use a qualitative status chart.
 - Regression tests can be part of an automated suite. Label that overlap and avoid counting them again in a combined total. Keep manual checks and CI job results distinct from test-case totals.
-- Use numeric graphs only for comparable, measured values with clear units and a named baseline. Do not infer coverage or performance gains from passing tests, and do not use a pie chart that hides failures or unrun checks.
+- Pie slices must use the same unit and form disjoint parts of one stated total. Include observed failures and skips. Keep blocked/unrun checks visible in adjacent text or a status chart; never invent test counts for them. Do not add regression subsets to their parent suite total, and do not infer coverage or performance gains from passing tests. Comparisons across runs must name their baselines.
 - Keep results tied to the tested revision and environment. After changes that affect a result, rerun the affected checks and update the table and chart together.
 
 ## Publishing and final verification
