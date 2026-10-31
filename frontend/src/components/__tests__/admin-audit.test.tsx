@@ -16,9 +16,13 @@ let mockAuditState = {
   refetch: vi.fn(),
 };
 
-vi.mock('@/hooks/useAudit', () => ({
-  useAuditLogs: () => mockAuditState,
-}));
+vi.mock('@/hooks/useAudit', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/hooks/useAudit')>();
+  return {
+    ...actual,
+    useAuditLogs: () => mockAuditState,
+  };
+});
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -125,5 +129,37 @@ describe('AuditLog page state rendering (#265)', () => {
     expect(screen.getByText('Editor User')).toBeInTheDocument();
     expect(screen.getByText('Logins')).toBeInTheDocument();
     expect(screen.getByText('Creations')).toBeInTheDocument();
+  });
+
+  it('renders form identity and role-change details in audit table badges (#264)', () => {
+    mockAuditState.isLoading = false;
+    mockAuditState.isError = false;
+    mockAuditState.data = [
+      {
+        id: 1,
+        user_id: 10,
+        user_email: 'admin@cit.edu',
+        user_name: 'Admin User',
+        action: 'evaluation.form_created (form_title=Annual Review, form_id=7)',
+        datetime: new Date().toISOString(),
+        ip_address: '127.0.0.1',
+      },
+      {
+        id: 2,
+        user_id: 11,
+        user_email: 'admin@cit.edu',
+        user_name: 'Admin User',
+        action: 'user.updated (target_user_email=target@example.test, detail=Role changed to Admin in A)',
+        datetime: new Date().toISOString(),
+        ip_address: '127.0.0.1',
+      },
+    ];
+
+    const wrapper = createWrapper();
+    render(<AuditLog />, { wrapper });
+
+    expect(screen.getByText(/Annual Review/)).toBeInTheDocument();
+    expect(screen.getByText(/target@example\.test/)).toBeInTheDocument();
+    expect(screen.getByText(/Role changed to Admin in A/)).toBeInTheDocument();
   });
 });

@@ -10,6 +10,7 @@ import {
   useAuditLogsByAction,
   useAuditLogsByDate,
   useAuditLog,
+  formatAuditAction,
 } from '../useAudit';
 
 let mockActiveOrgId: number | null = 42;
@@ -132,5 +133,31 @@ describe('useAudit hooks tenant scoping and query keys', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(api.get).toHaveBeenCalledWith('/audit/recent/');
+  });
+});
+
+describe('formatAuditAction (#264)', () => {
+  it('preserves form_title and form identity from form_created action', () => {
+    expect(
+      formatAuditAction('evaluation.form_created (form_title=Annual Review, form_id=7)')
+    ).toBe('Evaluation: Form Created (Annual Review)');
+  });
+
+  it('preserves target_user_email and role-change detail from user.updated action', () => {
+    expect(
+      formatAuditAction(
+        'user.updated (target_user_email=target@example.test, detail=Role changed to Admin in A)'
+      )
+    ).toBe('User: Updated (target@example.test — Role changed to Admin in A)');
+  });
+
+  it('formats basic action without metadata', () => {
+    expect(formatAuditAction('user.login')).toBe('User: Login');
+  });
+
+  it('preserves plain parenthetical detail without key=value syntax', () => {
+    expect(formatAuditAction('user.login (Campus Wi-Fi)')).toBe(
+      'User: Login (Campus Wi-Fi)'
+    );
   });
 });

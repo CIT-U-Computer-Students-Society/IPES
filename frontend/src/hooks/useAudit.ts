@@ -20,6 +20,87 @@ export interface AuditLog {
   datetime: string;
 }
 
+
+export function formatAuditAction(rawAction: string): string {
+  if (!rawAction) return '';
+
+  const parenMatch = rawAction.match(/^(.*?)(?:\s*\((.*)\)\s*)?$/);
+  const base = parenMatch?.[1]?.trim() || rawAction;
+  const parenContent = parenMatch?.[2]?.trim();
+
+  const formattedBase = base
+    .replace('.', ': ')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  if (!parenContent) {
+    return formattedBase;
+  }
+
+  const metadata: Record<string, string> = {};
+  const kvRegex = /(?:^|,\s*)([a-zA-Z0-9_]+)\s*=\s*([^,]+)/g;
+  let match: RegExpExecArray | null;
+  let hasKeyValue = false;
+
+  while ((match = kvRegex.exec(parenContent)) !== null) {
+    hasKeyValue = true;
+    const key = match[1].toLowerCase();
+    const val = match[2].trim().replace(/^['"]|['"]$/g, '');
+    metadata[key] = val;
+  }
+
+  if (!hasKeyValue) {
+    const plain = parenContent.replace(/^['"]|['"]$/g, '').trim();
+    return plain ? `${formattedBase} (${plain})` : formattedBase;
+  }
+
+  const titleValues: string[] = [];
+  if (metadata.form_title) titleValues.push(metadata.form_title);
+  else if (metadata.title) titleValues.push(metadata.title);
+  else if (metadata.org_name) titleValues.push(metadata.org_name);
+  else if (metadata.name) titleValues.push(metadata.name);
+
+  if (metadata.unit_name && metadata.position_name) {
+    titleValues.push(`${metadata.unit_name} / ${metadata.position_name}`);
+  } else if (metadata.unit_name) {
+    titleValues.push(metadata.unit_name);
+  } else if (metadata.position_name) {
+    titleValues.push(metadata.position_name);
+  }
+
+  const userKey = ['target_user_email', 'user_email', 'target_user_name', 'target_user']
+    .find((k) => metadata[k]);
+  const detailKey = ['detail', 'reason', 'notes']
+    .find((k) => metadata[k]);
+
+  const detailParts: string[] = [];
+  if (titleValues.length > 0) {
+    detailParts.push(titleValues.join(' — '));
+  }
+  if (userKey) {
+    detailParts.push(metadata[userKey]);
+  }
+  if (detailKey) {
+    detailParts.push(metadata[detailKey]);
+  }
+
+  if (detailParts.length === 0) {
+    const secondaryKeys = Object.keys(metadata).filter(
+      (k) => !k.endsWith('_id') && k !== 'id'
+    );
+    for (const k of secondaryKeys) {
+      detailParts.push(`${k}: ${metadata[k]}`);
+    }
+  }
+
+  if (detailParts.length > 0) {
+    return `${formattedBase} (${detailParts.join(' — ')})`;
+  }
+
+  const idEntries = Object.entries(metadata).map(([k, v]) => `${k}=${v}`);
+  return idEntries.length > 0 ? `${formattedBase} (${idEntries.join(', ')})` : formattedBase;
+}
+
 // ===== Fetch Hooks =====
 
 // Fetch all audit logs
