@@ -223,26 +223,49 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Allow only owners to delete pending or rejected accomplishments."""
-        accomplishment = self.get_object()
-
-        if accomplishment.user_id != request.user:
-            return Response(
-                {'error': 'You can only delete your own accomplishments'},
-                status=status.HTTP_403_FORBIDDEN
+        with transaction.atomic():
+            pk = kwargs.get('pk')
+            accomplishment = (
+                Accomplishment.objects.select_for_update()
+                .filter(pk=pk)
+                .first()
             )
+            if not accomplishment:
+                return Response(
+                    {'detail': 'Not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        if accomplishment.status not in ['Pending', 'Rejected']:
-            return Response(
-                {
-                    'error': (
-                        'You can only delete pending or rejected'
-                        ' accomplishments'
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST
+            scoped_exists = (
+                self.filter_queryset(self.get_queryset())
+                .filter(pk=pk)
+                .exists()
             )
+            if not scoped_exists:
+                return Response(
+                    {'detail': 'Not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        return super().destroy(request, *args, **kwargs)
+            if accomplishment.user_id != request.user:
+                return Response(
+                    {'error': 'You can only delete your own accomplishments'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            if accomplishment.status not in ['Pending', 'Rejected']:
+                return Response(
+                    {
+                        'error': (
+                            'You can only delete pending or rejected'
+                            ' accomplishments'
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            self.perform_destroy(accomplishment)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_destroy(self, instance):
         """Delete accomplishment and log the audit event."""
