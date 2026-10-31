@@ -7,6 +7,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
+import { fetchAllPages } from '@/lib/pagination';
 
 // Audit log types
 export interface AuditLog {
@@ -129,9 +130,7 @@ export const useAuditLogs = (params?: {
   return useQuery({
     queryKey: ['audit', 'logs', effectiveOrgId ?? null, mergedParams],
     queryFn: async () => {
-      const response = await api.get(`/audit/${queryString}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/${queryString}`);
     },
     staleTime: 30 * 1000, // 30 seconds for audit logs
   });
@@ -166,9 +165,7 @@ export const useAuditLogsByUser = (userId: number, organizationId?: number) => {
   return useQuery({
     queryKey: ['audit', 'by_user', effectiveOrgId ?? null, userId],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_user/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_user/?${searchParams.toString()}`);
     },
     enabled: !!userId,
   });
@@ -186,9 +183,7 @@ export const useAuditLogsByAction = (action: string, organizationId?: number) =>
   return useQuery({
     queryKey: ['audit', 'by_action', effectiveOrgId ?? null, action],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_action/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_action/?${searchParams.toString()}`);
     },
     enabled: !!action,
   });
@@ -206,9 +201,7 @@ export const useAuditLogsByDate = (startDate: string, endDate: string, organizat
   return useQuery({
     queryKey: ['audit', 'by_date', effectiveOrgId ?? null, startDate, endDate],
     queryFn: async () => {
-      const response = await api.get(`/audit/by_date/?${searchParams.toString()}`);
-      const data = await response.json() as { results: AuditLog[] } | AuditLog[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<AuditLog>(`/audit/by_date/?${searchParams.toString()}`);
     },
     enabled: !!startDate && !!endDate,
   });
