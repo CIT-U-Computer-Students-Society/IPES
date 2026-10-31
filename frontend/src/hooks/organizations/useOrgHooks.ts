@@ -15,11 +15,12 @@ export const useUnitCompletionStats = (organizationId?: number) => {
   const queryString = effectiveOrgId ? `?organization_id=${effectiveOrgId}` : '';
 
   return useQuery({
-    queryKey: ['organizations', 'unit-completion', organizationId],
+    queryKey: ['organizations', 'unit-completion', effectiveOrgId],
     queryFn: async () => {
       const response = await api.get(`/organizations/unit_completion_stats/${queryString}`);
       return response.json() as Promise<UnitCompletionStats[]>;
     },
+    enabled: !!effectiveOrgId,
   });
 };
 
@@ -31,11 +32,12 @@ export const useAnalyticsSummary = (organizationId?: number) => {
   const queryString = effectiveOrgId ? `?organization_id=${effectiveOrgId}` : '';
 
   return useQuery({
-    queryKey: ['organizations', 'analytics', organizationId],
+    queryKey: ['organizations', 'analytics', effectiveOrgId],
     queryFn: async () => {
       const response = await api.get(`/organizations/analytics_summary/${queryString}`);
       return response.json() as Promise<AnalyticsSummary>;
     },
+    enabled: !!effectiveOrgId,
   });
 };
 
