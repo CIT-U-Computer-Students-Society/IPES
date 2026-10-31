@@ -16,6 +16,7 @@ from django.utils import timezone
 from apps.audit.utils import log_action, AuditActions
 from apps.organizations.access import active_organization
 from apps.organizations.models import Organization
+from apps.validation import positive_id
 
 from ..models import Accomplishment
 from ..serializers import (
@@ -28,7 +29,7 @@ from ..serializers import (
 
 
 def _check_org_admin(user, org_id):
-    """Return True if *user* is an active Admin for *org_id*, False otherwise."""
+    """Return True if user is an active Admin for org_id, False otherwise."""
     from apps.organizations.models import OrganizationRole
     return OrganizationRole.objects.filter(
         user_id=user,
@@ -54,62 +55,97 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
     def _get_org_id_from_request(self):
         """Return the active organization ID from the request header."""
-        return self.request.headers.get('X-Organization-Id')
+        raw = self.request.headers.get('X-Organization-Id')
+        if raw is None or str(raw).strip() == '':
+            return None
+        return positive_id(raw, 'organization_id')
 
-    def get_queryset(self):
-        """Filter accomplishments based on organization, user role, and parameters"""
-        queryset = Accomplishment.objects.all()
-        user = self.request.user
+    def _resolve_organization_id(self, request=None, allow_none=True):
+        """
+        Resolve and validate organization_id from header and query parameters.
+        Ensures consistent 400 ValidationErrors for malformed, nonnumeric,
+        or mismatched IDs.
+        """
+        req = request or self.request
+        header_org = req.headers.get('X-Organization-Id')
+        query_org = req.query_params.get('organization_id')
+        if header_org is not None and str(header_org).strip() == '':
+            header_org = None
+        if query_org is not None and str(query_org).strip() == '':
+            query_org = None
 
-        is_global_admin = user.is_staff or user.is_superuser
-        header_org = self._get_org_id_from_request()
-        query_org = self.request.query_params.get('organization_id')
         if header_org and query_org and str(header_org) != str(query_org):
             raise ValidationError({
                 'organization_id': (
                     'Organization header and parameter must match.'
                 )
             })
-        org_id = query_org or header_org
 
-        if not org_id and not is_global_admin:
-            return (
-                queryset.filter(user_id=user)
-                .select_related('user_id', 'verified_by')
-                .order_by('-date_completed', '-id')
-            )
+        raw_org = query_org or header_org
+        if not raw_org:
+            if not allow_none:
+                raise ValidationError({
+                    'organization_id': (
+                        'An active organization must be selected.'
+                    )
+                })
+            return None
+
+        return positive_id(raw_org, 'organization_id')
+
+    def get_queryset(self):
+        """Filter accomplishments by org, role, and query parameters."""
+        queryset = Accomplishment.objects.all()
+        user = self.request.user
+
+        is_global_admin = user.is_staff or user.is_superuser
+        org_id = self._resolve_organization_id()
+
+        # Optional filters
+        user_id_param = self.request.query_params.get('user_id')
+        user_id = (
+            positive_id(user_id_param, 'user_id')
+            if user_id_param
+            else None
+        )
 
         is_org_admin = False
-        if org_id and not is_global_admin:
+        if not org_id and not is_global_admin:
+            queryset = queryset.filter(user_id=user)
+        elif org_id and not is_global_admin:
             is_org_admin = _check_org_admin(user, org_id)
-
             if not is_org_admin:
-                return (
-                    queryset.filter(user_id=user, organization_id=org_id)
-                    .select_related('user_id', 'verified_by')
-                    .order_by('-date_completed', '-id')
+                queryset = queryset.filter(
+                    user_id=user,
+                    organization_id=org_id,
                 )
-
-            queryset = queryset.filter(organization_id=org_id)
-
+            else:
+                queryset = queryset.filter(organization_id=org_id)
         elif org_id and is_global_admin:
             queryset = queryset.filter(organization_id=org_id)
 
-        # Optional filters
-        user_id = self.request.query_params.get('user_id')
+        if user_id and (is_global_admin or is_org_admin):
+            queryset = queryset.filter(user_id=user_id)
+
         status_param = self.request.query_params.get('status')
         type_param = self.request.query_params.get('type')
 
-        if user_id and (is_global_admin or is_org_admin):
-            queryset = queryset.filter(user_id=user_id)
         if status_param:
             queryset = queryset.filter(status=status_param)
         if type_param:
             queryset = queryset.filter(type=type_param)
 
-        return queryset.select_related('user_id', 'verified_by').order_by('-date_completed', '-id')
+        return (
+            queryset.select_related('user_id', 'verified_by')
+            .order_by('-date_completed', '-id')
+        )
 
     def create(self, request, *args, **kwargs):
+        org_id = self._resolve_organization_id(request, allow_none=False)
+        if not Organization.objects.filter(pk=org_id).exists():
+            raise ValidationError({
+                'organization_id': 'Organization not found.'
+            })
         active_organization(request)
         return super().create(request, *args, **kwargs)
 
@@ -119,7 +155,8 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         organization = Organization.objects.get(pk=org_id)
 
         accomplishment = serializer.save(
-            user_id=self.request.user, organization_id=organization
+            user_id=self.request.user,
+            organization_id=organization,
         )
         log_action(
             self.request.user,
@@ -242,17 +279,20 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         """Get accomplishments pending verification (Admin only)"""
         user = request.user
         is_global_admin = user.is_staff or user.is_superuser
-        org_id = (
-            request.query_params.get('organization_id')
-            or self._get_org_id_from_request()
-        )
+        org_id = self._resolve_organization_id(request)
 
         if not is_global_admin:
             if not org_id:
-                return Response({'error': 'organization_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'error': 'organization_id is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             if not _check_org_admin(user, org_id):
-                return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {'error': 'Unauthorized'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         accomplishments = self.get_queryset().filter(status='Pending')
         serializer = AccomplishmentListSerializer(accomplishments, many=True)
@@ -277,17 +317,20 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         """Get summary statistics for accomplishments"""
         user = request.user
         is_global_admin = user.is_staff or user.is_superuser
-        org_id = (
-            request.query_params.get('organization_id')
-            or self._get_org_id_from_request()
-        )
+        org_id = self._resolve_organization_id(request)
 
         if not is_global_admin:
             if not org_id:
-                return Response({'error': 'organization_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'error': 'organization_id is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             if not _check_org_admin(user, org_id):
-                return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {'error': 'Unauthorized'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         # Scope directly by org FK
         if org_id:
@@ -295,8 +338,9 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         else:
             queryset = Accomplishment.objects.all()
 
-        user_id = request.query_params.get('user_id')
-        if user_id:
+        user_id_param = request.query_params.get('user_id')
+        if user_id_param:
+            user_id = positive_id(user_id_param, 'user_id')
             queryset = queryset.filter(user_id=user_id)
 
         total = queryset.count()
@@ -325,9 +369,13 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
         user = request.user
         is_global_admin = user.is_staff or user.is_superuser
-        header_org = self._get_org_id_from_request()
+        header_org = self.request.headers.get('X-Organization-Id')
         query_org = request.query_params.get('organization_id')
-        body_org = request.data.get('organization_id')
+        body_org = (
+            request.data.get('organization_id')
+            if isinstance(request.data, dict)
+            else None
+        )
         selectors = [
             s for s in (header_org, query_org, body_org)
             if s is not None and str(s).strip() != ''
@@ -338,14 +386,24 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
                     'Conflicting organization selectors provided.'
                 )
             })
-        org_id = str(selectors[0]) if selectors else None
+        org_id = (
+            positive_id(selectors[0], 'organization_id')
+            if selectors
+            else None
+        )
 
         if not is_global_admin:
             if not org_id:
-                return Response({'error': 'organization_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'error': 'organization_id is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             if not _check_org_admin(user, org_id):
-                return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {'error': 'Unauthorized'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         with transaction.atomic():
             accomplishment = (
@@ -430,22 +488,29 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         Return a specific user's Verified accomplishments + org unit info,
         for use by evaluators filling out a peer evaluation form.
         """
-        evaluatee_id = request.query_params.get('user_id')
-        header_org = self._get_org_id_from_request()
+        evaluatee_id_param = request.query_params.get('user_id')
+        header_org = self.request.headers.get('X-Organization-Id')
         query_org = request.query_params.get('organization_id')
+        if header_org is not None and str(header_org).strip() == '':
+            header_org = None
+        if query_org is not None and str(query_org).strip() == '':
+            query_org = None
         if header_org and query_org and str(header_org) != str(query_org):
             raise ValidationError({
                 'organization_id': (
                     'Organization header and parameter must match.'
                 )
             })
-        org_id = query_org or header_org
+        raw_org = query_org or header_org
 
-        if not evaluatee_id or not org_id:
+        if not evaluatee_id_param or not raw_org:
             return Response(
                 {'error': 'user_id and organization_id are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        org_id = positive_id(raw_org, 'organization_id')
+        evaluatee_id = positive_id(evaluatee_id_param, 'user_id')
 
         from apps.organizations.models import Membership, OrganizationRole
 
@@ -486,8 +551,9 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
 
         serializer = AccomplishmentListSerializer(accomplishments, many=True)
 
+        eval_user = evaluatee_role.user
         return Response({
-            'evaluatee_name': evaluatee_role.user.get_full_name() or evaluatee_role.user.email,
+            'evaluatee_name': eval_user.get_full_name() or eval_user.email,
             'unit_name': (
                 evaluatee_membership.unit_id.name
                 if evaluatee_membership and evaluatee_membership.unit_id
