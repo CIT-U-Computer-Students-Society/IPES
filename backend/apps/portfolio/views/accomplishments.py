@@ -9,7 +9,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from django.db import transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import DataError, transaction
 from django.db.models import Count
 from django.utils import timezone
 
@@ -225,11 +226,17 @@ class AccomplishmentViewSet(viewsets.ModelViewSet):
         """Allow only owners to delete pending or rejected accomplishments."""
         with transaction.atomic():
             pk = kwargs.get('pk')
-            accomplishment = (
-                Accomplishment.objects.select_for_update()
-                .filter(pk=pk)
-                .first()
-            )
+            try:
+                accomplishment = (
+                    Accomplishment.objects.select_for_update()
+                    .filter(pk=pk)
+                    .first()
+                )
+            except (ValueError, TypeError, DjangoValidationError, DataError):
+                return Response(
+                    {'detail': 'Not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             if not accomplishment:
                 return Response(
                     {'detail': 'Not found.'},

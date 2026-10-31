@@ -327,3 +327,15 @@ class AccomplishmentDeletionConcurrencyTests(TransactionTestCase):
         )
         if verification == 200:
             self.assertTrue(exists)
+
+    def test_delete_malformed_id_returns_404(self):
+        """Deleting a non-numeric pk returns HTTP 404 cleanly."""
+        client = APIClient(raise_request_exception=False)
+        client.force_authenticate(self.owner)
+        url = reverse('accomplishments-detail', kwargs={'pk': 'not-an-id'})
+        resp = client.delete(
+            url,
+            HTTP_X_ORGANIZATION_ID=str(self.org.pk),
+        )
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.data, {'detail': 'Not found.'})
