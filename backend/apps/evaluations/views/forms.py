@@ -66,6 +66,19 @@ class EvaluationFormViewSet(viewsets.ModelViewSet):
             form_id=str(form.id)
         )
 
+    @transaction.atomic
+    def perform_update(self, serializer):
+        """Update form and log the change"""
+        form = serializer.save()
+        log_action(
+            self.request.user,
+            AuditActions.FORM_UPDATED,
+            self.request,
+            organization_id=form.organization_id_id,
+            form_title=form.title,
+            form_id=str(form.id)
+        )
+
     @action(detail=True, methods=['post'])
     def activate(self, request, pk=None):
         """Activate a form"""

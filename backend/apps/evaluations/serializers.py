@@ -56,16 +56,44 @@ class QuestionCreateSerializer(ValidatedModelSerializer):
 class EvaluationFormSerializer(ScopedEvaluationSerializer):
     """Serializer for EvaluationForm model"""
     questions = QuestionSerializer(many=True, read_only=True)
-    created_by_name = serializers.CharField(source='created_by.email', read_only=True)
-    
+    created_by_name = serializers.CharField(
+        source='created_by.email', read_only=True
+    )
+
     class Meta:
         model = EvaluationForm
         fields = [
-            'id', 'organization_id', 'title', 'description', 
+            'id', 'organization_id', 'title', 'description',
             'start_date', 'end_date', 'created_by', 'created_by_name',
-            'is_active', 'results_released', 'created_at', 'updated_at', 'questions'
+            'is_active', 'results_released', 'created_at', 'updated_at',
+            'questions'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self.instance:
+            if (
+                'is_active' in attrs
+                and attrs['is_active'] != self.instance.is_active
+            ):
+                raise serializers.ValidationError({
+                    'is_active': (
+                        'Form activation status must be changed through the '
+                        'dedicated lifecycle endpoints.'
+                    )
+                })
+            if (
+                'results_released' in attrs
+                and attrs['results_released'] != self.instance.results_released
+            ):
+                raise serializers.ValidationError({
+                    'results_released': (
+                        'Results release status must be changed through the '
+                        'dedicated lifecycle endpoint.'
+                    )
+                })
+        return attrs
 
 
 class EvaluationFormCreateSerializer(ScopedEvaluationSerializer):
