@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
+from apps.audit.utils import log_action, AuditActions
 from ..models import Membership
 from ..serializers import MembershipSerializer
 from ..access import active_organization, EvaluationOrganizationPermission
@@ -17,7 +18,9 @@ class MembershipViewSet(viewsets.ModelViewSet):
     """ViewSet for Membership CRUD"""
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
-    permission_classes = [permissions.IsAuthenticated, EvaluationOrganizationPermission]
+    permission_classes = [
+        permissions.IsAuthenticated, EvaluationOrganizationPermission,
+    ]
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(
@@ -72,21 +75,36 @@ class MembershipViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Automatically set start date when creating a membership"""
-        serializer.save(
+        membership = serializer.save(
             date_start=timezone.now().date(),
             is_active=True,
+        )
+        log_action(
+            self.request.user,
+            AuditActions.MEMBERSHIP_CREATED,
+            self.request,
+            organization_id=membership.unit_id.organization_id_id,
+            membership_id=membership.pk,
+            target_user_id=membership.user_id_id,
+            unit_id=membership.unit_id_id,
+            position_id=membership.position_id_id,
         )
 
     def perform_update(self, serializer):
         """Set end date on deactivation or clear end date on reactivation"""
         instance = serializer.instance
+        previous_active = instance.is_active
         reactivated = (
-            not instance.is_active and
+            not previous_active and
             serializer.validated_data.get('is_active') is True
         )
         deactivated = (
-            instance.is_active and
+            previous_active and
             serializer.validated_data.get('is_active') is False
+        )
+        changed_fields = sorted(
+            name for name, value in serializer.validated_data.items()
+            if getattr(instance, name) != value
         )
 
         if reactivated:
@@ -99,7 +117,53 @@ class MembershipViewSet(viewsets.ModelViewSet):
             updated_instance.date_end = timezone.now().date()
             updated_instance.save(update_fields=['date_end'])
 
+        org_id = updated_instance.unit_id.organization_id_id
+        if deactivated:
+            log_action(
+                self.request.user,
+                AuditActions.MEMBERSHIP_DEACTIVATED,
+                self.request,
+                organization_id=org_id,
+                membership_id=updated_instance.pk,
+                target_user_id=updated_instance.user_id_id,
+                unit_id=updated_instance.unit_id_id,
+                position_id=updated_instance.position_id_id,
+            )
+        elif reactivated:
+            log_action(
+                self.request.user,
+                AuditActions.MEMBERSHIP_ACTIVATED,
+                self.request,
+                organization_id=org_id,
+                membership_id=updated_instance.pk,
+                target_user_id=updated_instance.user_id_id,
+                unit_id=updated_instance.unit_id_id,
+                position_id=updated_instance.position_id_id,
+            )
+        elif changed_fields:
+            log_action(
+                self.request.user,
+                AuditActions.MEMBERSHIP_UPDATED,
+                self.request,
+                organization_id=org_id,
+                membership_id=updated_instance.pk,
+                target_user_id=updated_instance.user_id_id,
+                unit_id=updated_instance.unit_id_id,
+                position_id=updated_instance.position_id_id,
+                fields=','.join(changed_fields),
+            )
+
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.date_end = timezone.now().date()
         instance.save(update_fields=['is_active', 'date_end'])
+        log_action(
+            self.request.user,
+            AuditActions.MEMBERSHIP_DEACTIVATED,
+            self.request,
+            organization_id=instance.unit_id.organization_id_id,
+            membership_id=instance.pk,
+            target_user_id=instance.user_id_id,
+            unit_id=instance.unit_id_id,
+            position_id=instance.position_id_id,
+        )
