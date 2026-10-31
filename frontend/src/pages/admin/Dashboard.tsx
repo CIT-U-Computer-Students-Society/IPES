@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useUsers } from "@/hooks/useUsers";
 import { useAssignments } from "@/hooks/useEvaluations";
 import { usePendingAccomplishments } from "@/hooks/usePortfolio";
-import { useRecentAuditLogs } from "@/hooks/useAudit";
+import { useRecentAuditLogs, formatAuditAction } from "@/hooks/useAudit";
 import { useUnitCompletionStats, useAnalyticsSummary } from "@/hooks/useOrganizations";
 import type { User } from "@/hooks/useUsers";
 import { type EvaluationAssignment } from "@/hooks/useEvaluations";
@@ -77,39 +77,7 @@ const StatCard = ({
 
 // Activity item component
 const ActivityItem = ({ activity }: { activity: AuditLog }) => {
-  const formatAction = (action: string) => {
-    return action
-      .replace('.', ': ')
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, l => l.toUpperCase());
-  };
-
-  // Render formatted action but simplify parenthetical metadata.
-  // If the action contains a parenthesis with key=value pairs (e.g. "(title=My Form, id=123)")
-  // prefer to show only the title value in parentheses: "(My Form)".
-  const formatted = formatAction(activity.action);
-  let displayAction = formatted;
-
-  // Extract trailing parenthetical if present
-  const parenMatch = formatted.match(/\((.*)\)\s*$/);
-  if (parenMatch) {
-    const inside = parenMatch[1];
-
-    // Try to find a title or name key inside the parenthetical
-    const titleMatch = inside.match(/(?:^|,\s*)(?:title|name)\s*=\s*([^,]+)/i);
-    if (titleMatch) {
-      let title = titleMatch[1].trim();
-      // Strip surrounding quotes if any
-      title = title.replace(/^['"]|['"]$/g, '');
-      displayAction = formatted.replace(/\s*\(.*\)\s*$/, ` (${title})`);
-    } else if (!inside.includes('=')) {
-      // If the parenthetical is already a plain label (no key=), keep it as-is
-      displayAction = formatted.replace(/\s*\(.*\)\s*$/, ` (${inside.trim()})`);
-    } else {
-      // If no title found, drop the key=value list to keep the action concise
-      displayAction = formatted.replace(/\s*\(.*\)\s*$/, '');
-    }
-  }
+  const displayAction = formatAuditAction(activity.action);
 
   return (
     <div className="flex gap-3">

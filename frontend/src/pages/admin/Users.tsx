@@ -1,5 +1,5 @@
 import { formatApiError } from "@/lib/api";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Users,
   Search,
@@ -143,7 +143,7 @@ const AdminUsers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isManageMembershipOpen, setIsManageMembershipOpen] = useState(false);
   const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [formData, setFormData] = useState({
@@ -163,6 +163,11 @@ const AdminUsers = () => {
   const { data: users, isLoading, error, refetch } = useUsers({ organization_id: activeOrganizationId });
   const { data: units } = useOrganizationUnits(activeOrganizationId);
   const { data: positions } = usePositionTypes(activeOrganizationId);
+
+  const selectedUser = useMemo(
+    () => users?.find((u: User) => u.id === selectedUserId) || null,
+    [users, selectedUserId]
+  );
 
   // Mutations
   const updateMembership = useUpdateMembership();
@@ -503,7 +508,7 @@ const AdminUsers = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => {
-                                setSelectedUser(user);
+                                setSelectedUserId(user.id);
                                 setIsManageMembershipOpen(true);
                               }}>
                                 <Settings2 className="w-4 h-4 mr-2" />
@@ -548,7 +553,12 @@ const AdminUsers = () => {
       </Card>
 
       {/* Manage Roles Dialog */}
-      <Dialog open={isManageMembershipOpen} onOpenChange={setIsManageMembershipOpen}>
+      <Dialog open={isManageMembershipOpen} onOpenChange={(open) => {
+        setIsManageMembershipOpen(open);
+        if (!open) {
+          setSelectedUserId(null);
+        }
+      }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Manage Roles: {selectedUser?.first_name} {selectedUser?.last_name}</DialogTitle>

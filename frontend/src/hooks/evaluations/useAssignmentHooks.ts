@@ -4,6 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { fetchAllPages } from '@/lib/pagination';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 import type { EvaluationAssignment, EvaluationSubmitData, MyPerformanceData } from './types';
 
@@ -22,11 +23,7 @@ export const useAssignments = (params?: { status?: string; form_id?: number; org
 
   return useQuery({
     queryKey: ['assignments', effectiveParams],
-    queryFn: async () => {
-      const response = await api.get(`/assignments/${queryString}`);
-      const data = await response.json() as { results: EvaluationAssignment[] } | EvaluationAssignment[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<EvaluationAssignment>(`/assignments/${queryString}`),
   });
 };
 
@@ -37,11 +34,9 @@ export const useMyPendingEvaluations = (params?: { organization_id?: number }) =
 
   return useQuery({
     queryKey: ['assignments', 'my_pending', orgId],
-    queryFn: async () => {
+    queryFn: () => {
       const url = orgId ? `/assignments/my_pending/?organization_id=${orgId}` : '/assignments/my_pending/';
-      const response = await api.get(url);
-      const data = await response.json() as { results: EvaluationAssignment[] } | EvaluationAssignment[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<EvaluationAssignment>(url);
     },
   });
 };
@@ -53,11 +48,9 @@ export const useMyCompletedEvaluations = (params?: { organization_id?: number })
 
   return useQuery({
     queryKey: ['assignments', 'my_completed', orgId],
-    queryFn: async () => {
+    queryFn: () => {
       const url = orgId ? `/assignments/my_completed/?organization_id=${orgId}` : '/assignments/my_completed/';
-      const response = await api.get(url);
-      const data = await response.json() as { results: EvaluationAssignment[] } | EvaluationAssignment[];
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<EvaluationAssignment>(url);
     },
   });
 };

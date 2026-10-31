@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { PositionType } from './types';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
+import { fetchAllPages } from '@/lib/pagination';
 
 export const usePositionTypes = (organizationId?: number) => {
   const { activeOrganizationId } = useOrganizationState();
@@ -15,9 +16,7 @@ export const usePositionTypes = (organizationId?: number) => {
     queryKey: ['positions', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return [];
-      const response = await api.get(`/positions/?organization_id=${effectiveOrgId}`);
-      const data = await response.json() as PositionType[] | { results: PositionType[] };
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<PositionType>(`/positions/?organization_id=${effectiveOrgId}`);
     },
     enabled: !!effectiveOrgId
   });

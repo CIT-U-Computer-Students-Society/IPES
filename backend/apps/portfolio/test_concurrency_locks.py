@@ -1,4 +1,8 @@
-from django.test import TestCase
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event
+from unittest.mock import patch
+from django.db import close_old_connections, connections
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -7,6 +11,7 @@ from apps.audit.models import AuditLog
 from apps.organizations.models import Organization, OrganizationRole
 from apps.portfolio.models import Accomplishment
 from apps.portfolio.serializers import AccomplishmentUpdateSerializer
+from apps.portfolio.views.accomplishments import AccomplishmentViewSet
 from apps.users.models import User
 
 
@@ -220,3 +225,117 @@ class AccomplishmentConcurrencyTests(TestCase):
         self.assertIsNone(acc.verified_by)
         self.assertIsNone(acc.comments)
         self.assertEqual(acc.title, 'Revised Title')
+
+
+class AccomplishmentDeletionConcurrencyTests(TransactionTestCase):
+    """Verify row-level locking protects accomplishments in deletion races."""
+
+    def setUp(self):
+        super().setUp()
+        self.org = Organization.objects.create(
+            name='Deletion Concurrency Org',
+            code='DELCONC',
+            period_year_start='2026-01-01',
+            is_active=True,
+        )
+        self.owner = User.objects.create_user(
+            username='del_conc_owner',
+            email='del_conc_owner@cit.edu',
+        )
+        self.admin = User.objects.create_user(
+            username='del_conc_admin',
+            email='del_conc_admin@cit.edu',
+        )
+        for user, role in ((self.owner, 'Member'), (self.admin, 'Admin')):
+            OrganizationRole.objects.create(
+                user=user,
+                organization=self.org,
+                role=role,
+            )
+        self.acc = Accomplishment.objects.create(
+            user_id=self.owner,
+            organization_id=self.org,
+            title='Evidence for deletion race',
+            description='Original description',
+            type='project',
+            status='Pending',
+            date_completed=timezone.now(),
+        )
+        self.detail = reverse('accomplishments-detail', args=[self.acc.pk])
+        self.verify = reverse('accomplishments-verify', args=[self.acc.pk])
+
+    def client_for(self, user):
+        client = APIClient()
+        client.force_authenticate(user)
+        client.credentials(HTTP_X_ORGANIZATION_ID=str(self.org.pk))
+        return client
+
+    def test_verification_between_delete_check_and_delete_preserves_evidence(
+        self,
+    ):
+        original = AccomplishmentViewSet.perform_destroy
+        ready, release = Event(), Event()
+
+        def interleave(view, instance):
+            ready.set()
+            if not release.wait(8):
+                raise RuntimeError('Delete scheduling hook timed out')
+            return original(view, instance)
+
+        def request(deleting):
+            close_old_connections()
+            try:
+                if deleting:
+                    return self.client_for(
+                        self.owner
+                    ).delete(self.detail).status_code
+                return self.client_for(
+                    self.admin
+                ).post(
+                    self.verify,
+                    {'status': 'Verified'},
+                    format='json',
+                ).status_code
+            finally:
+                connections.close_all()
+
+        with patch.object(
+            AccomplishmentViewSet, 'perform_destroy', interleave
+        ):
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                deleting = executor.submit(request, True)
+                try:
+                    self.assertTrue(ready.wait(5))
+                    verifying = executor.submit(request, False)
+                    try:
+                        verifying.result(timeout=0.5)
+                    except TimeoutError:
+                        pass
+                finally:
+                    release.set()
+                deletion = deleting.result(timeout=8)
+                verification = verifying.result(timeout=8)
+
+        exists = Accomplishment.objects.filter(
+            pk=self.acc.pk,
+            status='Verified',
+        ).exists()
+        self.assertNotEqual(
+            (deletion, verification),
+            (204, 200),
+            'DELETE removed evidence after verification returned 200',
+        )
+        if verification == 200:
+            self.assertTrue(exists)
+
+    def test_delete_malformed_id_returns_404(self):
+        """Deleting a non-numeric pk returns HTTP 404 cleanly."""
+        client = APIClient(raise_request_exception=False)
+        client.force_authenticate(self.owner)
+        url = reverse('accomplishments-detail', kwargs={'pk': 'not-an-id'})
+        resp = client.delete(
+            url,
+            HTTP_X_ORGANIZATION_ID=str(self.org.pk),
+        )
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.data, {'detail': 'Not found.'})

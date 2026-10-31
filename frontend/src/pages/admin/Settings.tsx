@@ -73,9 +73,9 @@ const AdminSettings = () => {
   const [deleteAdminPassword, setDeleteAdminPassword] = useState("");
 
   const [orgData, setOrgData] = useState({
-    name: currentMembership?.organization_name || organization?.name || "",
+    name: organization ? (organization.name ?? "") : (currentMembership?.organization_name || ""),
     description: organization?.description || "",
-    email: currentMembership?.organization_email || organization?.email || "",
+    email: organization ? (organization.email ?? "") : (currentMembership?.organization_email || ""),
   });
 
   const [orgSource, setOrgSource] = useState({ currentMembership, organization });
@@ -83,9 +83,9 @@ const AdminSettings = () => {
     setOrgSource({ currentMembership, organization });
     if (currentMembership || organization) {
       setOrgData({
-        name: currentMembership?.organization_name || organization?.name || "",
+        name: organization ? (organization.name ?? "") : (currentMembership?.organization_name || ""),
         description: organization?.description || "",
-        email: currentMembership?.organization_email || organization?.email || "",
+        email: organization ? (organization.email ?? "") : (currentMembership?.organization_email || ""),
       });
     }
   }

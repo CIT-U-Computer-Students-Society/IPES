@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { OrganizationUnit, UnitType } from './types';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
+import { fetchAllPages } from '@/lib/pagination';
 
 // ===== Organization Units =====
 
@@ -17,9 +18,7 @@ export const useOrganizationUnits = (organizationId?: number) => {
     queryKey: ['units', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return [];
-      const response = await api.get(`/units/?organization_id=${effectiveOrgId}`);
-      const data = await response.json() as OrganizationUnit[] | { results: OrganizationUnit[] };
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<OrganizationUnit>(`/units/?organization_id=${effectiveOrgId}`);
     },
     enabled: !!effectiveOrgId
   });
@@ -84,9 +83,7 @@ export const useUnitTypes = (organizationId?: number) => {
     queryKey: ['unit-types', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return [];
-      const response = await api.get(`/unit-types/?organization_id=${effectiveOrgId}`);
-      const data = await response.json() as UnitType[] | { results: UnitType[] };
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<UnitType>(`/unit-types/?organization_id=${effectiveOrgId}`);
     },
     enabled: !!effectiveOrgId
   });

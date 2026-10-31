@@ -1,9 +1,9 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { api } from '@/lib/api';
-import { useLogout, useUpdateCurrentUser } from '../useUsers';
+import { useLogout, useUpdateCurrentUser, useCurrentMembership } from '../useUsers';
 import { toast } from '@/lib/notifications';
 
 vi.mock('@/lib/api', () => ({ api: { patch: vi.fn(), post: vi.fn() } }));
@@ -58,4 +58,63 @@ it('keeps the session UI and cache when server logout fails', async () => {
   expect(toast.error).toHaveBeenCalledWith('Could not sign out. Please retry.');
   expect(client.getQueryData(['users', 'current'])).toEqual({ id: 1 });
   expect(localStorage.getItem('activeOrganizationId')).toBe('1');
+});
+
+describe('useCurrentMembership', () => {
+  it('synchronously derives membership matching activeOrganizationId and updates when current user cache changes', async () => {
+    const client = new QueryClient();
+    const initialUser = {
+      id: 1,
+      first_name: 'Ava',
+      last_name: 'Cruz',
+      memberships: [
+        { id: 10, organization_id: 1, organization_name: 'CS Society', role: 'admin' },
+        { id: 11, organization_id: 2, organization_name: 'Math Club', role: 'member' },
+      ],
+    };
+    client.setQueryData(['users', 'current'], initialUser);
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useCurrentMembership(), { wrapper });
+
+    expect(result.current.data).toEqual({
+      id: 10,
+      organization_id: 1,
+      organization_name: 'CS Society',
+      role: 'admin',
+    });
+
+    // Update currentUser cache
+    act(() => {
+      client.setQueryData(['users', 'current'], {
+        ...initialUser,
+        memberships: [
+          { id: 10, organization_id: 1, organization_name: 'CS Society Updated', role: 'admin' },
+          { id: 11, organization_id: 2, organization_name: 'Math Club', role: 'member' },
+        ],
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data?.organization_name).toBe('CS Society Updated');
+    });
+  });
+
+  it('returns null when active organization has no matching membership', () => {
+    const client = new QueryClient();
+    client.setQueryData(['users', 'current'], {
+      id: 1,
+      memberships: [{ id: 11, organization_id: 99, organization_name: 'Other' }],
+    });
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useCurrentMembership(), { wrapper });
+    expect(result.current.data).toBeNull();
+  });
 });
