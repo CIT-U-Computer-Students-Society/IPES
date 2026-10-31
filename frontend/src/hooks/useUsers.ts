@@ -4,6 +4,7 @@
  * Hooks for user management operations
  */
 
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { toast } from '@/lib/notifications';
@@ -177,17 +178,18 @@ export const useUpdateCurrentUser = () => {
 
 // Get current user's membership for active organization
 export const useCurrentMembership = () => {
-  const { data: currentUser } = useCurrentUser();
+  const { data: currentUser, ...rest } = useCurrentUser();
   const { activeOrganizationId } = useOrganizationState();
 
-  return useQuery({
-    queryKey: ['users', 'current', 'membership', activeOrganizationId],
-    queryFn: () => {
-      if (!currentUser?.memberships || !activeOrganizationId) return null;
-      return currentUser.memberships.find(m => m.organization_id === activeOrganizationId) || null;
-    },
-    enabled: !!currentUser && !!activeOrganizationId,
-  });
+  const currentMembership = useMemo(() => {
+    if (!currentUser?.memberships || !activeOrganizationId) return null;
+    return currentUser.memberships.find(m => m.organization_id === activeOrganizationId) || null;
+  }, [currentUser, activeOrganizationId]);
+
+  return {
+    ...rest,
+    data: currentMembership,
+  };
 };
 
 // Get user statistics
