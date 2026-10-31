@@ -129,6 +129,7 @@ export const useRemoveMember = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['organizations', 'analytics'] });
     }
   });

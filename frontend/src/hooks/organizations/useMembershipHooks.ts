@@ -36,6 +36,8 @@ export const useApproveJoinRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['join-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['organizations', 'analytics'] });
     }
   });
@@ -67,6 +69,7 @@ export const useUpdateMembership = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['organizations', 'analytics'] });
     }
   });
@@ -83,6 +86,7 @@ export const useCreateMembership = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['organizations', 'analytics'] });
     }
   });
