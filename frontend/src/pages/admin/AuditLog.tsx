@@ -10,7 +10,8 @@ import {
   Trash2,
   Shield,
   Download,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,7 +93,13 @@ const AuditLog = () => {
     }
   };
 
-  const { data: serverLogs = [], isLoading } = useAuditLogs({
+  const {
+    data: serverLogs = [],
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useAuditLogs({
     organization_id: activeOrganizationId ?? undefined
   });
 
@@ -122,6 +129,32 @@ const AuditLog = () => {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Audit Log</h1>
+            <p className="text-muted-foreground">Immutable record of system events and member actions</p>
+          </div>
+        </div>
+
+        <div className="bg-card rounded-lg border border-destructive/50 p-8 text-center flex flex-col items-center justify-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-destructive" />
+          <div className="space-y-1">
+            <p className="text-lg font-semibold text-foreground">Failed to load audit history</p>
+            <p className="text-sm text-muted-foreground">
+              {error instanceof Error ? error.message : "An unexpected error occurred while fetching audit logs."}
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
