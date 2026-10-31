@@ -46,7 +46,7 @@ To prevent deductive identification (e.g., guessing who wrote a comment when onl
 
 ## Best Practices for Constructive Feedback
 
-While your identity is protected, we encourage all officers to abide by the CIT-U Creed and student leadership code of conduct:
+While your identity is protected, we encourage all officers to abide by the student leadership code of conduct:
 
 - **Focus on Observable Behaviors**: Highlight concrete actions, missed deadlines, or exemplary teamwork rather than personal character traits.
 - **Be Actionable**: When offering criticism, suggest specific practices the officer can adopt in future terms to improve.
