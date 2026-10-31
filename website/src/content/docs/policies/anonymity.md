@@ -5,7 +5,7 @@ description: How IPES protects evaluator privacy and ensures honest, constructiv
 
 Honest, objective peer evaluation requires psychological safety. When student officers fear that candid constructive criticism will damage personal relationships or invite social retaliation, evaluation scores inflate artificially and lose their governance value.
 
-IPES was architected from the ground up by the **CIT-U SSG Committee on Research** to guarantee **peer confidentiality**.
+The IPES evaluation methodology was conceived by the **CIT-U SSG Committee on Research (CoR)** and implemented in software by the **Computer Students' Society (CSS)** to guarantee strict **peer confidentiality**.
 
 ---
 
@@ -46,7 +46,7 @@ To prevent deductive identification (e.g., guessing who wrote a comment when onl
 
 ## Best Practices for Constructive Feedback
 
-While your identity is protected, we encourage all officers to abide by the CIT-U Creed and student leadership code of conduct:
+While your identity is protected, we encourage all officers to abide by the student leadership code of conduct:
 
 - **Focus on Observable Behaviors**: Highlight concrete actions, missed deadlines, or exemplary teamwork rather than personal character traits.
 - **Be Actionable**: When offering criticism, suggest specific practices the officer can adopt in future terms to improve.
