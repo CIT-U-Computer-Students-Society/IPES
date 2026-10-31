@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { toast } from '@/lib/notifications';
+import { fetchAllPages } from '@/lib/pagination';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 
 // User type definition
@@ -74,10 +75,7 @@ export const useUsers = (params?: { is_active?: boolean; role?: string; organiza
     queryKey: ['users', effectiveParams],
     refetchInterval: AVATAR_REFRESH_INTERVAL,
     queryFn: async () => {
-      const response = await api.get(`/users/${queryString}`);
-      const data = await response.json() as { results: User[]; count: number } | User[];
-      // Handle both paginated and non-paginated responses
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<User>(`/users/${queryString}`);
     },
   });
 };

@@ -7,6 +7,7 @@ import type { Membership } from '../useUsers';
 import type { JoinRequest } from './types';
 import { api } from '@/lib/api';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
+import { fetchAllPages } from '@/lib/pagination';
 
 // Fetch pending join requests for an organization
 export const usePendingJoinRequests = (organizationId?: number) => {
@@ -17,9 +18,7 @@ export const usePendingJoinRequests = (organizationId?: number) => {
     queryKey: ['join-requests', 'pending', effectiveOrgId],
     queryFn: async () => {
       if (!effectiveOrgId) return [];
-      const response = await api.get(`/join-requests/?organization_id=${effectiveOrgId}&status=Pending`);
-      const data = await response.json() as JoinRequest[] | { results: JoinRequest[] };
-      return Array.isArray(data) ? data : data.results || [];
+      return fetchAllPages<JoinRequest>(`/join-requests/?organization_id=${effectiveOrgId}&status=Pending`);
     },
     enabled: !!effectiveOrgId
   });
