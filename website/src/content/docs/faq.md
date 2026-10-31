@@ -6,7 +6,7 @@ description: Common questions and troubleshooting steps for student officers and
 ## General Questions
 
 ### What is IPES?
-The **Individual Performance Evaluation System (IPES)** is a web-based evaluation platform created by the CIT-U Supreme Student Government (SSG) Committee on Research to digitize and automate peer performance evaluations across student organizations.
+The **Individual Performance Evaluation System (IPES)** is an evaluation system originally conceived and established by the **CIT-U Supreme Student Government (SSG) Committee on Research (CoR)**. Previously conducted using online forms such as Google Forms alongside manual spreadsheets, the purpose-built web application was developed and engineered by the **Computer Students' Society (CSS)** to automate assignment generation, accomplishment portfolios, and real-time performance analytics.
 
 ### Can I access IPES on my mobile device?
 Yes! IPES is fully responsive. You can complete evaluations, review accomplishments, and inspect scorecards on any modern smartphone, tablet, or desktop browser.

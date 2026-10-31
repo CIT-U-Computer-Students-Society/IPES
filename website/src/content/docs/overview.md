@@ -5,13 +5,13 @@ description: An in-depth overview of the Individual Performance Evaluation Syste
 
 ## Executive Overview
 
-The **Individual Performance Evaluation System (IPES)** is a full-stack web application conceived and developed by the **Committee on Research** of the **CIT-U Supreme Student Government (SSG)**.
+The **Individual Performance Evaluation System (IPES)** is an evaluation system established by the **Committee on Research (CoR)** of the **CIT-U Supreme Student Government (SSG)**. The full-stack web application is developed and engineered by the **Computer Students' Society (CSS)**.
 
 Periodic individual performance evaluation is a cornerstone of student leadership governance at CIT-University. It provides student leaders, committee heads, and executive officers with candid, multidirectional feedback regarding their contributions, work ethic, leadership quality, and collaboration skills.
 
-Before IPES, this process was conducted through standalone Google Forms and spreadsheets. While functional for small teams, scaling Google Forms across dozens of student committees and hundreds of officers introduced substantial administrative friction, delayed result turnaround times, and compromised response privacy.
+Previously, the SSG Committee on Research conducted these evaluations using online forms such as Google Forms alongside manual spreadsheets. While functional for small teams, administering evaluations through Google Forms across dozens of student committees and hundreds of officers introduced substantial administrative friction, heavy manual workloads for organizers and respondents alike, delayed result turnaround times, and privacy challenges.
 
-IPES digitizes this entire process from end to end.
+To address these challenges, the Computer Students' Society engineered the IPES web application to digitize, automate, and secure the entire evaluation process from end to end.
 
 ---
 
