@@ -4,17 +4,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { fetchAllPages } from '@/lib/pagination';
 import type { AssignmentRule, AssignmentRuleCreateData } from './types';
 
 // Fetch rules for a form
 export const useFormRules = (formId: number) => {
   return useQuery({
     queryKey: ['assignment-rules', formId],
-    queryFn: async () => {
-      const response = await api.get(`/assignment-rules/?form_id=${formId}`);
-      const data = await response.json() as { results: AssignmentRule[] } | AssignmentRule[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<AssignmentRule>(`/assignment-rules/?form_id=${formId}`),
     enabled: !!formId,
     staleTime: 30_000,
   });

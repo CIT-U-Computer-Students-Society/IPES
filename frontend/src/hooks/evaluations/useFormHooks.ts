@@ -4,6 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { fetchAllPages } from '@/lib/pagination';
 import { useOrganizationState } from '@/contexts/OrganizationContext';
 import type { EvaluationForm, Question } from './types';
 
@@ -22,11 +23,7 @@ export const useForms = (params?: { is_active?: boolean; is_published?: boolean;
 
   return useQuery({
     queryKey: ['forms', effectiveParams],
-    queryFn: async () => {
-      const response = await api.get(`/forms/${queryString}`);
-      const data = await response.json() as { results: EvaluationForm[] } | EvaluationForm[];
-      return Array.isArray(data) ? data : data.results || [];
-    },
+    queryFn: () => fetchAllPages<EvaluationForm>(`/forms/${queryString}`),
   });
 };
 
