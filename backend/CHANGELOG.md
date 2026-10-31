@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.0.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/backend-v3.0.1...backend-v3.0.2) (2026-10-31)
+
+
+### Bug Fixes
+
+* **evaluations:** exclude closed forms from member pending queue ([94480de](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/94480de1cf8b7512502cdf83e0ee620a637044e6)), closes [#237](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/237)
+* **evaluations:** make multi-rule assignment matrix generation atomic ([c472aba](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/c472aba17236749d341701fbeca4bcbbd4a1d1b3)), closes [#239](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/239)
+* **evaluations:** record audit events on form updates and guard lifecycle mutations ([06a50fb](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/06a50fb3cbe6d2c9b84a6a032243fd89b6cde71d)), closes [#259](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/259)
+* **evaluations:** reset completed assignments on question creation and guard released forms ([bc0b79b](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/bc0b79b959f4158b238ea22dc57edc27ee0c3aee)), closes [#236](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/236)
+* **organizations:** exclude inactive user accounts from analytics total_users ([f5b9cc5](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f5b9cc59b475b6781434d5f75ddffefce0e05e33))
+* **organizations:** isolate analytics actions to active tenant ([ed96d35](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ed96d35c350a207e7a75eeaf12668f9f61b1af74)), closes [#269](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/269)
+* **organizations:** record audit events for structure and membership mutations ([4a206ee](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/4a206eee3db078294812c05f8bf09645291a24cd)), closes [#277](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/277)
+* **portfolio:** apply status and type query filters to member accomplishment queries ([3f4771d](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/3f4771d2719a34a24bc947b98a22fdef62528569))
+* **portfolio:** enforce active membership and organization checks on accomplishment submission ([6636dc7](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/6636dc7e6a5bb16cf29a5f8f48c2cf25ab9562f5))
+* **portfolio:** persist and display verification comments on approved accomplishments ([47dbcba](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/47dbcba2375b227defe8d34145e010fab0a1e3b5)), closes [#251](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/251)
+* **portfolio:** restrict accomplishment deletion to owners and pending/rejected status with audit logging ([ec741f3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ec741f304e5205673c34b8ee75b56fb956dbced1))
+* **portfolio:** return 404 for malformed accomplishment id on deletion ([9071ebe](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/9071ebe56ebe756870190f1e7c15f1e89b9b4d9d))
+* **portfolio:** serialize accomplishment deletion with database row locks ([f61f6a6](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f61f6a6c8b2c5c4b3d9ed802765b394a8818141c))
+* **portfolio:** serialize accomplishment edits and reviews with concurrency locks ([fbe9754](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/fbe975414468f86582c31072989df1b26505a150))
+* **portfolio:** validate organization identifiers at request boundary ([a34afec](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/a34afec36de9028301bea058a97c850cd6993814))
+
 ## [3.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/backend-v3.0.0...backend-v3.0.1) (2026-10-30)
 
 

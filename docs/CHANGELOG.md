@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.7](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.6...docs-v1.0.7) (2026-10-31)
+
+
+### Documentation
+
+* add static landing page and user guide implementation plan ([d193660](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/d19366006a53d42cb78f7e4b05910c67c8f65aa1))
+
 ## [1.0.6](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/docs-v1.0.5...docs-v1.0.6) (2026-10-30)
 
 
