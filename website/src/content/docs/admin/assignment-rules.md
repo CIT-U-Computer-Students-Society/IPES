@@ -11,7 +11,7 @@ When the evaluation cycle transitions to **Active**, IPES parses these rules aga
 
 ## 1. Rule Types & Previewing the Matrix
 
-<img src="/images/annotated/admin/assignment-rules.svg" alt="Assignment Rules Engine and Matrix Preview Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/admin/assignment-rules.svg" alt="Assignment Rules Engine and Matrix Preview Annotated Interface" class="guide-screenshot" />
 
 ### Assignment Rule Evaluation Flow
 
@@ -44,4 +44,4 @@ flowchart TD
 Always verify the matrix preview to ensure every officer has appropriate evaluatees assigned before launching the cycle.
 :::
 
-Next, learn how to manage the [Accomplishment Verification Queue](/admin/accomplishment-verification/).
+Next, learn how to manage the [Accomplishment Verification Queue](/IPES/admin/accomplishment-verification/).

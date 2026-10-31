@@ -11,7 +11,7 @@ Verified accomplishments ensure that peer ratings and administrative reviews are
 
 ## 1. Reviewing Proof & Making Decisions
 
-<img src="/images/annotated/admin/accomplishment-review.svg" alt="Admin Accomplishment Verification Drawer Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/admin/accomplishment-review.svg" alt="Admin Accomplishment Verification Drawer Annotated Interface" class="guide-screenshot" />
 
 ### Verification Workflow
 
@@ -26,4 +26,4 @@ Verified accomplishments ensure that peer ratings and administrative reviews are
    - **Approve & Verify**: Validates the achievement and permanently marks it as Verified.
    - **Reject with Notes**: Returns the item to the officer's portfolio with rejection feedback for resubmission.
 
-Next, learn how to monitor submission progress and [Release Results](/admin/cycle-management/).
+Next, learn how to monitor submission progress and [Release Results](/IPES/admin/cycle-management/).

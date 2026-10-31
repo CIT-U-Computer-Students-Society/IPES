@@ -11,7 +11,7 @@ Navigate to **Evaluations** (`/member/evaluations`) or click **Start Form** from
 
 ## The Evaluation Form Interface
 
-<img src="/images/annotated/officer/evaluation-rubric.svg" alt="Evaluation Rubric Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/officer/evaluation-rubric.svg" alt="Evaluation Rubric Annotated Interface" class="guide-screenshot" />
 
 ### Evaluation Submission Flow
 
@@ -44,4 +44,4 @@ flowchart TD
 Once an evaluation is submitted, the record is permanently locked to preserve evaluation integrity. If you made a critical error before the cycle closes, notify your administrator immediately.
 :::
 
-Next, learn how to interpret your [Evaluation Results](/officer/results/).
+Next, learn how to interpret your [Evaluation Results](/IPES/officer/results/).

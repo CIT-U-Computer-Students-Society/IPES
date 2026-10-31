@@ -9,7 +9,7 @@ The **Evaluation Form Builder** (`/admin/forms/builder` or `/admin/forms`) provi
 
 ## 1. Creating and Authoring Forms
 
-<img src="/images/annotated/admin/form-builder.svg" alt="Form Builder and Rubrics Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/admin/form-builder.svg" alt="Form Builder and Rubrics Annotated Interface" class="guide-screenshot" />
 
 ### Core Builder Steps
 
@@ -24,4 +24,4 @@ The **Evaluation Form Builder** (`/admin/forms/builder` or `/admin/forms`) provi
 You can preview the form in Member View at any time while in `Draft` state to verify how evaluators will experience the questionnaire before activating the cycle.
 :::
 
-Next, learn how to configure automated evaluator-evaluatee mappings in the [Assignment Rules Engine](/admin/assignment-rules/).
+Next, learn how to configure automated evaluator-evaluatee mappings in the [Assignment Rules Engine](/IPES/admin/assignment-rules/).

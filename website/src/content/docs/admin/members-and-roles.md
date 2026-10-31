@@ -30,4 +30,4 @@ In the member list table:
 - **Edit**: Update an officer's position, committee, or administrative role.
 - **Deactivate (Soft Delete)**: If an officer resigns or steps down, deactivate their membership. Deactivating preserves historical evaluation responses, ensuring that past evaluation analytics remain mathematically accurate.
 
-Next, learn how to create evaluation questionnaires in the [Evaluation Form Builder](/admin/form-builder/).
+Next, learn how to create evaluation questionnaires in the [Evaluation Form Builder](/IPES/admin/form-builder/).

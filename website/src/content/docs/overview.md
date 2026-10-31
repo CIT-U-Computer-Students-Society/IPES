@@ -64,5 +64,5 @@ To ensure organizational trust and prevent tampering:
 
 Ready to explore how to use IPES? Select your user track:
 
-- **[Officer & Member Instructions](/officer/getting-started/)**: For student officers answering evaluations and submitting accomplishments.
-- **[Administrator Instructions](/admin/organization-setup/)**: For committee heads and org admins managing the evaluation cycles.
+- **[Officer & Member Instructions](/IPES/officer/getting-started/)**: For student officers answering evaluations and submitting accomplishments.
+- **[Administrator Instructions](/IPES/admin/organization-setup/)**: For committee heads and org admins managing the evaluation cycles.

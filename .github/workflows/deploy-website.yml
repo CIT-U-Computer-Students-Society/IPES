@@ -1,6 +1,11 @@
 name: Deploy IPES Static Website & Guides
 
 on:
+  pull_request:
+    branches: [dev, main]
+    paths:
+      - 'website/**'
+      - '.github/workflows/deploy-website.yml'
   push:
     branches:
       - main
@@ -39,6 +44,9 @@ jobs:
       - name: Build with Astro & Starlight
         run: npm --prefix website run build
 
+      - name: Verify published paths
+        run: npm --prefix website run check:paths
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -46,6 +54,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

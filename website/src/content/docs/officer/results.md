@@ -9,7 +9,7 @@ Once an evaluation cycle has concluded and administrators have officially **Rele
 
 ## The Performance Scorecard
 
-<img src="/images/annotated/officer/results-scorecard.svg" alt="Performance Results Scorecard Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/officer/results-scorecard.svg" alt="Performance Results Scorecard Annotated Interface" class="guide-screenshot" />
 
 ### Reading Your Visual Metrics
 
@@ -28,4 +28,4 @@ Once an evaluation cycle has concluded and administrators have officially **Rele
 Results are visible only after an administrator transitions the evaluation cycle from **Closed** to **Released**.
 :::
 
-Next, explore the [Administrator Guide](/admin/organization-setup/) if you have management responsibilities.
+Next, explore the [Administrator Guide](/IPES/admin/organization-setup/) if you have management responsibilities.
