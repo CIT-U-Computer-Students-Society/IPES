@@ -12,7 +12,9 @@ from django.db.models import Count, Avg, Q
 from django.utils import timezone
 
 from apps.audit.utils import log_action, AuditActions
-from apps.organizations.access import active_organization, is_organization_admin
+from apps.organizations.access import (
+    active_organization, is_organization_admin,
+)
 
 from ..models import (
     Organization, UnitType, OrganizationUnit, PositionType,
@@ -343,15 +345,15 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def unit_completion_stats(self, request):
         """
-        Get evaluation completion statistics by unit.
+        Get evaluation completion statistics by unit for the active
+        organization.
         """
         from apps.evaluations.models import EvaluationAssignment
 
-        org_id = request.query_params.get('organization_id')
-        if org_id:
-            units = OrganizationUnit.objects.filter(organization_id=org_id, is_active=True)
-        else:
-            units = OrganizationUnit.objects.filter(is_active=True)
+        org_id = active_organization(request)
+        units = OrganizationUnit.objects.filter(
+            organization_id=org_id, is_active=True
+        )
 
         stats = []
         for unit in units:
@@ -373,13 +375,17 @@ class OrganizationViewSet(viewsets.ModelViewSet):
                 continue
 
             assignments = EvaluationAssignment.objects.filter(
+                form_id__organization_id=org_id,
+                form_id__is_deleted=False,
                 evaluatee_id__in=member_user_ids
             )
 
             total = assignments.count()
             completed = assignments.filter(status='Completed').count()
 
-            completion_percentage = round((completed / total * 100), 1) if total > 0 else 0
+            completion_percentage = (
+                round((completed / total * 100), 1) if total > 0 else 0
+            )
 
             stats.append({
                 'unit_id': unit.id,
@@ -398,38 +404,34 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def analytics_summary(self, request):
         """
-        Get comprehensive analytics summary for the dashboard.
+        Get comprehensive analytics summary for the active organization
+        dashboard.
         """
         from apps.evaluations.models import EvaluationAssignment
-        from apps.users.models import User
 
-        org_id = request.query_params.get('organization_id')
+        org_id = active_organization(request)
 
-        if org_id:
-            units_qs = OrganizationUnit.objects.filter(organization_id=org_id, is_active=True)
-            memberships_qs = Membership.objects.filter(
-                unit_id__in=units_qs,
-                is_active=True
-            )
-        else:
-            memberships_qs = Membership.objects.filter(is_active=True)
-            units_qs = OrganizationUnit.objects.filter(
-                id__in=memberships_qs.values('unit_id'),
-                is_active=True
-            )
+        units_qs = OrganizationUnit.objects.filter(
+            organization_id=org_id, is_active=True
+        )
+        memberships_qs = Membership.objects.filter(
+            unit_id__in=units_qs,
+            is_active=True
+        )
 
         total_members = memberships_qs.values('user_id').distinct().count()
         total_units = units_qs.count()
+        total_users = OrganizationRole.objects.filter(
+            organization_id=org_id,
+            is_active=True
+        ).values('user_id').distinct().count()
 
-        total_users = User.objects.filter(is_active=True).count()
-
-        if org_id:
-            member_user_ids = memberships_qs.values_list('user_id', flat=True)
-            assignments = EvaluationAssignment.objects.filter(
-                evaluatee_id__in=member_user_ids
-            )
-        else:
-            assignments = EvaluationAssignment.objects.all()
+        member_user_ids = memberships_qs.values_list('user_id', flat=True)
+        assignments = EvaluationAssignment.objects.filter(
+            form_id__organization_id=org_id,
+            form_id__is_deleted=False,
+            evaluatee_id__in=member_user_ids
+        )
 
         total_assignments = assignments.count()
         completed_assignments = assignments.filter(status='Completed').count()
@@ -442,7 +444,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         )
 
         return Response({
-            'total_organizations': Organization.objects.filter(is_active=True).count(),
+            'total_organizations': 1,
             'total_units': total_units,
             'total_members': total_members,
             'total_users': total_users,
