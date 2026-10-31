@@ -423,7 +423,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         total_units = units_qs.count()
         total_users = OrganizationRole.objects.filter(
             organization_id=org_id,
-            is_active=True
+            is_active=True,
+            user__is_active=True
         ).values('user_id').distinct().count()
 
         member_user_ids = memberships_qs.values_list('user_id', flat=True)

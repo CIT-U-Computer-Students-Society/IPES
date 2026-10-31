@@ -302,3 +302,24 @@ class AnalyticsTenantScopingTests(APITestCase):
                 self.assertEqual(
                     response.status_code, status.HTTP_403_FORBIDDEN
                 )
+
+    def test_soft_deleted_users_excluded_from_total_users(self):
+        """
+        Soft-deleted users must not be counted in analytics total_users.
+        """
+        self.member_shared.is_active = False
+        self.member_shared.save()
+
+        self.client.force_authenticate(self.admin_a)
+        self.client.credentials(HTTP_X_ORGANIZATION_ID=str(self.org_a.id))
+        response = self.client.get(
+            f'{self.analytics_url}?organization_id={self.org_a.id}'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        roles_count = OrganizationRole.objects.filter(
+            organization_id=self.org_a.id,
+            is_active=True,
+            user__is_active=True,
+        ).values('user_id').distinct().count()
+        self.assertEqual(roles_count, 2)
+        self.assertEqual(response.data['total_users'], 2)
