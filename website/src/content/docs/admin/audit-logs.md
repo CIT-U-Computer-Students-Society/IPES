@@ -36,4 +36,4 @@ Clicking **View** on any audit log entry reveals the permanent JSON payload:
 
 This permanent audit trail ensures that questions regarding form deadlines, score releases, or membership privileges can always be verified with incontrovertible evidence.
 
-Explore the [Confidentiality & Anonymity Policy](/policies/anonymity/) to understand how IPES protects evaluator privacy.
+Explore the [Confidentiality & Anonymity Policy](/IPES/policies/anonymity/) to understand how IPES protects evaluator privacy.

@@ -9,7 +9,7 @@ The **Officer Dashboard** (`/member/dashboard`) is your mission control center i
 
 ## Dashboard Overview
 
-<img src="/images/annotated/officer/dashboard-overview.svg" alt="Officer Dashboard Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/officer/dashboard-overview.svg" alt="Officer Dashboard Annotated Interface" class="guide-screenshot" />
 
 ### Key Metrics Explained
 
@@ -32,4 +32,4 @@ The **Officer Dashboard** (`/member/dashboard`) is your mission control center i
 Evaluation assignments are confidential. Evaluatees cannot see who gave specific ratings or qualitative comments.
 :::
 
-Next, learn how to build and maintain your [Accomplishment Portfolio](/officer/accomplishments/).
+Next, learn how to build and maintain your [Accomplishment Portfolio](/IPES/officer/accomplishments/).

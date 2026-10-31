@@ -9,7 +9,7 @@ Once an evaluation cycle is active, administrators can track live completion pro
 
 ## 1. Tracking Real-Time Completion & Releasing Results
 
-<img src="/images/annotated/admin/cycle-release.svg" alt="Cycle Management and Results Release Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/admin/cycle-release.svg" alt="Cycle Management and Results Release Annotated Interface" class="guide-screenshot" />
 
 ### Cycle State Transitions
 
@@ -34,4 +34,4 @@ stateDiagram-v2
    - After verifying all accomplishment reviews and final tallies, click **Release Results**.
    - The system computes weighted averages, radar vectors, percentiles, and publishes anonymized scorecards to evaluated officers.
 
-Next, learn how to monitor security and compliance using the [System Audit Logs](/admin/audit-logs/).
+Next, learn how to monitor security and compliance using the [System Audit Logs](/IPES/admin/audit-logs/).

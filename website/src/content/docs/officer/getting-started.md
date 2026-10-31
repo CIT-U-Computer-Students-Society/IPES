@@ -11,7 +11,7 @@ Welcome to IPES! As a student officer or committee member, you will use IPES to 
 
 To access your evaluation assignments, navigate to the IPES application portal at [https://ipes.cc/login](https://ipes.cc/login).
 
-<img src="/images/annotated/officer/login-and-select-org.svg" alt="Sign In and Organization Selection Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/officer/login-and-select-org.svg" alt="Sign In and Organization Selection Annotated Interface" class="guide-screenshot" />
 
 ### Step-by-Step Instructions
 
@@ -44,4 +44,4 @@ Once an organization is selected, you will be taken to your **Officer Dashboard*
 - **Role Switcher**: If your membership grants administrative privileges in addition to officer duties, you will see a toggle in the top bar to switch between the **Officer View** and **Admin View**.
 - **Sign Out**: Click your user avatar in the top right corner and select **Log Out** to securely terminate your session.
 
-Next, explore how to monitor your evaluation progress on the [Officer Dashboard](/officer/dashboard/).
+Next, explore how to monitor your evaluation progress on the [Officer Dashboard](/IPES/officer/dashboard/).

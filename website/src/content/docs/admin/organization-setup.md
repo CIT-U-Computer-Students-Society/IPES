@@ -13,7 +13,7 @@ Navigate to **Organization Settings** (`/admin/organization`) to configure these
 
 Units represent functional subdivisions within your student body (e.g., *"Executive Board"*, *"Committee on Research"*, *"Ways and Means"*).
 
-<img src="/images/annotated/admin/units-and-positions.svg" alt="Admin Units and Positions Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/admin/units-and-positions.svg" alt="Admin Units and Positions Annotated Interface" class="guide-screenshot" />
 
 ### Structural Hierarchy Model
 
@@ -40,4 +40,4 @@ flowchart TD
 IPES enforces **soft deletes**. Deleting a unit deactivates it without deleting historical evaluation assignments or audit records from prior academic terms.
 :::
 
-Next, learn how to invite and manage [Members & Role Permissions](/admin/members-and-roles/).
+Next, learn how to invite and manage [Members & Role Permissions](/IPES/admin/members-and-roles/).

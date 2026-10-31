@@ -13,7 +13,7 @@ When administrators review an evaluation cycle, these verified accomplishments p
 
 To add an accomplishment to your portfolio, click the **+ Add Accomplishment** button on the top right of the page:
 
-<img src="/images/annotated/officer/accomplishment-form.svg" alt="Accomplishment Submission Modal Annotated Interface" class="guide-screenshot" />
+<img src="/IPES/images/annotated/officer/accomplishment-form.svg" alt="Accomplishment Submission Modal Annotated Interface" class="guide-screenshot" />
 
 ### Form Fields
 
@@ -46,4 +46,4 @@ Your submitted accomplishments are displayed in a clean tabular view with status
 | **Verified** (Green) | Approved by an administrator as authentic | None. This item is officially logged and factored into your record. |
 | **Rejected** (Red) | Not approved due to missing proof or insufficient detail | Click the item to read the administrator's rejection remarks, update your proof link, and resubmit. |
 
-Next, learn how to complete [Peer Evaluations](/officer/evaluations/).
+Next, learn how to complete [Peer Evaluations](/IPES/officer/evaluations/).

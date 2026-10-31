@@ -8,6 +8,7 @@ import mermaid from 'astro-mermaid';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://cit-u-computer-students-society.github.io',
+	base: '/IPES/',
 	vite: {
 		plugins: [tailwindcss()],
 	},

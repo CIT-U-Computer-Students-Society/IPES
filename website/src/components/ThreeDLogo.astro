@@ -134,7 +134,7 @@ interface Props {
     };
 
     // Load and build the 3D model from SVG vector paths
-    fetch('/ipes-logo-colored.svg')
+    fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/ipes-logo-colored.svg`)
       .then((res) => res.text())
       .then((svgText) => {
         const loader = new SVGLoader();
