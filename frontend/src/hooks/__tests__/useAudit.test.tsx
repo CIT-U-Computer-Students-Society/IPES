@@ -197,4 +197,18 @@ describe('formatAuditAction (#264)', () => {
       'User: Login (Campus Wi-Fi)'
     );
   });
+
+  it('preserves commas inside backend-emitted form title', () => {
+    expect(
+      formatAuditAction('evaluation.form_created (form_title=Annual Review, Q1, form_id=7)')
+    ).toBe('Evaluation: Form Created (Annual Review, Q1)');
+  });
+
+  it('retains target identity of membership update with changed fields', () => {
+    const result = formatAuditAction(
+      'membership.updated (membership_id=12, target_user_id=17, unit_id=4, position_id=3, fields=position_id)'
+    );
+    expect(result).toContain('target_user_id=17');
+    expect(result).toContain('fields: position_id');
+  });
 });

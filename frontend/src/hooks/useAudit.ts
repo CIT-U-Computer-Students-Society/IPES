@@ -39,7 +39,7 @@ export function formatAuditAction(rawAction: string): string {
   }
 
   const metadata: Record<string, string> = {};
-  const kvRegex = /(?:^|,\s*)([a-zA-Z0-9_]+)\s*=\s*([^,]+)/g;
+  const kvRegex = /(?:^|,\s*)([a-zA-Z0-9_]+)\s*=\s*(.*?)(?=(?:,\s*[a-zA-Z0-9_]+\s*=)|$)/g;
   let match: RegExpExecArray | null;
   let hasKeyValue = false;
 
@@ -80,18 +80,25 @@ export function formatAuditAction(rawAction: string): string {
   }
   if (userKey) {
     detailParts.push(metadata[userKey]);
+  } else if (metadata.target_user_id) {
+    detailParts.push(`target_user_id=${metadata.target_user_id}`);
+  } else if (metadata.membership_id) {
+    detailParts.push(`membership_id=${metadata.membership_id}`);
   }
   if (detailKey) {
     detailParts.push(metadata[detailKey]);
   }
 
-  if (detailParts.length === 0) {
-    const secondaryKeys = Object.keys(metadata).filter(
-      (k) => !k.endsWith('_id') && k !== 'id'
-    );
-    for (const k of secondaryKeys) {
-      detailParts.push(`${k}: ${metadata[k]}`);
-    }
+  const secondaryKeys = Object.keys(metadata).filter(
+    (k) =>
+      !k.endsWith('_id') &&
+      k !== 'id' &&
+      !['form_title', 'title', 'org_name', 'name', 'unit_name', 'position_name'].includes(k) &&
+      k !== userKey &&
+      k !== detailKey
+  );
+  for (const k of secondaryKeys) {
+    detailParts.push(`${k}: ${metadata[k]}`);
   }
 
   if (detailParts.length > 0) {
