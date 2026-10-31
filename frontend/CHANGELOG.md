@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.1.0](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.0.1...web-v3.1.0) (2026-10-31)
+
+
+### Features
+
+* **frontend:** integrate user guide navigation links and add capture script ([26bee1b](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/26bee1bff0c0e162a3a8e4b420c8ad6311c32ccc))
+
+
+### Bug Fixes
+
+* **audit:** preserve entity identities and metadata details in formatted event text ([b66d420](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/b66d420190419aa9b9dcd2d7e338013ac9575535)), closes [#264](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/264)
+* **audit:** preserve metadata commas and retain target identities in event text ([e75f138](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/e75f1385c077d5aaf44482cf67947b1ab84e6592))
+* **audit:** render request failure and retry action on audit query error ([fe233e3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/fe233e30acc98ced21be3a44104f850112681a9c)), closes [#265](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/265)
+* **audit:** traverse all pagination pages for audit logs and filtering ([c4a17b3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/c4a17b358a13ebb668e7451f042708e58842b68b)), closes [#258](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/258)
+* **evaluations:** exclude closed forms from member pending queue ([94480de](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/94480de1cf8b7512502cdf83e0ee620a637044e6)), closes [#237](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/237)
+* **evaluations:** traverse paginated assignment, form, and rule records across all pages ([7d4a1f3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/7d4a1f310ab4696494ef0ab6334f34d15bd8a050))
+* **organizations:** scope dashboard analytics cache keys to effective organization ([f3e1505](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f3e1505323bdc1dcc2119013384ca49a2aa8fbb3)), closes [#274](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/274)
+* **organizations:** traverse all API pagination pages for members and structure ([ac92ef7](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ac92ef797ecdfe90439fedcf2c171eb6a6162272)), closes [#273](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/273)
+* **portfolio:** persist and display verification comments on approved accomplishments ([47dbcba](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/47dbcba2375b227defe8d34145e010fab0a1e3b5)), closes [#251](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/251)
+* **portfolio:** render actionable error state on request failure with retry recovery ([12dd659](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/12dd659128a9f1d82a07250e5cb1f2dd4e89f9f1))
+* **portfolio:** reset unsaved draft notes on accomplishment review dialog cancel ([42b5a1f](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/42b5a1f3a3f4caf893c37407e8d4b9acc729f351)), closes [#247](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/247)
+* **portfolio:** restrict accomplishment deletion to owners and pending/rejected status with audit logging ([ec741f3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/ec741f304e5205673c34b8ee75b56fb956dbced1))
+* **portfolio:** traverse paginated accomplishment records across all pages ([1597076](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/1597076f2ca31b76a4dfece62c8a90e3f1e46e23))
+* **settings:** prefer authoritative cleared organization email over stale membership ([cdd7cc0](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/cdd7cc0a06834353f6952c1e9bc19e6f11aff2c0))
+* **users:** derive current membership synchronously from current user ([52060bd](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/52060bdbf58bd8a7ccd8512567eb8ab3825dcb64)), closes [#275](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/275)
+* **users:** invalidate unit and directory caches and derive role dialog state ([edbf982](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/edbf9820f671fdc8fcc97b80634bdffc9bc4d305)), closes [#276](https://github.com/CIT-U-Computer-Students-Society/IPES/issues/276)
+
 ## [3.0.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.0.0...web-v3.0.1) (2026-10-30)
 
 
