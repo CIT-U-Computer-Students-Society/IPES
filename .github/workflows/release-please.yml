@@ -23,7 +23,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Prepare combined component release PR
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN_IPES_CSS2627 || secrets.RELEASE_PLEASE_TOKEN || github.token }}
           target-branch: main
