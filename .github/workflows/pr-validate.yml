@@ -76,7 +76,7 @@ jobs:
           python -m coverage html
           python -m coverage xml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: backend-unit-coverage
@@ -115,7 +115,7 @@ jobs:
           npm run test:coverage
           npm run test:harness
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: frontend-unit-coverage
