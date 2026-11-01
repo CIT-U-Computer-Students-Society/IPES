@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Publish component releases merged into main
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           # Uses configured release PAT (with workflow scope) or falls back to GITHUB_TOKEN.
           github-token: ${{ secrets.RELEASE_PLEASE_TOKEN_IPES_CSS2627 || secrets.RELEASE_PLEASE_TOKEN || github.token }}
