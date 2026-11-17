@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.1.1...web-v3.1.2) (2026-11-17)
+
+
+### Build and Dependencies
+
+* **deps:** bump minimatch, eslint and typescript-eslint in /frontend ([640b533](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/640b5338f0f1343bb7f5284957779a4978ddfd6a))
+* **deps:** bump minimatch, eslint and typescript-eslint in /frontend ([7721b7f](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/7721b7f9fb44bbae5f21e8cb4cea4b694e326ff8))
+
 ## [3.1.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.1.0...web-v3.1.1) (2026-11-17)
 
 
