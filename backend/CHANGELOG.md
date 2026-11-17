@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.3](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/backend-v3.0.2...backend-v3.0.3) (2026-11-17)
+
+
+### Build and Dependencies
+
+* **deps-dev:** bump coverage from 7.17.0 to 7.17.2 in /backend ([edaa05e](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/edaa05eafbc09538b1903efd99a5ec2029523ec2))
+* **deps-dev:** bump coverage from 7.17.0 to 7.17.2 in /backend ([28ab948](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/28ab9483403d80664dfbe35ad9881aa02b25287a))
+* **deps:** update django requirement from &lt;6.2,&gt;=6.1.2 to &gt;=6.1.3,&lt;6.2 in /backend ([fb24306](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/fb243063f1e11454e23cd6f9b14c7abcacfd13ea))
+* **deps:** update django requirement in /backend ([28ceb1a](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/28ceb1ac71bf759ba5d05f5a33230fc2f1abef34))
+
 ## [3.0.2](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/backend-v3.0.1...backend-v3.0.2) (2026-10-31)
 
 
