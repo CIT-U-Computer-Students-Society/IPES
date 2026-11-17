@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.1.1](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.1.0...web-v3.1.1) (2026-11-17)
+
+
+### Build and Dependencies
+
+* **deps-dev:** bump @vitest/coverage-v8 from 5.0.3 to 5.1.0 in /frontend ([abf1451](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/abf1451c8610160bff7e41b202a949f769e430f9))
+* **deps-dev:** bump @vitest/coverage-v8 in /frontend ([c1b5381](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/c1b5381f9aa143671508322d70284533539e5e00))
+* **deps-dev:** bump jsdom from 29.0.1 to 31.0.1 in /frontend ([7f1ba02](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/7f1ba0238e5c9e1b214236cf88b876c455e0af83))
+* **deps-dev:** bump jsdom from 29.0.1 to 31.0.1 in /frontend ([2f45fa3](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/2f45fa3fc9c6e26d05ead047f76e2237a5d1b6a9))
+* **deps-dev:** bump typescript-eslint from 8.70.0 to 8.72.1 in /frontend ([436cf2c](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/436cf2c7c65fe1a0505fdb3df5b882adf3594942))
+* **deps-dev:** bump typescript-eslint in /frontend ([f3a2aba](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f3a2abab566e25c33ff52c4d7c72fc5eb57b260b))
+* **deps:** bump @tanstack/react-query from 5.101.4 to 5.105.3 in /frontend ([bc9e5e8](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/bc9e5e8d18fd29741452e4fc209e730fb69c9a5f))
+* **deps:** bump @tanstack/react-query in /frontend ([644cc29](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/644cc2911a8978f8e9087bd46129e06703c65108))
+* **deps:** bump react-router-dom from 7.18.2 to 7.18.5 in /frontend ([f715e36](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/f715e3634c0ff0cdcf59546dff032a55c9c735c5))
+* **deps:** bump react-router-dom from 7.18.2 to 7.18.5 in /frontend ([7cae8ac](https://github.com/CIT-U-Computer-Students-Society/IPES/commit/7cae8acb3bb90baeb75918f867e5ff761352601c))
+
 ## [3.1.0](https://github.com/CIT-U-Computer-Students-Society/IPES/compare/web-v3.0.1...web-v3.1.0) (2026-10-31)
 
 
