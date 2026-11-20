@@ -29,7 +29,7 @@
     "@lottiefiles/dotlottie-web": "^0.62.0",
     "@mantine/core": "9.7.4",
     "@mantine/hooks": "9.7.4",
-    "@mantine/notifications": "9.7.4",
+    "@mantine/notifications": "9.8.1",
     "@tanstack/react-query": "^5.105.3",
     "clsx": "^2.1.1",
     "lucide-react": "^1.46.0",
